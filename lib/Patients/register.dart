@@ -44,6 +44,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,);
     }
+    else if(int.parse(phoneController.text)<=8 && int.parse(phoneController.text)>=12){
+      print("numberphone salah");
+      Fluttertoast.showToast(msg: "Your Number does not fulfill the requirement"
+          "of phone number",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,);
+    }
     else{
       print("tak sikit");
       var url = Uri.http("192.168.8.186", '/teleclinic/register.php', {'q': '{http}'});
@@ -73,7 +80,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
         Navigator.push(context,
           MaterialPageRoute(
-            builder: (context) => successRegister(),
+            builder: (context) => SuccessRegisterScreen(),
           ),
         );
       }
@@ -369,50 +376,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
 
 
-            //   Padding(
-            //     padding: const EdgeInsets.all(16.0),
-            //     child: TextField(
-            //       controller: passwordController,
-            //       decoration: const InputDecoration(
-            //         labelText: 'password',
-            //       ),
-            //     ),
-            //   ),
-            //   ElevatedButton(
-            //     onPressed: () {
-            //       String username = usernameController.text;
-            //       String password = passwordController.text;
-            //
-            //       if (username == 'test' && password == 'abc') {
-            //         Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //             builder: (context) => test(),
-            //           ),
-            //         );
-            //       } else {
-            //         showDialog(
-            //           context: context,
-            //           builder: (context) {
-            //             return AlertDialog(
-            //               title: const Text('Login Failed'),
-            //               content: const Text('Invalid'),
-            //               actions: [
-            //                 TextButton(
-            //                   child: const Text('oke'),
-            //                   onPressed: () {
-            //                     Navigator.pop(context);
-            //                   },
-            //                 ),
-            //               ],
-            //             );
-            //           },
-            //         );
-            //       }
-            //     },
-            //     child: const Text('Login'),
-            //   ),
-
           ],
         ),
 
@@ -426,24 +389,109 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
 
 
-class successRegister extends StatefulWidget {
-  const successRegister({super.key});
+class SuccessRegisterScreen extends StatefulWidget {
+  const SuccessRegisterScreen({super.key});
 
   @override
-  State<successRegister> createState() => _successRegisterState();
+  State<SuccessRegisterScreen> createState() => _SuccessRegisterState();
 }
 
-class _successRegisterState extends State<successRegister> {
+class _SuccessRegisterState extends State<SuccessRegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('test'),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 9.0, top: 150),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'asset/done1.png',
+                          width: 120,
+                          height: 120,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 100, left: 90.0),
+                        child: SizedBox(width: 10),
+                      ),
+                      Text(
+                        "Congratulations!",
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 30,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 40,),
+                        child: SizedBox(width: 10),
+                      ),
+                      Text(
+                        "You Have Successfully Registered",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+             Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context, MaterialPageRoute(builder: (context) => LoginScreen(),));
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
+                          ),
+                          backgroundColor: Color(hexColor('#024362')), // Set your preferred background color
+                        ),
+                        child: Text('Proceed to Login',
+                          style:TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,                  ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+        ],
       ),
     );
   }
 }
-
 
 
 
