@@ -22,6 +22,9 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscureText= true;
+  bool _isPasswordEightCharacters = false;
+  bool _havePasswordConstraints = false;
+  bool _passwordTotalConstraints = false;
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -32,6 +35,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         || passwordController.text.isEmpty){
       print("dapat sikit");
       Fluttertoast.showToast(msg: "both cannot field",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,);
+    }
+    else if(!_passwordTotalConstraints ){
+      print("password salah");
+      Fluttertoast.showToast(msg: "Your Password does not fulfill the requirement",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,);
     }
@@ -71,6 +80,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+
+  onPasswordChanged(String password){
+
+    final numericRegex = RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])'
+                                r'(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
+    setState(() {
+      _isPasswordEightCharacters = false;
+      if(password.length >=8){
+        _isPasswordEightCharacters = true;
+      }
+
+      _havePasswordConstraints = false;
+      if(numericRegex.hasMatch(password)){
+        _havePasswordConstraints=true;
+      }
+
+      _passwordTotalConstraints = false;
+      if(_isPasswordEightCharacters == true &&
+          _havePasswordConstraints == true){
+
+        _passwordTotalConstraints = true;
+      }
+    });
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,34 +192,79 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 )
             ),
 
-            Container(
-                padding: EdgeInsets.all(20),
-                child: Column(  //column untuk letak icon and textfield
-                  children: [
-                    TextField(
-                      controller: passwordController,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: Icon(Icons.lock),
-                        suffixIcon: GestureDetector(
-                          onTap: (){
-                            setState(() {
-                              _obscureText = !_obscureText;
-                            });
-                          },
-                          child:Icon(!_obscureText? Icons.visibility:
-                          Icons.visibility_off ),
-                        ),
-                        border: loginInputBorder(),
-                        enabledBorder: loginInputBorder(),
-                        focusedBorder: loginFocusedBorder(),
-                      ) ,
-                      obscureText: _obscureText,
-                    )
-
-                  ],
-                )
+      Container(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          children: [
+            TextField(
+              onChanged: (password) => onPasswordChanged(password),
+              controller: passwordController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                prefixIcon: Icon(Icons.lock),
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _obscureText = !_obscureText;
+                    });
+                  },
+                  child: Icon(!_obscureText ? Icons.visibility : Icons.visibility_off),
+                ),
+                border: loginInputBorder(),
+                enabledBorder: loginInputBorder(),
+                focusedBorder: loginFocusedBorder(),
+              ),
+              obscureText: _obscureText,
             ),
+            SizedBox(height: 1),
+            Row(
+              children: [
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 500),
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: _isPasswordEightCharacters
+                        ? Colors.green
+                        : Colors.transparent,
+                    border: _isPasswordEightCharacters
+                        ? Border.all(color: Colors.transparent)
+                        : Border.all(color: Colors.grey.shade400),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: Center(child: Icon(Icons.check, color: Colors.white, size: 15)),
+                ),
+                SizedBox(width: 10),
+                Text("Contains at least 8 characters")
+              ],
+            ),
+            SizedBox(height: 1),
+            Row(
+              children: [
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 500),
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: _havePasswordConstraints
+                        ? Colors.green
+                        : Colors.transparent,
+                    border: _havePasswordConstraints
+                        ? Border.all(color: Colors.transparent)
+                        : Border.all(color: Colors.grey.shade400),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: Center(child: Icon(Icons.check, color: Colors.white, size: 15)),
+                ),
+                SizedBox(width: 10),
+                Text(" At least uppercase and lowercase, 1 digit, 1 symbol")
+              ],
+            ),
+            SizedBox(height: 10),  // Add space between the two rows
+            // Add more Rows for other indicators if needed
+          ],
+        ),
+      ),
 
             // SizedBox(height: 30),
             // Padding(
