@@ -142,40 +142,41 @@ class _eMedicalRecordScreenState extends State<eMedicalRecordScreen> {
                     fontWeight: FontWeight. bold,
                     textStyle: const TextStyle(fontSize: 38, color:Colors.black),),),
               ),
-      SizedBox(
-        width: 874,
-        height: 404.0,
-        child: Container(
-            margin: EdgeInsets.all(8),
-            // alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.blueAccent),
-              borderRadius: BorderRadius.all(
-                  Radius.circular(24.0) ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blueGrey,
-                  offset: const Offset(
-                    5.0,
-                    5.0,
-                  ),
-                  blurRadius: 10.0,
-                  spreadRadius: 2.0,
-                ), //BoxShadow
-                BoxShadow(
-                  color: Colors.white,
-                  offset: const Offset(0.0, 0.0),
-                  blurRadius: 0.0,
-                  spreadRadius: 0.0,
-                ), //BoxShadow
-              ],//                 <--- border radius here
+          SizedBox(
+            width: 874,
+            height: 404.0,
+            child: Container(
+                margin: EdgeInsets.all(8),
+                // alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blueAccent),
+                  borderRadius: BorderRadius.all(
+                      Radius.circular(24.0) ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blueGrey,
+                      offset: const Offset(
+                        5.0,
+                        5.0,
+                      ),
+                      blurRadius: 10.0,
+                      spreadRadius: 2.0,
+                    ), //BoxShadow
+                    BoxShadow(
+                      color: Colors.white,
+                      offset: const Offset(0.0, 0.0),
+                      blurRadius: 0.0,
+                      spreadRadius: 0.0,
+                    ), //BoxShadow
+                  ],//                 <--- border radius here
+                ),
             ),
+          ),
+            ]
         ),
-      ),
-            ]),
 
       ), //<---
-      );
+    );
 
 
 
