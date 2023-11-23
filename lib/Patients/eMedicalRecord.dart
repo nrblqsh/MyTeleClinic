@@ -50,78 +50,132 @@ class _eMedicalRecordScreenState extends State<eMedicalRecordScreen> {
       backgroundColor: Colors.white,
       title: Center(child: Image.asset(
         "asset/MYTeleClinic.png",
-        width: 394,
+        width: 594,
         height: 258,
       ),
       ),
     ),
       body: Container(
-        padding: EdgeInsets.all(7),
+        padding: EdgeInsets.all(15),
         child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(14.0),
+               padding: const EdgeInsets.only(right: 500,top:25),
                 child: Text("Vital Info",
                   style: GoogleFonts.roboto(
                     fontWeight: FontWeight. bold,
-                    textStyle: const TextStyle(fontSize: 32, color:Colors.black),),),
+                    textStyle: const TextStyle(fontSize: 38, color:Colors.black),),),
               ), //<------------
-              Expanded(
-                child:SizedBox(
-                  width: 874,
-                  height: 1.0,
-                  child: Container(
-                    margin: EdgeInsets.all(24),
-                    padding: EdgeInsets.only(top: 18),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.blueAccent),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(24.0) ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blueGrey,
-                          offset: const Offset(
-                            5.0,
-                            5.0,
+              // Expanded(
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 778,
+                    height: 400.0,
+                    child: Container(
+                      padding: EdgeInsets.all(24),
+                      // alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.blueAccent),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(24.0) ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blueGrey,
+                            offset: const Offset(
+                              5.0,
+                              5.0,
+                            ),
+                            blurRadius: 10.0,
+                            spreadRadius: 2.0,
+                          ), //BoxShadow
+                          BoxShadow(
+                            color: Colors.white,
+                            offset: const Offset(0.0, 0.0),
+                            blurRadius: 0.0,
+                            spreadRadius: 0.0,
+                          ), //BoxShadow
+                        ],//                 <--- border radius here
+                        ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(3.0),
+                        child: GridView.builder(
+                          itemCount: _infos.length,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount:3,
+                              mainAxisSpacing: 1.0,
+                              crossAxisSpacing: 50.0,
                           ),
-                          blurRadius: 10.0,
-                          spreadRadius: 2.0,
-                        ), //BoxShadow
-                        BoxShadow(
-                          color: Colors.white,
-                          offset: const Offset(0.0, 0.0),
-                          blurRadius: 0.0,
-                          spreadRadius: 0.0,
-                        ), //BoxShadow
-                      ],//                 <--- border radius here
-                      ),
-                    child: GridView.builder(
-                      itemCount: _infos.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount:3),
-                      itemBuilder: (context,index){
-                        return ListTile(
-                          title: Image.network(_infos[index]["Image"]!,
-                            width: 100,height: 100,),
-                          subtitle: Column(
-                            children: [
-                              Text(_infos[index]["Info"]!,
-                                style: const TextStyle(fontSize: 24, color:Colors.black),),
-                            ],
-                          ),
+                          itemBuilder: (context,index){
+                            return ListTile(
+                                title: Row(
+                                  children: [
+                                    Image.network(_infos[index]["Image"]!,
+                                            width: 90,height: 90,),
+                                  ],
+                                ),
 
-                        );
-                      }, ),
+                                subtitle:
+                                 Row(
+                                   children: [
+                                     Column(
+                                       children: [
+                                          Text(_infos[index]["Info"]!,
+                                                    style: const TextStyle(fontSize: 16, color:Colors.black),),
+                                       ],
+                                     ),
+                                   ],
+                                 ),
+
+
+                            );
+                          }, ),
+                      ),
+                    ),
+
                   ),
                 ),
+              Padding(
+                padding: const EdgeInsets.only(right: 300,top:14),
+                child: Text("Consultation History",
+                  style: GoogleFonts.roboto(
+                    fontWeight: FontWeight. bold,
+                    textStyle: const TextStyle(fontSize: 38, color:Colors.black),),),
               ),
-            ]),
+      SizedBox(
+        width: 874,
+        height: 404.0,
+        child: Container(
+            margin: EdgeInsets.all(8),
+            // alignment: Alignment.center,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.blueAccent),
+              borderRadius: BorderRadius.all(
+                  Radius.circular(24.0) ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.blueGrey,
+                  offset: const Offset(
+                    5.0,
+                    5.0,
+                  ),
+                  blurRadius: 10.0,
+                  spreadRadius: 2.0,
+                ), //BoxShadow
+                BoxShadow(
+                  color: Colors.white,
+                  offset: const Offset(0.0, 0.0),
+                  blurRadius: 0.0,
+                  spreadRadius: 0.0,
+                ), //BoxShadow
+              ],//                 <--- border radius here
+            ),
+        ),
       ),
+            ]),
 
-
-
-    );
+      ), //<---
+      );
 
 
 
