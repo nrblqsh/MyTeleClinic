@@ -46,10 +46,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
     else if(int.parse(phoneController.text)<=8 && int.parse(phoneController.text)>=12){
       print("numberphone salah");
-      Fluttertoast.showToast(msg: "Your Number does not fulfill the requirement"
-          "of phone number",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Invalid Phone Number'),
+            content: const Text('Your Number does not fulfill the requirement'),
+            actions: [
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+        },
+      );
     }
     else{
       print("tak sikit");
@@ -64,11 +77,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
       var data = json.decode(response.body);
       if (data == "error") {
         print("test");
-        Fluttertoast.showToast(
-          backgroundColor: Colors.orange,
-          textColor: Colors.white,
-          msg: 'User already exists!',
-          toastLength: Toast.LENGTH_SHORT,
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('User already Exist!'),
+              content: const Text('Login your account'),
+              actions: [
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            );
+          },
         );
       } else {
         print("tah");

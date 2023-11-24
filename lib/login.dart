@@ -5,6 +5,8 @@ import 'package:my_teleclinic/Specialists/specialist_home.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'Patients/resetPassword.dart';
+
 void main() {
   runApp(const MaterialApp(
     home: LoginScreen(),
@@ -263,41 +265,27 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
 
-
-            //   SizedBox(),
-            //  GestureDetector(
-            //   onTap:()
-            //   {
-            //     setState(() {
-            //       login();
-            //     });
-            //   },
-            //   child:Container(
-            //     alignment: Alignment.center,
-            //     width: 300,
-            //     height: 50,
-            //     decoration: BoxDecoration(
-            //       borderRadius: BorderRadius.circular(50),
-            //       color: Color(hexColor('C73B3B')),
-            //     ),
-            //     child: Text('Login', style:
-            //     TextStyle(color: Colors.white,
-            //         fontFamily: 'Inter',
-            //         fontWeight: FontWeight.w700,
-            //         fontSize: 18,
-            //         ),),
-            //   )
-            // ),
-
-            SizedBox(height: 16),
-            Text(
-              'Forgot Password?',
-              style: TextStyle(
-                  color: Color(
-                    hexColor('#024362'),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ResetPasswordScreen(),
                   ),
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w700
+                ); // go to register screen
+              },
+              child: Column(
+                children: [
+                  SizedBox(height: 16),
+                  Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      color: Color(hexColor('#024362')),
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
             ),
 
@@ -343,6 +331,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
+
+
+
+
 
 OutlineInputBorder loginInputBorder(){
   return OutlineInputBorder(
