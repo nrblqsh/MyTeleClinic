@@ -48,42 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
       print("tak dapat");
       var url = Uri.http(
           "192.168.8.186", '/teleclinic/login.php', {'q': '{http}'});
-      // var url = Uri.parse('http://192.168.0.179/workshop2/test.php');
-//       var response = await http.post(url , body: {
-//         "phone" : phoneController.text,
-//         "password" : passwordController.text,
-//
-//       }
-//       );
-// print("Status code: ${response.statusCode}");
-//
-//       var data = json.decode(response.body);
-//       if(data == "success"){
-//         print("test");
-//         Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
-//       }
-//
-//       else{
-//
-//         print("tah la");
-//         showDialog(context: context,
-//             builder: (context){
-//           return AlertDialog(
-//             title: const Text('Login Failed'),
-//             content: const Text('Invalid username or password'),
-//             actions: [
-//               TextButton(child:
-//               const Text('OK'),
-//                   onPressed:(){
-//                 Navigator.pop(context);
-//                 },
-// 	       )
-//               ],
-//              );
-//             }
-//           );
-//       }
-//     } //else
 
       try {
         var response = await http.post(url, body: {
@@ -93,9 +57,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
         var data = json.decode(response.body);
         if (data.toString() == "success patients") {
+          String patientName = data['patientName'];
           print("test");
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => PatientHomePage(),));
+              context, MaterialPageRoute(builder: (context) =>
+              PatientHomePage(patientName:patientName),));
+
         } else if (data.toString() == "success specialist") {
           print("doctor masuk");
           Navigator.push(

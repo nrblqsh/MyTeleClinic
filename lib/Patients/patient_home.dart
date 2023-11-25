@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:my_teleclinic/login.dart';
 
 void main(){
   runApp(const MaterialApp(
-    home: PatientHomePage(),
+    home: PatientHomePage(patientName: '',),
   ));
 }
 class PatientHomePage extends StatefulWidget {
-  const PatientHomePage({super.key});
+  final String patientName;
+  const PatientHomePage({Key? key, required this.patientName});
 
   @override
   State<PatientHomePage> createState() => _PatientHomePageState();
@@ -17,7 +19,7 @@ class _PatientHomePageState extends State<PatientHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Welcome Patient"),
+        title: Text("Welcome ${widget.patientName}"),
       ),
     );
   }

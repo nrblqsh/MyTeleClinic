@@ -170,11 +170,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       appBar: AppBar(
         toolbarHeight: 70,
         backgroundColor: Colors.white,
-        leading: BackButton(
-          color: Colors.blue,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
           onPressed: () {
             Navigator.pop(context);
           },
+          color: Colors.blue,
         ),
         title: Center(
           child: Image.asset(
@@ -184,9 +185,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           ),
         ),
       ),
-
-
-
 
   body: SingleChildScrollView(
         child:
