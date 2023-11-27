@@ -3,6 +3,7 @@ import 'package:my_teleclinic/Patients/register.dart';
 import 'package:my_teleclinic/Patients/patient_home.dart';
 import 'package:my_teleclinic/Specialists/specialist_home.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import 'Patients/resetPassword.dart';
@@ -56,13 +57,21 @@ class _LoginScreenState extends State<LoginScreen> {
         });
 
         var data = json.decode(response.body);
-        if (data.toString() == "success patients") {
-          String patientName = data['patientName'];
-          print("test");
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) =>
-              PatientHomePage(patientName:patientName),));
+        if (data["status"] == "success patients" ) {
+          // Login successful for patient, extract patient name
+          String patientName = data["patientName"];
 
+          final SharedPreferences pref = await SharedPreferences.getInstance();
+          await pref.setString("phone", phoneController.text);
+          await pref.setString("password", passwordController.text);
+          await pref.setString("patientName", patientName); // Save patient name in SharedPreferences
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PatientHomePage(phone: phoneController.text, patientName: patientName),
+            ),
+          );
         } else if (data.toString() == "success specialist") {
           print("doctor masuk");
           Navigator.push(
