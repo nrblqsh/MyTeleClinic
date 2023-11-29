@@ -5,7 +5,6 @@ import 'package:my_teleclinic/Specialists/specialist_home.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-
 import 'Patients/resetPassword.dart';
 
 void main() {
@@ -60,13 +59,14 @@ class _LoginScreenState extends State<LoginScreen> {
         if (data["status"] == "success patients" ) {
           // Login successful for patient, extract patient name
           String patientName = data["patientName"];
-          String patientID = data["patientID"];
+          int patientID = int.parse(data["patientID"]);
 
           final SharedPreferences pref = await SharedPreferences.getInstance();
           await pref.setString("phone", phoneController.text);
           await pref.setString("password", passwordController.text);
           await pref.setString("patientName", patientName);
-          await pref.setString("patientID", patientID);// Save patient name in SharedPreferences
+          await pref.setInt("patientID", patientID);//
+          // Save patient name in SharedPreferences
 
           Navigator.push(
             context,
