@@ -4,8 +4,10 @@ import 'package:my_teleclinic/Patients/settings.dart';
 class PatientHomePage extends StatefulWidget {
   final String phone;
   final String patientName;
+  final String patientID;
 
-  PatientHomePage({required this.phone, required this.patientName});
+  PatientHomePage({required this.phone, required this.patientName,
+    required this.patientID});
 
   @override
   State<PatientHomePage> createState() => _PatientHomePageState();
@@ -14,6 +16,7 @@ class PatientHomePage extends StatefulWidget {
 class _PatientHomePageState extends State<PatientHomePage> {
   late String phone; // To store the retrieved phone number
   late String patientName;
+  late String patientID;
 
   @override
   void initState() {
@@ -26,6 +29,7 @@ class _PatientHomePageState extends State<PatientHomePage> {
     setState(() {
       phone = widget.phone;
       patientName = widget.patientName;
+      patientID = widget.patientID;
     });
   }
 
@@ -51,7 +55,8 @@ class _PatientHomePageState extends State<PatientHomePage> {
                   builder: (context) {
                     return AlertDialog(
                       title: Text("Username"),
-                      content: Text("Your username is: $patientName"),
+                      content: Text("Your username and patientID is: "
+                          "$patientName, patient ID: $patientID"),
                       actions: [
                         TextButton(
                           onPressed: () {

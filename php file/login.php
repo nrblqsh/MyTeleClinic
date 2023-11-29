@@ -17,11 +17,24 @@ $result_specialist = mysqli_query($db, $sql_specialist);
 $count_specialist = mysqli_num_rows($result_specialist);
 
 if ($count == 1) {
-    echo json_encode("success patients");
-} else if($count_specialist==1){
+
+    // Fetch patient details including patientName
+    $row = mysqli_fetch_assoc($result_patient);
+    $patientName = $row['patientName'];
+    $patientID = $row['patientID'];
+
+
+    // Create an associative array to send as JSON response
+    $response = array(
+        "status" => "success patients",
+        "patientName" => $patientName,
+        "patientID" => $patientID
+    );
+
+    echo json_encode($response);
+} else if ($count_specialist == 1) {
     echo json_encode("success specialist");
-}
-else {
+} else {
     echo json_encode("error");
 }
 ?>

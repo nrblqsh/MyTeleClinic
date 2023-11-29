@@ -60,22 +60,26 @@ class _LoginScreenState extends State<LoginScreen> {
         if (data["status"] == "success patients" ) {
           // Login successful for patient, extract patient name
           String patientName = data["patientName"];
+          String patientID = data["patientID"];
 
           final SharedPreferences pref = await SharedPreferences.getInstance();
           await pref.setString("phone", phoneController.text);
           await pref.setString("password", passwordController.text);
-          await pref.setString("patientName", patientName); // Save patient name in SharedPreferences
+          await pref.setString("patientName", patientName);
+          await pref.setString("patientID", patientID);// Save patient name in SharedPreferences
 
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PatientHomePage(phone: phoneController.text, patientName: patientName),
+              builder: (context) => PatientHomePage(phone: phoneController.text,
+                  patientName: patientName, patientID: patientID),
             ),
           );
         } else if (data.toString() == "success specialist") {
           print("doctor masuk");
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Specialist_Home_Screen(),));
+              context, MaterialPageRoute(builder: (context) =>
+              Specialist_Home_Screen(),));
         }
         else {
           print("tah la");
