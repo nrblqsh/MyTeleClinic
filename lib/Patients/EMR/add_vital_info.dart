@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:my_teleclinic/Patients/EMR/blood_glucose.dart';
 import '../../Controller/request_controller.dart';
+//import 'package:connectivity/connectivity.dart';
+
 
 void main() {
   runApp(MaterialApp(
@@ -17,6 +19,8 @@ class VitalInfo {
   final double bloodGlucose;
   final double heartRate;
   final String date;
+
+
 
   VitalInfo(
       this.weight,
@@ -42,11 +46,14 @@ class VitalInfo {
     'waistCircumference': waistCircumference,  'bloodPressure': bloodPressure,
     'bloodGlucose': bloodGlucose,  'heartRate': heartRate, 'latestDate': date};
 
+
   Future<bool> save() async {
     RequestController req = RequestController(path: "/teleclinic/vitalInfo.php");
     req.setBody(toJson());
     await req.post();
     return req.status() == 200;
+
+
   }
 
   static Future<List<VitalInfo>> loadAll() async {
@@ -103,8 +110,7 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
         double.parse(bloodPressure),
         double.parse(bloodGlucose),
         double.parse(heartRate),
-        dateController.text,
-      );
+        dateController.text);
 
       if (await vitalInfo.save()) {
         setState(() {
