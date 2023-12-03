@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
     else {
       print("tak dapat");
       var url = Uri.http(
-          "192.168.8.186", '/teleclinic/login.php', {'q': '{http}'});
+          "192.168.182.198", '/teleclinic/login.php', {'q': '{http}'});
 
       try {
         var response = await http.post(url, body: {

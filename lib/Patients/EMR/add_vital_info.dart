@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:my_teleclinic/Patients/EMR/blood_glucose.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/request_controller.dart';
 //import 'package:connectivity/connectivity.dart';
 
 
 void main() {
   runApp(MaterialApp(
-    home: AddVitalInfoScreen(),
+    home: AddVitalInfoScreen( patientID: 0 ),
   ));
 }
 
@@ -19,7 +20,7 @@ class VitalInfo {
   final double bloodGlucose;
   final double heartRate;
   final String date;
-
+  final int patientID;
 
 
   VitalInfo(
@@ -29,11 +30,12 @@ class VitalInfo {
       this.bloodGlucose,
       this.heartRate,
       this.waistCircumference,
-      this.date,
+      this.date, this.patientID,
       );
 
   VitalInfo.fromJson(Map<String, dynamic> json)
-      : weight = json['weight'],
+      : patientID = int.parse(json['patientID'].toString()),
+        weight = json['weight'],
         height = json['height'],
         waistCircumference = json['waistCircumference'],
         bloodGlucose = json['bloodGlucose'],
@@ -42,18 +44,16 @@ class VitalInfo {
         date = json['latestDate'];
 
   // toJson will be automatically called by jsonEncode when necessary
-  Map<String, dynamic> toJson() => {'weight': weight, 'height': height,
+  Map<String, dynamic> toJson() => {'patientID': patientID,'weight': weight, 'height': height,
     'waistCircumference': waistCircumference,  'bloodPressure': bloodPressure,
     'bloodGlucose': bloodGlucose,  'heartRate': heartRate, 'latestDate': date};
 
 
   Future<bool> save() async {
-    RequestController req = RequestController(path: "/teleclinic/vitalInfo.php");
+    RequestController req = RequestController(path: "/teleclinic/vitalInfo.php?");
     req.setBody(toJson());
     await req.post();
     return req.status() == 200;
-
-
   }
 
   static Future<List<VitalInfo>> loadAll() async {
@@ -70,17 +70,23 @@ class VitalInfo {
 }
 
 class AddVitalInfoScreen extends StatefulWidget {
+  final int patientID;
+
+  AddVitalInfoScreen({required this.patientID});
+
   @override
   _AddVitalInfoScreenState createState() => _AddVitalInfoScreenState();
 }
 
 class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
+  late int patientID;
   final List<VitalInfo> weights = [];
   final List<VitalInfo> heights = [];
   final List<VitalInfo> waistCircumferences = [];
   final List<VitalInfo> bloodGlucoses = [];
   final List<VitalInfo> bloodPressures = [];
   final List<VitalInfo> heartRates = [];
+  TextEditingController patientIDController = TextEditingController();
   TextEditingController waistCircumferenceController = TextEditingController();
   TextEditingController weightController = TextEditingController();
   TextEditingController heightController = TextEditingController();
@@ -88,6 +94,58 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
   TextEditingController bloodPressureController = TextEditingController();
   TextEditingController heartRateController = TextEditingController();
   TextEditingController dateController = TextEditingController();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      RequestController req = RequestController(
+        path: "/api/timezone/Asia/Kuala_Lumpur",
+        server: "http://worldtimeapi.org",
+      );
+      req.get().then((value) {
+        dynamic res = req.result();
+        dateController.text =
+            res["date"].toString().substring(0, 19).replaceAll('T', '');
+      });
+    //super.initState();
+    _loadData();
+      //patientID.addAll(await VitalInfo.loadAll());
+      weights.addAll(await VitalInfo.loadAll());
+      heights.addAll(await VitalInfo.loadAll());
+      waistCircumferences.addAll(await VitalInfo.loadAll());
+      bloodPressures.addAll(await VitalInfo.loadAll());
+      bloodGlucoses.addAll(await VitalInfo.loadAll());
+      heartRates.addAll(await VitalInfo.loadAll());
+    });
+  }
+
+  _selectDate() async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        // Format the picked date to display only the date part
+        dateController.text =
+        "${pickedDate.year}-${pickedDate.month}-${pickedDate.day}";
+      });
+    }
+  }
+
+
+  Future<void> _loadData()  async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+     int storedID = prefs.getInt("patientID") ?? 0;
+
+    setState(() {
+      patientID = storedID;
+      patientIDController.text = patientID.toString();
+    });
+  }
 
   Future<void> _addVitalInfo() async {
     String weight = weightController.text.trim();
@@ -110,7 +168,7 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
         double.parse(bloodPressure),
         double.parse(bloodGlucose),
         double.parse(heartRate),
-        dateController.text);
+        dateController.text, int.parse(patientIDController.text));
 
       if (await vitalInfo.save()) {
         setState(() {
@@ -589,42 +647,5 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      RequestController req = RequestController(
-        path: "/api/timezone/Asia/Kuala_Lumpur",
-        server: "http://worldtimeapi.org",
-      );
-      req.get().then((value) {
-        dynamic res = req.result();
-        dateController.text =
-            res["date"].toString().substring(0, 19).replaceAll('T', '');
-      });
-      weights.addAll(await VitalInfo.loadAll());
-      heights.addAll(await VitalInfo.loadAll());
-      waistCircumferences.addAll(await VitalInfo.loadAll());
-      bloodPressures.addAll(await VitalInfo.loadAll());
-      bloodGlucoses.addAll(await VitalInfo.loadAll());
-      heartRates.addAll(await VitalInfo.loadAll());
-    });
-  }
 
-  _selectDate() async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-
-    if (pickedDate != null) {
-      setState(() {
-        // Format the picked date to display only the date part
-        dateController.text =
-        "${pickedDate.year}-${pickedDate.month}-${pickedDate.day}";
-      });
-    }
-  }
 }

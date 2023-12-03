@@ -72,7 +72,7 @@ class _PatientHomePageState extends State<PatientHomePage> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AddVitalInfoScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddVitalInfoScreen( patientID: patientID)));
                 // Add the functionality for the new button here
                 // For example, you can navigate to another screen or perform some action
                 // Replace the code inside onPressed with your desired functionality

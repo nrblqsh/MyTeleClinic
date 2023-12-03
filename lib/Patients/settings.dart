@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_teleclinic/login.dart';
 
 import 'editProfile.dart';
-import 'editProfile1.dart';
+//import 'editProfile1.dart';
 
 void main(){
   runApp( MaterialApp(
