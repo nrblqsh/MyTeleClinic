@@ -44,7 +44,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,);
     }
-    else if(int.parse(phoneController.text)<=8 && int.parse(phoneController.text)>=12){
+    else if(int.parse(phoneController.text)<=8 &&
+        int.parse(phoneController.text)>=12){
       print("numberphone salah");
       showDialog(
         context: context,

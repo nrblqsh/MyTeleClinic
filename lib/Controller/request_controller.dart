@@ -5,48 +5,59 @@ class RequestController {
   String path;
   String server;
   http.Response? _res;
-  final Map<dynamic,dynamic> _body = {};
-  final Map<String,String> _headers = {};
+  final Map<dynamic, dynamic> _body = {};
+  final Map<String, String> _headers = {};
   dynamic _resultData;
 
-  RequestController ({required this.path, this.server = "http://192.168.8.186"});
+  RequestController({required this.path, this.server = "http://192.168.8.186"});
 
-  setBody (Map<String, dynamic> data){
+  setBody(Map<String, dynamic> data) {
     _body.clear();
     _body.addAll(data);
-    _headers["Content-Type"]="application/json; charset=UTF-8";
+    _headers["Content-Type"] = "application/json; charset=UTF-8";
   }
 
-  Future<void>post() async{
+  Future<void> post() async {
     _res = await http.post(
-      Uri.parse(server + path), headers: _headers, body: jsonEncode(_body),
+      Uri.parse(server + path),
+      headers: _headers,
+      body: jsonEncode(_body),
     );
     _parseResult();
   }
 
-  Future<void> get() async{
+  Future<void> get() async {
     _res = await http.get(
-      Uri.parse (server + path), headers:_headers,
+      Uri.parse(server + path),
+      headers: _headers,
     );
     _parseResult();
   }
 
-  void _parseResult(){
+  Future<void> put() async {
+    _res = await http.put(
+      Uri.parse(server + path),
+      headers: _headers,
+      body: jsonEncode(_body),
+    );
+    _parseResult();
+  }
 
-    try{
+  void _parseResult() {
+    try {
       print("raw response: ${_res?.body}");
-      _resultData = jsonDecode(_res?.body??"");
-    }catch(ex){
+      _resultData = jsonDecode(_res?.body ?? "");
+    } catch (ex) {
       _resultData = _res?.body;
-      print ("exception in http result parsing ${ex}");
+      print("exception in http result parsing ${ex}");
     }
   }
 
-  dynamic result(){
+  dynamic result() {
     return _resultData;
   }
 
-  int status(){
+  int status() {
     return _res?.statusCode ?? 0;
   }
 }

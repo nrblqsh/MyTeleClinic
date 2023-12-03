@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:my_teleclinic/Patients/settings.dart';
 
+import 'EMR/add_vital_info.dart';
+
 class PatientHomePage extends StatefulWidget {
   final String phone;
   final String patientName;
   final int patientID;
 
-  PatientHomePage({required this.phone, required this.patientName,
-    required this.patientID});
+  PatientHomePage({required this.phone, required this.patientName, required this.patientID});
 
   @override
   State<PatientHomePage> createState() => _PatientHomePageState();
@@ -25,7 +26,6 @@ class _PatientHomePageState extends State<PatientHomePage> {
   }
 
   Future<void> _loadData() async {
-
     setState(() {
       phone = widget.phone;
       patientName = widget.patientName;
@@ -47,16 +47,14 @@ class _PatientHomePageState extends State<PatientHomePage> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                SettingsScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen()));
 
                 showDialog(
                   context: context,
                   builder: (context) {
                     return AlertDialog(
                       title: Text("Username"),
-                      content: Text("Your username and patientID is: "
-                          "$patientName, patient ID: $patientID"),
+                      content: Text("Your username and patientID is: $patientName, patient ID: $patientID"),
                       actions: [
                         TextButton(
                           onPressed: () {
@@ -70,6 +68,33 @@ class _PatientHomePageState extends State<PatientHomePage> {
                 );
               },
               child: Text("Check Username"),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddVitalInfoScreen()));
+                // Add the functionality for the new button here
+                // For example, you can navigate to another screen or perform some action
+                // Replace the code inside onPressed with your desired functionality
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("New Button Pressed"),
+                      content: Text("You pressed the new button!"),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text("OK"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: Text("New Button"),
             ),
           ],
         ),

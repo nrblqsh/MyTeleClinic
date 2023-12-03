@@ -10,13 +10,13 @@ $password = $_POST['password'];
 
 $sql_patient = "SELECT * FROM patient WHERE phone = '$phone' AND password = '$password'";
 $result_patient = mysqli_query($db, $sql_patient);
-$count = mysqli_num_rows($result_patient);
+$count_patient = mysqli_num_rows($result_patient);
 
 $sql_specialist = "SELECT * FROM specialist WHERE phone = '$phone' AND password = '$password'";
 $result_specialist = mysqli_query($db, $sql_specialist);
 $count_specialist = mysqli_num_rows($result_specialist);
 
-if ($count == 1) {
+if ($count_patient == 1) {
 
     // Fetch patient details including patientName
     $row = mysqli_fetch_assoc($result_patient);

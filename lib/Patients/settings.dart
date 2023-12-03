@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_teleclinic/login.dart';
 
 import 'editProfile.dart';
+import 'editProfile1.dart';
 
 void main(){
   runApp( MaterialApp(
@@ -37,7 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap:()
                   {
                     Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => EditProfile(),));
+                        context, MaterialPageRoute(builder: (context) => EditProfile1(),));
                   },
 
                 child:
@@ -54,8 +55,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ,
                   color: Colors.grey,
                   onPressed: () {
-                    Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => EditProfile(),));
+                    // Navigator.push(
+                    //     context, MaterialPageRoute(builder: (context) => EditProfile(),));
 
                   },
                 ),
