@@ -76,25 +76,9 @@ class _PatientHomePageState extends State<PatientHomePage> {
                 // Add the functionality for the new button here
                 // For example, you can navigate to another screen or perform some action
                 // Replace the code inside onPressed with your desired functionality
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: Text("New Button Pressed"),
-                      content: Text("You pressed the new button!"),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text("OK"),
-                        ),
-                      ],
-                    );
-                  },
-                );
+
               },
-              child: Text("New Button"),
+              child: Text("Add Vital Info"),
             ),
           ],
         ),

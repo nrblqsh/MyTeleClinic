@@ -42,6 +42,8 @@ dependencies:
   shared_preferences:  ^2.1.1
   bottom_picker: ^2.3.2
   intl: ^0.18.1
+  syncfusion_flutter_datagrid: ^21.2.8
+
 
 dev_dependencies:
   flutter_test:

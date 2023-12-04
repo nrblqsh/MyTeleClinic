@@ -20,6 +20,7 @@ class _eMedicalRecordScreenState extends State<eMedicalRecordScreen> {
     {
       "Info": "Weight",
       "Image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRz1kwv1DTXkYiC_Z0TqiogSf3HHbqlpTJmuA&usqp=CAU"
+
     },
     {
       "Info": "Height",

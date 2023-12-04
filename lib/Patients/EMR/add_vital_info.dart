@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:my_teleclinic/Patients/EMR/blood_glucose.dart';
+import 'package:my_teleclinic/Patients/EMR/vital_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/request_controller.dart';
 //import 'package:connectivity/connectivity.dart';
@@ -19,7 +20,7 @@ class VitalInfo {
   final double bloodPressure;
   final double bloodGlucose;
   final double heartRate;
-  final String date;
+  final String latestDate;
   final int patientID;
 
 
@@ -30,7 +31,7 @@ class VitalInfo {
       this.bloodGlucose,
       this.heartRate,
       this.waistCircumference,
-      this.date, this.patientID,
+      this.latestDate, this.patientID,
       );
 
   VitalInfo.fromJson(Map<String, dynamic> json)
@@ -41,12 +42,12 @@ class VitalInfo {
         bloodGlucose = json['bloodGlucose'],
         bloodPressure = json['bloodPressure'],
         heartRate = json['heartRate'],
-        date = json['latestDate'];
+        latestDate = json['latestDate'];
 
   // toJson will be automatically called by jsonEncode when necessary
   Map<String, dynamic> toJson() => {'patientID': patientID,'weight': weight, 'height': height,
     'waistCircumference': waistCircumference,  'bloodPressure': bloodPressure,
-    'bloodGlucose': bloodGlucose,  'heartRate': heartRate, 'latestDate': date};
+    'bloodGlucose': bloodGlucose,  'heartRate': heartRate, 'latestDate': latestDate};
 
 
   Future<bool> save() async {
