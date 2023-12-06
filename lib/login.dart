@@ -5,7 +5,7 @@ import 'package:my_teleclinic/Specialists/specialist_home.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'Patients/resetPassword.dart';
+import 'Patients/forgotPassword.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
     else {
       print("tak dapat");
       var url = Uri.http(
-          "192.168.182.198", '/teleclinic/login.php', {'q': '{http}'});
+          "192.168.8.186", '/teleclinic/login.php', {'q': '{http}'});
 
       try {
         var response = await http.post(url, body: {
@@ -250,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ResetPasswordScreen(),
+                    builder: (context) => forgotPasswordScreen(),
                   ),
                 ); // go to register screen
               },
