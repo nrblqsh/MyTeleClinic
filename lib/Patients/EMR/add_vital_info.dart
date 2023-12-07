@@ -4,6 +4,8 @@ import 'package:my_teleclinic/Patients/EMR/blood_glucose.dart';
 import 'package:my_teleclinic/Patients/EMR/vital_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/request_controller.dart';
+import '../../changePassword1.dart';
+import '../patient_home.dart';
 //import 'package:connectivity/connectivity.dart';
 
 
@@ -179,12 +181,15 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
           bloodPressures.add(vitalInfo);
           bloodGlucoses.add(vitalInfo);
           heartRates.add(vitalInfo);
-          weightController.clear();
-          heightController.clear();
-          waistCircumferenceController.clear();
-          bloodPressureController.clear();
-          bloodGlucoseController.clear();
-          heartRateController.clear();
+          // weightController.clear();
+          // heightController.clear();
+          // waistCircumferenceController.clear();
+          // bloodPressureController.clear();
+          // bloodGlucoseController.clear();
+          // heartRateController.clear();
+          Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SuccessAddScreen()),);
         });
       } else {
         _showMessage("Failed to save Vital Info data");
@@ -649,4 +654,115 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
   }
 
 
+}
+
+class SuccessAddScreen extends StatefulWidget {
+  const SuccessAddScreen({super.key});
+
+  @override
+  State<SuccessAddScreen> createState() => _SuccessAddState();
+}
+
+
+
+class _SuccessAddState extends State<SuccessAddScreen> {
+  @override
+  void initState() {
+    _loadData();
+  }
+  Future<void> _loadData()  async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int storedID = prefs.getInt("patientID") ?? 0;
+    String storedPhone = prefs.getString("phone") ?? "";
+    String storedName = prefs.getString("patientName") ?? "" ;
+
+    setState(() {
+      patientID = storedID;
+      phone = storedPhone;
+      patientName = storedName;
+
+    });
+  }
+  late String phone; // To store the retrieved phone number
+  late String patientName;
+  late int patientID;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 9.0, top: 150),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'asset/done1.png',
+                          width: 120,
+                          height: 120,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 40,),
+                        child: SizedBox(width: 10),
+                      ),
+                      Text(
+                        "Successfully Added Vital Info !",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context, MaterialPageRoute(builder: (context) => PatientHomePage (phone: phone, patientName: patientName, patientID: patientID),));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
+                      ),
+                      backgroundColor: Color(hexColor('#024362')), // Set your preferred background color
+                    ),
+                    child: Text('Back to Homepage',
+                      style:TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,                  ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        ],
+      ),
+    );
+  }
 }
