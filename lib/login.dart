@@ -73,13 +73,22 @@ class _LoginScreenState extends State<LoginScreen> {
             MaterialPageRoute(
               builder: (context) => PatientHomePage(phone: phoneController.text,
                   patientName: patientName, patientID: patientID),
+
             ),
           );
-        } else if (data.toString() == "success specialist") {
+          setState(() {
+            phoneController.clear();
+            passwordController.clear();
+          });
+        } else if (data["status"] == "success specialist") {
           print("doctor masuk");
           Navigator.push(
               context, MaterialPageRoute(builder: (context) =>
               Specialist_Home_Screen(),));
+          setState(() {
+            phoneController.clear();
+            passwordController.clear();
+          });
         }
         else {
           print("tah la");
