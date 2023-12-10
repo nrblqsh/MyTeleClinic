@@ -33,7 +33,12 @@ if ($count_patient == 1) {
 
     echo json_encode($response);
 } else if ($count_specialist == 1) {
-    echo json_encode("success specialist");
+
+   $response = array(
+           "status" => "success specialist",);
+
+   echo json_encode($response);
+
 } else {
     echo json_encode("error");
 }

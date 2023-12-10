@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_teleclinic/Specialists/view_patient.dart';
 
 void main(){
   runApp(const MaterialApp(
@@ -18,6 +19,13 @@ class _Specialist_Home_ScreenState extends State<Specialist_Home_Screen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Welcome Doctor"),
+      ),
+      body :
+      ElevatedButton(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => viewPatientScreen()));
+        },
+        child: Text("View Patient List"),
       ),
     );
   }

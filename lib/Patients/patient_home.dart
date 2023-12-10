@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:my_teleclinic/Patients/Telemedicine/view_specialist.dart';
 import 'package:my_teleclinic/Patients/settings.dart';
 
 import 'EMR/add_vital_info.dart';
+import 'EMR/vital_info_report.dart';
 
 class PatientHomePage extends StatefulWidget {
   final String phone;
@@ -73,12 +75,23 @@ class _PatientHomePageState extends State<PatientHomePage> {
             ElevatedButton(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => AddVitalInfoScreen( patientID: patientID)));
-                // Add the functionality for the new button here
-                // For example, you can navigate to another screen or perform some action
-                // Replace the code inside onPressed with your desired functionality
 
               },
-              child: Text("Add Vital Info"),
+              child: Text("Add Vital Info "),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => VitalInfoReportScreen( patientID: patientID)));
+
+              },
+              child: Text("Vital Info Report"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => viewSpecialistScreen()));
+
+              },
+              child: Text("Telemedicine"),
             ),
           ],
         ),

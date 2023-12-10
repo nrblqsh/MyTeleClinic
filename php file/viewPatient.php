@@ -1,16 +1,12 @@
 <?php
 
     $servername = "localhost";
-
-    // Give your username and password
     $username = "root";
     $password = "";
-
-   // Give your Database name
     $dbname = "teleclinic";
 
   // Give your table name
-    $table = "vital_info"; // lets create a table named Employees.
+    $table = "patient"; // lets create a table named Employees.
 
     // Create Connection
     $conn = new mysqli($servername, $username, $password, $dbname);
@@ -21,11 +17,8 @@
     }
 
     // Get all records from the database
-
-    $sql = "SELECT * FROM $table WHERE patientID = $patientID ORDER BY infoID";
-
+    $sql = "SELECT * from $table ";
     $db_data = array();
-
     $result = $conn->query($sql);
     if($result->num_rows > 0){
         while($row = $result->fetch_assoc()){

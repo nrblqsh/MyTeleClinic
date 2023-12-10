@@ -7,18 +7,18 @@ import 'package:my_teleclinic/login.dart';
 
 void main() {
   runApp(const MaterialApp(
-    home: ResetPasswordScreen(),
+    home: forgotPasswordScreen(),
   ));
 }
 
-class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({Key? key}) : super(key: key);
+class forgotPasswordScreen extends StatefulWidget {
+  const forgotPasswordScreen({Key? key}) : super(key: key);
 
   @override
-  _ResetPasswordScreenState createState() => _ResetPasswordScreenState();
+  _forgotPasswordScreenState createState() => _forgotPasswordScreenState();
 }
 
-class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+class _forgotPasswordScreenState extends State<forgotPasswordScreen> {
 
   bool _obscureText= true;
   bool _isPasswordEightCharacters = false;
