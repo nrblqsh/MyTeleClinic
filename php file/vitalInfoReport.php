@@ -22,7 +22,8 @@
 
     // Get all records from the database
 
-    $sql = "SELECT * from $table ORDER BY infoID ";
+    $sql = "SELECT * FROM $table WHERE patientID = $patientID ORDER BY infoID";
+
     $db_data = array();
 
     $result = $conn->query($sql);

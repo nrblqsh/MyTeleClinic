@@ -3,6 +3,7 @@ import 'package:my_teleclinic/Patients/Telemedicine/view_specialist.dart';
 import 'package:my_teleclinic/Patients/settings.dart';
 
 import 'EMR/add_vital_info.dart';
+import 'EMR/vital_info_report.dart';
 
 class PatientHomePage extends StatefulWidget {
   final String phone;
@@ -76,7 +77,14 @@ class _PatientHomePageState extends State<PatientHomePage> {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => AddVitalInfoScreen( patientID: patientID)));
 
               },
-              child: Text("Add Vital Info"),
+              child: Text("Add Vital Info "),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => VitalInfoReportScreen( patientID: patientID)));
+
+              },
+              child: Text("Vital Info Report"),
             ),
             ElevatedButton(
               onPressed: () {
