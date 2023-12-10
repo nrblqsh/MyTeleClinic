@@ -16,6 +16,7 @@ class eMedicalRecordScreen extends StatefulWidget {
 }
 
 class _eMedicalRecordScreenState extends State<eMedicalRecordScreen> {
+
   var _infos = [
     {
       "Info": "Weight",

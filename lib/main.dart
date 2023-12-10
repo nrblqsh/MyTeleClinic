@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:my_teleclinic/menu_screen.dart';
-import 'login.dart'; // Import your login screen widget
+import 'home_page.dart';
+import 'login.dart';
+import 'menu_page.dart'; // Import your login screen widget
 
 void main() {
   runApp(const MyApp());
@@ -13,9 +14,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: LoginScreen(),
+      initialRoute: '/menu', // Set the initial route to MenuPage
       routes: {
         '/loginscreen': (context) => const LoginScreen(),
-        '/menupage': (context) => const MenuScreen(),
+        '/menu': (context) => MenuPage(), // Define the route for MenuPage
+        '/home': (context) => HomePage(),
       },
     );
   }
