@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:my_teleclinic/Patients/EMR/blood_glucose.dart';
-import 'package:my_teleclinic/Patients/EMR/vital_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/request_controller.dart';
 import '../../changePassword1.dart';
+import '../patient_home_page.dart';
 import '../patient_home.dart';
 //import 'package:connectivity/connectivity.dart';
 
@@ -740,7 +739,7 @@ class _SuccessAddState extends State<SuccessAddScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => PatientHomePage (phone: phone, patientName: patientName, patientID: patientID),));
+                          context, MaterialPageRoute(builder: (context) => HomePage (phone: phone, patientName: patientName, patientID: patientID),));
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
@@ -764,5 +763,11 @@ class _SuccessAddState extends State<SuccessAddScreen> {
         ],
       ),
     );
+  }
+  int hexColor(String color) {
+    String newColor = '0xff' + color;
+    newColor = newColor.replaceAll('#', '');
+    int finalColor = int.parse(newColor);
+    return finalColor;
   }
 }

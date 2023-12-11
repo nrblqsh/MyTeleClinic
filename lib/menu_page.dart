@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart'; // Import the HomePage
+import 'Patients/patient_home_page.dart'; // Import the HomePage
 
 class MenuPage extends StatelessWidget {
   @override
@@ -16,13 +16,13 @@ class MenuPage extends StatelessWidget {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomePage()),
+                MaterialPageRoute(builder: (context) => HomePage(phone: '', patientName: '', patientID: 0,)),
               );
             },
             child: Text('Go to Homepage'),
           ),
           SizedBox(height: 20),
-          HomePage(), // Reuse the HomePage widget
+          HomePage(phone: '', patientName: '', patientID: 0,), // Reuse the HomePage widget
         ],
       ),
     );

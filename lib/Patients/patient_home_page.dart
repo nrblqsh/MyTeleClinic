@@ -3,25 +3,31 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:my_teleclinic/Chatbox/chatbox.dart';
-import 'Map/mapLocation.dart';
-import 'Patients/EMR/add_vital_info.dart';
-import 'Patients/Telemedicine/view_specialist.dart';
-import 'Patients/settings.dart';
-
-void main() {
-  runApp(const MaterialApp(
-    home: HomePage(),
-  ));
-}
+import '../Map/mapLocation.dart';
+import 'EMR/add_vital_info.dart';
+import 'EMR/vital_info_report.dart';
+import 'Telemedicine/view_specialist.dart';
+import 'settings.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final String phone;
+  final String patientName;
+  final int patientID;
+
+  HomePage(
+      {required this.phone,
+      required this.patientName,
+      required this.patientID});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  late String phone; // To store the retrieved phone number
+  late String patientName;
+  late int patientID;
+
   int _currentIndex = 2;
   bool hasNewMessage = false;
   int newMessagesCount = 0;
@@ -37,9 +43,18 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    _loadData();
     checkForNewMessages();
     super.initState();
     getUserLocation();
+  }
+
+  Future<void> _loadData() async {
+    setState(() {
+      phone = widget.phone;
+      patientName = widget.patientName;
+      patientID = widget.patientID;
+    });
   }
 
   Future<void> getUserLocation() async {
@@ -58,7 +73,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 98,
+        toolbarHeight: 72,
         backgroundColor: Colors.white,
         title: Center(
           child: Image.asset(
@@ -75,13 +90,25 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 200.0, bottom: 10),
+                  child: Text(
+                    "Welcome ${patientName ?? 'Loading...'},",
+                    style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.bold,
+                      textStyle:
+                          const TextStyle(fontSize: 22, color: Colors.black),
+                    ),
+                  ),
+                ),
                 Row(
                   children: [
                     Text(
                       "Services",
                       style: GoogleFonts.roboto(
                         fontWeight: FontWeight.bold,
-                        textStyle: const TextStyle(fontSize: 22, color: Colors.black),
+                        textStyle:
+                            const TextStyle(fontSize: 22, color: Colors.black),
                       ),
                     ),
                     SizedBox(width: 8.0),
@@ -93,15 +120,20 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(width: 8.0),
                     InkWell(
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(
-                            builder: (context) => ChatboxScreen()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChatboxScreen()));
                       },
                       child: Stack(
                         children: [
-                          Icon(
-                            Icons.mail,
-                            size: 24,
-                            color: hasNewMessage ? Colors.grey : Colors.grey,
+                          Padding(
+                            padding: const EdgeInsets.only(left: 180),
+                            child: Icon(
+                              Icons.mail,
+                              size: 32,
+                              color: hasNewMessage ? Colors.grey : Colors.grey,
+                            ),
                           ),
                           if (hasNewMessage)
                             Positioned(
@@ -136,58 +168,91 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Column(
-                          children: [
-                            Image.network(
-                              "https://cdn-icons-png.flaticon.com/512/1076/1076325.png",
-                              height: 64,
-                            ),
-                            SizedBox(height: 8.0),
-                            Text(
-                              "E-Medical Record",
-                              style: GoogleFonts.roboto(
-                                fontWeight: FontWeight.bold,
-                                textStyle: const TextStyle(fontSize: 14, color: Colors.blueGrey),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      VitalInfoReportScreen(patientID: 0)),
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              Image.network(
+                                "https://cdn-icons-png.flaticon.com/512/1076/1076325.png",
+                                height: 64,
                               ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            Image.network(
-                              "https://cdn-icons-png.flaticon.com/512/5980/5980109.png",
-                              width: 64,
-                              height: 64,
-                            ),
-                            SizedBox(height: 8.0),
-                            Text(
-                              "TeleMedicine",
-                              style: GoogleFonts.roboto(
-                                fontWeight: FontWeight.bold,
-                                textStyle: const TextStyle(fontSize: 14, color: Colors.blueGrey),
+                              SizedBox(height: 8.0),
+                              Text(
+                                "E-Medical Record",
+                                style: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.bold,
+                                  textStyle: const TextStyle(
+                                      fontSize: 14, color: Colors.blueGrey),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                        Column(
-                          children: [
-                            Image.network(
-                              "https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678116-calendar-512.png",
-                              width: 64,
-                              height: 64,
-                            ),
-                            SizedBox(height: 8.0),
-                            Text(
-                              "View Booking",
-                              style: GoogleFonts.roboto(
-                                fontWeight: FontWeight.bold,
-                                textStyle: const TextStyle(fontSize: 14, color: Colors.blueGrey),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      viewSpecialistScreen()),
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              Image.network(
+                                "https://cdn-icons-png.flaticon.com/512/5980/5980109.png",
+                                width: 64,
+                                height: 64,
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 8.0),
+                              Text(
+                                "TeleMedicine",
+                                style: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.bold,
+                                  textStyle: const TextStyle(
+                                      fontSize: 14, color: Colors.blueGrey),
+                                ),
+                              ),
+                            ],
+                          ),
+
                         ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              viewSpecialistScreen()),
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Image.network(
+                        "https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678116-calendar-512.png",
+                        width: 64,
+                        height: 64,
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        "View Booking",
+                        style: GoogleFonts.roboto(
+                          fontWeight: FontWeight.bold,
+                          textStyle: const TextStyle(fontSize: 14, color: Colors.blueGrey),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                       ],
                     ),
                   ),
@@ -200,7 +265,8 @@ class _HomePageState extends State<HomePage> {
                         "Nearby Clinic",
                         style: GoogleFonts.roboto(
                           fontWeight: FontWeight.bold,
-                          textStyle: const TextStyle(fontSize: 22, color: Colors.black),
+                          textStyle: const TextStyle(
+                              fontSize: 22, color: Colors.black),
                         ),
                       ),
                       SizedBox(width: 8.0),
@@ -234,8 +300,10 @@ class _HomePageState extends State<HomePage> {
                         GoogleMap(
                           initialCameraPosition: CameraPosition(
                             target: userLocation != null
-                                ? LatLng(userLocation!.latitude, userLocation!.longitude)
-                                : const LatLng(2.3232303497978815, 102.29396072202006),
+                                ? LatLng(userLocation!.latitude,
+                                    userLocation!.longitude)
+                                : const LatLng(
+                                    2.3232303497978815, 102.29396072202006),
                             zoom: 14,
                           ),
                         ),
@@ -247,15 +315,20 @@ class _HomePageState extends State<HomePage> {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => MapLocation()),
+                                  MaterialPageRoute(
+                                      builder: (context) => MapLocation()),
                                 );
                                 print("Button tapped!");
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all<Color>(Color(hexColor('C73B3B'))),
-                                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Color(hexColor('C73B3B'))),
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
+                                    borderRadius: BorderRadius.circular(
+                                        10.0), // Adjust the radius as needed
                                   ),
                                 ),
                               ),
@@ -280,20 +353,23 @@ class _HomePageState extends State<HomePage> {
           });
 
           if (index == 0) {
-            Navigator.push(context, MaterialPageRoute(
-                builder: (context) => AddVitalInfoScreen(patientID: 0,)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        AddVitalInfoScreen(patientID: patientID)));
           } else if (index == 1) {
-            Navigator.push(context, MaterialPageRoute(
-                builder: (context) => viewSpecialistScreen()));
-
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => viewSpecialistScreen()));
           } else if (index == 2) {
             Navigator.pushReplacementNamed(context, '/menu');
           } else if (index == 3) {
             // Add your navigation logic here
           } else if (index == 4) {
-            Navigator.push(context, MaterialPageRoute(
-                builder: (context) => SettingsScreen()));
-
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => SettingsScreen()));
           }
         },
         items: [
@@ -302,7 +378,7 @@ class _HomePageState extends State<HomePage> {
             label: 'EMR',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.video_camera_front_rounded),
+            icon: Icon(Icons.health_and_safety),
             label: 'TeleMedicine',
           ),
           BottomNavigationBarItem(

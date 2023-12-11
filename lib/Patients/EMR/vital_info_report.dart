@@ -43,7 +43,7 @@ class _VitalInfoReportScreenState extends State<VitalInfoReportScreen> {
 
   Future<List<VitalInfo>> generateVitalInfoList() async {
     try {
-      var url = 'http://192.168.0.116/teleclinic/vitalInfoReport.php?patientID=$patientID';
+      var url = 'http://10.131.78.189/teleclinic/vitalInfoReport.php?patientID=$patientID';
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
