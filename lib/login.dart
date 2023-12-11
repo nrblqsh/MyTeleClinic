@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:my_teleclinic/Patients/register.dart';
-import 'package:my_teleclinic/Patients/patient_home.dart';
-import 'package:my_teleclinic/Specialists/specialist_home.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'Patients/forgotPassword.dart';
+import 'Patients/patient_home_page.dart';
+import 'Specialists/specialist_home.dart';
+
+
 
 void main() {
   runApp(const MaterialApp(
@@ -71,8 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PatientHomePage(phone: phoneController.text,
-                  patientName: patientName, patientID: patientID),
+              builder: (context) => HomePage(phone: '', patientName: '', patientID: 0,),
 
             ),
           );
@@ -82,9 +83,19 @@ class _LoginScreenState extends State<LoginScreen> {
           });
         } else if (data["status"] == "success specialist") {
           print("doctor masuk");
+
+          String specialistName = data["specialistName"];
+          int specialistID = int.parse(data["specialistID"]);
+
+          final SharedPreferences pref = await SharedPreferences.getInstance();
+          await pref.setString("phone", phoneController.text);
+          await pref.setString("password", passwordController.text);
+          await pref.setString("specialistName", specialistName);
+          await pref.setInt("specialistID", specialistID);
+
           Navigator.push(
               context, MaterialPageRoute(builder: (context) =>
-              Specialist_Home_Screen(),));
+              SpecialistHomeScreen(),));
           setState(() {
             phoneController.clear();
             passwordController.clear();

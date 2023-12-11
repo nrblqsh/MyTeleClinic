@@ -10,35 +10,38 @@ $password = $_POST['password'];
 
 $sql_patient = "SELECT * FROM patient WHERE phone = '$phone' AND password = '$password'";
 $result_patient = mysqli_query($db, $sql_patient);
-$count_patient = mysqli_num_rows($result_patient);
+$count = mysqli_num_rows($result_patient);
 
 $sql_specialist = "SELECT * FROM specialist WHERE phone = '$phone' AND password = '$password'";
 $result_specialist = mysqli_query($db, $sql_specialist);
 $count_specialist = mysqli_num_rows($result_specialist);
 
-if ($count_patient == 1) {
-
+if ($count == 1) {
     // Fetch patient details including patientName
     $row = mysqli_fetch_assoc($result_patient);
     $patientName = $row['patientName'];
     $patientID = $row['patientID'];
 
-
-    // Create an associative array to send as JSON response
+    // Create an associative array to send as JSON response for patient
     $response = array(
         "status" => "success patients",
         "patientName" => $patientName,
         "patientID" => $patientID
     );
-
     echo json_encode($response);
 } else if ($count_specialist == 1) {
+    // Fetch specialist details including specialistName
+    $row = mysqli_fetch_assoc($result_specialist);
+    $specialistName = $row['specialistName'];
+    $specialistID = $row['specialistID'];
 
-   $response = array(
-           "status" => "success specialist",);
-
-   echo json_encode($response);
-
+    // Create an associative array to send as JSON response for specialist
+    $response = array(
+        "status" => "success specialist",
+        "specialistName" => $specialistName,
+        "specialistID" => $specialistID
+    );
+    echo json_encode($response);
 } else {
     echo json_encode("error");
 }

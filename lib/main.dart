@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'Patients/patient_home_page.dart';
 import 'login.dart';
 import 'menu_page.dart'; // Import your login screen widget
 
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/loginscreen': (context) => const LoginScreen(),
         '/menu': (context) => MenuPage(), // Define the route for MenuPage
-        '/home': (context) => HomePage(),
+        '/home': (context) => HomePage(phone: '', patientName: '', patientID: 0,),
       },
     );
   }
