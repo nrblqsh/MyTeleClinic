@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:my_teleclinic/Patients/Telemedicine/AppForLater.dart';
 import 'package:my_teleclinic/Patients/Telemedicine/specialist.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../changePassword1.dart';
@@ -21,7 +22,7 @@ class viewSpecialistScreen extends StatefulWidget {
 }
 
 Future<List<Specialist>> fetchSpecialist() async {
-  String url = 'http://10.131.78.189/teleclinic/viewSpecialist.php';
+  String url = 'http://10.131.76.52/teleclinic/viewSpecialist.php';
   final response = await http.get(Uri.parse(url));
   return specialistFromJson(response.body);
 }
@@ -94,6 +95,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                         return Card(
                           child: GestureDetector(
                             onTap: () {
+                            _loadData();
                               showDialog(
                                 context: context,
                                 // Make sure you have access to the context
@@ -146,6 +148,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                               '${specialist.specialistName}',
                                               style: TextStyle(fontSize: 20),
                                             ),
+                                            //
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.only(bottom: 15.0),
@@ -176,6 +179,16 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                               backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
                                             ),
                                               child: Text("Request Consultation Now"),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                  context, MaterialPageRoute(builder: (context) => AppointmentScreen(patientID: 0, specialistID:0,),));
+                                            },
+                                            style: ButtonStyle(
+                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                                            ),
+                                            child: Text("Book For Later"),
                                           )
                                         ],
                                       ),
@@ -253,6 +266,21 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
           )
         ])));
   }
+
+  Future<void> _loadData()  async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int storedID = prefs.getInt("patientID") ?? 0;
+    int storedSpecialistID = prefs.getInt("specialistID") ?? specialistID;
+
+
+    setState(() {
+      patientID = storedID;
+      specialistID = storedSpecialistID;
+
+    });
+  }
+  late int patientID;
+  late int specialistID;
 }
 
 class SuccessRequestScreen extends StatefulWidget {
@@ -272,19 +300,23 @@ class _SuccessRequestState extends State<SuccessRequestScreen> {
   Future<void> _loadData()  async{
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     int storedID = prefs.getInt("patientID") ?? 0;
+    int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
     String storedPhone = prefs.getString("phone") ?? "";
     String storedName = prefs.getString("patientName") ?? "" ;
+
 
     setState(() {
       patientID = storedID;
       phone = storedPhone;
       patientName = storedName;
+      specialistID = storedSpecialistID;
 
     });
   }
   late String phone; // To store the retrieved phone number
   late String patientName;
   late int patientID;
+  late int specialistID;
 
   @override
   Widget build(BuildContext context) {
