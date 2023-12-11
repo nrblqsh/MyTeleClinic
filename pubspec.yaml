@@ -46,6 +46,8 @@ dependencies:
   geolocator: ^10.1.0
   image_picker: ^1.0.4
   syncfusion_flutter_datagrid: ^21.2.8
+  dio: ^5.4.0
+  flutter_polyline_points: ^2.0.0
   js_wrapping: ^0.7.4
   js_wrapping_generator: ^0.7.4
 
