@@ -9,16 +9,16 @@ List<Specialist> specialistFromJson(String str) => List<Specialist>.from(json.de
 String specialistToJson(List<Specialist> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Specialist {
-  String specialistId;
-  String clinicId;
+  String specialistID;
+  String clinicID;
   String specialistName;
   String specialistTitle;
   String phone;
   String password;
 
   Specialist({
-    required this.specialistId,
-    required this.clinicId,
+    required this.specialistID,
+    required this.clinicID,
     required this.specialistName,
     required this.specialistTitle,
     required this.phone,
@@ -26,8 +26,8 @@ class Specialist {
   });
 
   factory Specialist.fromJson(Map<String, dynamic> json) => Specialist(
-    specialistId: json["specialistID"],
-    clinicId: json["clinicID"],
+    specialistID: json["specialistID"],
+    clinicID: json["clinicID"],
     specialistName: json["specialistName"],
     specialistTitle: json["specialistTitle"],
     phone: json["phone"],
@@ -35,8 +35,8 @@ class Specialist {
   );
 
   Map<String, dynamic> toJson() => {
-    "specialistID": specialistId,
-    "clinicID": clinicId,
+    "specialistID": specialistID,
+    "clinicID": clinicID,
     "specialistName": specialistName,
     "specialistTitle": specialistTitle,
     "phone": phone,

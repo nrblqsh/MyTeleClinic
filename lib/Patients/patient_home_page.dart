@@ -91,9 +91,9 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(right: 200.0, bottom: 10),
+                  padding: const EdgeInsets.only(right: 100.0, bottom: 10),
                   child: Text(
-                    "Welcome ${patientName ?? 'Loading...'},",
+                    "Welcome ${patientName},",
                     style: GoogleFonts.roboto(
                       fontWeight: FontWeight.bold,
                       textStyle:

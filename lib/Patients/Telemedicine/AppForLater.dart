@@ -9,11 +9,11 @@ import '/Model/booking.dart';
 import '../../Patients/Telemedicine/ViewBooking.dart';
 
 
-void main() {
-  runApp( MaterialApp(
-    home: AppointmentScreen(patientID: 0, specialistID: 0),
-  ));
-}
+// void main() {
+//   runApp( MaterialApp(
+//     home: AppointmentScreen(patientID: 0, specialistID: specialistID),
+//   ));
+// }
 
 class AppointmentScreen extends StatefulWidget {
   final int patientID;
@@ -65,28 +65,28 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
 
   @override
   void initState() {
-      super.initState();
-      _loadData();
-    }
+    super.initState();
+    _loadData();
+  }
 
 Future<void> _loadData()  async{
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   int storedID = prefs.getInt("patientID") ?? 0;
-  int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
+  //int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
 
-  setState(() {
-    patientID = storedID;
-    specialistID = storedSpecialistID;
-    patientIDController.text = patientID.toString();
-    specialistIDController.text = specialistID.toString();
-  });
-  print('Data Parsed :');
-  print(patientID );
-  print(specialistID);
-}
+    setState(() {
+      patientID = storedID;
+      specialistID = widget.specialistID;
+      patientIDController.text = patientID.toString();
+      specialistIDController.text = specialistID.toString();
+    });
+    print('Data Parsed :');
+    print(patientID );
+    print(specialistID);
+  }
 
 // late int patientID;
-// late int specialistID;
+//late int specialistID;
 
   @override
   Widget build(BuildContext context) {

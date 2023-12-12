@@ -8,21 +8,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../changePassword1.dart';
 import '../patient_home_page.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    home: viewSpecialistScreen(),
-  ));
-}
+// void main() {
+//   runApp(const MaterialApp(
+//     home: viewSpecialistScreen(),
+//   ));
+// }
 
 class viewSpecialistScreen extends StatefulWidget {
-  const viewSpecialistScreen({super.key});
+  // final int specialistID;
+  // viewSpecialistScreen({
+  //   required this.specialistID,
+  //   // Other required properties
+  // });
+ // const viewSpecialistScreen({super.key});
 
   @override
   _viewSpecialistScreenState createState() => _viewSpecialistScreenState();
 }
 
 Future<List<Specialist>> fetchSpecialist() async {
-  String url = 'http://10.131.76.52/teleclinic/viewSpecialist.php';
+  String url = 'http://192.168.0.116/teleclinic/viewSpecialist.php';
   final response = await http.get(Uri.parse(url));
   return specialistFromJson(response.body);
 }
@@ -95,6 +100,11 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                         return Card(
                           child: GestureDetector(
                             onTap: () {
+                              Specialist specialist = specialists[index];
+                            //  print('index-');
+                             // print(index);
+                              specialistID = int.parse('${specialist.specialistID}');
+                             // print(specialistID);
                             _loadData();
                               showDialog(
                                 context: context,
@@ -183,7 +193,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                           ElevatedButton(
                                             onPressed: () {
                                               Navigator.push(
-                                                  context, MaterialPageRoute(builder: (context) => AppointmentScreen(patientID: 0, specialistID:0,),));
+                                                  context, MaterialPageRoute(builder: (context) => AppointmentScreen(patientID: 0, specialistID:specialistID,),));
                                             },
                                             style: ButtonStyle(
                                               backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
@@ -269,6 +279,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
 
   Future<void> _loadData()  async{
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Specialist specialist = specialists[index];
     int storedID = prefs.getInt("patientID") ?? 0;
     int storedSpecialistID = prefs.getInt("specialistID") ?? specialistID;
 
@@ -303,7 +314,6 @@ class _SuccessRequestState extends State<SuccessRequestScreen> {
     int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
     String storedPhone = prefs.getString("phone") ?? "";
     String storedName = prefs.getString("patientName") ?? "" ;
-
 
     setState(() {
       patientID = storedID;
