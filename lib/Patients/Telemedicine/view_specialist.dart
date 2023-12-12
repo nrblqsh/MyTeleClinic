@@ -27,7 +27,7 @@ class viewSpecialistScreen extends StatefulWidget {
 }
 
 Future<List<Specialist>> fetchSpecialist() async {
-  String url = 'http://192.168.0.116/teleclinic/viewSpecialist.php';
+  String url = 'http://10.131.74.150/teleclinic/viewSpecialist.php';
   final response = await http.get(Uri.parse(url));
   return specialistFromJson(response.body);
 }

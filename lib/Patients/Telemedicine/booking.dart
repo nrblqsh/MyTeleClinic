@@ -37,7 +37,7 @@ class Booking {
   //add save
   Future<bool> save() async {
     // API OPERATION
-    RequestController req = RequestController(path: '/teleclinic/appointment.php');
+    RequestController req = RequestController(path: '/teleclinic/booking.php');
     req.setBody(toJson());
     await req.post();
     if (req.status() == 200) {
@@ -49,7 +49,7 @@ class Booking {
 
 
 Future<List<Booking>> fetchBookings() async {
-  final String url = 'http://192.168.0.116/teleclinic/appointment.php'; // Modify the path accordingly
+  final String url = 'http://10.131.74.150/teleclinic/booking.php'; // Modify the path accordingly
   final response = await http.get(Uri.parse(url));
 
   if (response.statusCode == 200) {
