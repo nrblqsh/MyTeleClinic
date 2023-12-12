@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+
 
 void main() {
   runApp(const MaterialApp(
@@ -48,6 +50,57 @@ class _MapLocationState extends State<MapLocation> {
     userLocation = await Geolocator.getCurrentPosition();
   }
 
+  Future<List<LatLng>> getDirections(LatLng origin, LatLng destination, String travelMode) async {
+    final apiKey = 'AIzaSyBayQdqPuNJaYbS5vOd_ij7WsQdyPojKsk';
+    final apiUrl = 'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=${origin.latitude},${origin.longitude}&'
+        'destination=${destination.latitude},${destination.longitude}&'
+        'mode=$travelMode&key=$apiKey';
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final decodedData = json.decode(response.body);
+
+      print('Decoded Data: $decodedData');
+
+      if (decodedData['status'] == 'OK') {
+        final List<dynamic> routes = decodedData['routes'];
+        if (routes.isNotEmpty) {
+          final List<dynamic> legs = routes[0]['legs'];
+          if (legs.isNotEmpty) {
+            final List<dynamic> steps = legs[0]['steps'];
+            if (steps.isNotEmpty) {
+              final List<LatLng> polylineCoordinates = [];
+
+              for (final step in steps) {
+                final String points = step['polyline']['points'];
+                final List<PointLatLng> decodedPoints =
+                PolylinePoints().decodePolyline(points);
+
+                // Convert PointLatLng to LatLng
+                final List<LatLng> convertedPoints = decodedPoints
+                    .map((point) => LatLng(point.latitude, point.longitude))
+                    .toList();
+
+                polylineCoordinates.addAll(convertedPoints);
+              }
+
+              print('Polyline Coordinates: $polylineCoordinates');
+
+              return polylineCoordinates;
+            }
+          }
+        }
+      }
+    }
+
+    print('No valid response received');
+    return [];
+  }
+
+
+
   void packData() {
     getUserLocation().then((_) async {
       if (userLocation != null) {
@@ -62,6 +115,8 @@ class _MapLocationState extends State<MapLocation> {
             infoWindow: const InfoWindow(
               title: 'My Location',
             ),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue), // Set the marker color to blue
+
           ),
         );
         CameraPosition cameraPosition = CameraPosition(
@@ -123,12 +178,26 @@ class _MapLocationState extends State<MapLocation> {
                                     ' from current location to ($destinationLat,'
                                     ' $destinationLng)');
 
-                            drawPolyline(
-                              LatLng(
-                                  userLocation!.latitude,
-                                  userLocation!.longitude),
+                            getDirections(
+                              LatLng(userLocation!.latitude, userLocation!.longitude),
                               LatLng(destinationLat, destinationLng),
-                            );
+                              'driving',
+                            ).then((polylineCoordinates) {
+                              if (polylineCoordinates.isNotEmpty) {
+                                drawPolyline(polylineCoordinates);
+                              } else {
+                                print('No polyline coordinates received');
+                              }
+                            });
+
+
+
+                            // drawPolyline(
+                            //   LatLng(
+                            //       userLocation!.latitude,
+                            //       userLocation!.longitude),
+                            //   LatLng(destinationLat, destinationLng),
+                            // );
 
                             Navigator.of(context).pop();
                           }
@@ -161,13 +230,13 @@ class _MapLocationState extends State<MapLocation> {
     });
   }
 
-  void drawPolyline(LatLng origin, LatLng destination) {
+  void drawPolyline(List<LatLng> polylineCoordinates) {
     clearPolylines();
 
     PolylineId id = PolylineId('poly');
     Polyline polyline = Polyline(
       polylineId: id,
-      points: [origin, destination],
+      points: polylineCoordinates,
       color: Colors.blue,
       width: 5,
     );
@@ -176,6 +245,8 @@ class _MapLocationState extends State<MapLocation> {
       polylines[id] = polyline;
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
