@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
+import '../main.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -14,13 +15,17 @@ void main() {
 }
 
 class MapLocation extends StatefulWidget {
-  const MapLocation({super.key});
+  const MapLocation({Key? key}) : super(key: key);
 
   @override
   State<MapLocation> createState() => _MapLocationState();
 }
 
 class _MapLocationState extends State<MapLocation> {
+
+  String? distance;
+  String? duration;
+
   final Completer<GoogleMapController> _controller = Completer();
   static const CameraPosition _initialPosition = CameraPosition(
     target: LatLng(2.3232303497978815, 102.29396072202006),
@@ -30,6 +35,8 @@ class _MapLocationState extends State<MapLocation> {
   final List<Marker> myMarker = [];
   Map<PolylineId, Polyline> polylines = {};
   Position? userLocation; // Declare userLocation at a higher scope
+  final TextEditingController _searchController = TextEditingController();
+  List<String> suggestions = [];
 
   @override
   void initState() {
@@ -50,9 +57,11 @@ class _MapLocationState extends State<MapLocation> {
     userLocation = await Geolocator.getCurrentPosition();
   }
 
-  Future<List<LatLng>> getDirections(LatLng origin, LatLng destination, String travelMode) async {
+  Future<List<LatLng>> getDirections(
+      LatLng origin, LatLng destination, String travelMode) async {
     final apiKey = 'AIzaSyBayQdqPuNJaYbS5vOd_ij7WsQdyPojKsk';
-    final apiUrl = 'https://maps.googleapis.com/maps/api/directions/json?'
+    final apiUrl =
+        'https://maps.googleapis.com/maps/api/directions/json?'
         'origin=${origin.latitude},${origin.longitude}&'
         'destination=${destination.latitude},${destination.longitude}&'
         'mode=$travelMode&key=$apiKey';
@@ -99,8 +108,6 @@ class _MapLocationState extends State<MapLocation> {
     return [];
   }
 
-
-
   void packData() {
     getUserLocation().then((_) async {
       if (userLocation != null) {
@@ -115,13 +122,12 @@ class _MapLocationState extends State<MapLocation> {
             infoWindow: const InfoWindow(
               title: 'My Location',
             ),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue), // Set the marker color to blue
-
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueBlue),
           ),
         );
         CameraPosition cameraPosition = CameraPosition(
-          target:
-          LatLng(userLocation!.latitude, userLocation!.longitude),
+          target: LatLng(userLocation!.latitude, userLocation!.longitude),
           zoom: 14,
         );
 
@@ -136,8 +142,8 @@ class _MapLocationState extends State<MapLocation> {
 
   Future<void> fetchMarkers() async {
     try {
-      final response =
-      await http.get(Uri.parse('http://192.168.8.186/teleclinic/clinic.php'));
+      final response = await http.get(
+          Uri.parse('http://${MyApp.ipAddress}${MyApp.clinicPath}'));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -149,65 +155,12 @@ class _MapLocationState extends State<MapLocation> {
                 double.parse(item['longitude'])),
             infoWindow: InfoWindow(
               title: item['clinicName'],
+              snippet: 'Phone: ${item['phone']}\n',
             ),
             onTap: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text('Navigate to ${item['clinicName']}?'),
-                    content: Text(
-                        'Do you want to navigate to this clinic from your current location?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text('No'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          if (userLocation != null) {
-                            double destinationLat =
-                            double.parse(item['latitude']);
-                            double destinationLng =
-                            double.parse(item['longitude']);
-
-                            print(
-                                'Navigate to ${item['clinicName']}'
-                                    ' from current location to ($destinationLat,'
-                                    ' $destinationLng)');
-
-                            getDirections(
-                              LatLng(userLocation!.latitude, userLocation!.longitude),
-                              LatLng(destinationLat, destinationLng),
-                              'driving',
-                            ).then((polylineCoordinates) {
-                              if (polylineCoordinates.isNotEmpty) {
-                                drawPolyline(polylineCoordinates);
-                              } else {
-                                print('No polyline coordinates received');
-                              }
-                            });
-
-
-
-                            // drawPolyline(
-                            //   LatLng(
-                            //       userLocation!.latitude,
-                            //       userLocation!.longitude),
-                            //   LatLng(destinationLat, destinationLng),
-                            // );
-
-                            Navigator.of(context).pop();
-                          }
-                        },
-                        child: Text('Yes'),
-                      ),
-                    ],
-                  );
-                },
-              );
+              // Handle tap on the marker's InfoWindow
+              print('Marker tapped: ${item['clinicName']}');
+             showDistanceAndDuration(item);
             },
           );
         }).toList();
@@ -223,11 +176,195 @@ class _MapLocationState extends State<MapLocation> {
     }
   }
 
+  Widget buildDialog(dynamic item) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Stack(
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(36.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item['clinicName'],
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    Text(
+                      '· ${item['phone']}                 ',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    SizedBox(height: 25),
+                    Text(
+                      '· ${item['clinicType']}',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+
+                    if(distance!= null && duration !=null)
+
+                        SizedBox(height: 30,),
+                        Text(
+                          ' $distance                            \t\t         $duration',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+
+                  ],
+                ),
+              ),
+              Divider(),
+              ElevatedButton(
+                onPressed: () {
+                  handleNavigation(item);
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  backgroundColor: Color(hexColor('C73B3B')),
+                  fixedSize:
+                  Size.fromHeight(45), // Adjust the height as needed
+                ),
+                child: Text(
+                  'Navigate to this Clinic',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            top: 8.0,
+            right: 8.0,
+            child: IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> fetchDistanceAndDuration(LatLng destination) async {
+    if (userLocation != null) {
+      final result = await getDistanceAndDuration(
+        LatLng(userLocation!.latitude, userLocation!.longitude),
+        destination,
+      );
+
+      setState(() {
+        distance = result['distance'];
+        duration = result['duration'];
+      });
+    }
+  }
+
+  Future<void> showDistanceAndDuration(dynamic item) async {
+    double destinationLat = double.parse(item['latitude']);
+    double destinationLng = double.parse(item['longitude']);
+
+    print(
+      'Calculating distance and duration to ${item['clinicName']}'
+          ' from current location to ($destinationLat, $destinationLng)',
+    );
+
+    // Fetch distance and duration
+    final result = await getDistanceAndDuration(
+      LatLng(userLocation!.latitude, userLocation!.longitude),
+      LatLng(destinationLat, destinationLng),
+    );
+
+    setState(() {
+      distance = result['distance'];
+      duration = result['duration'];
+    });
+
+    // Now show the dialog with distance and duration
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return buildDialog(item);
+      },
+    );
+  }
+
+
+  Future<void> handleNavigation(dynamic item) async {
+    if (userLocation != null) {
+      double destinationLat = double.parse(item['latitude']);
+      double destinationLng = double.parse(item['longitude']);
+
+      print(
+        'Navigate to ${item['clinicName']}'
+            ' from current location to ($destinationLat, $destinationLng)',
+      );
+
+      // Call fetchDistanceAndDuration here with the destination
+      await fetchDistanceAndDuration(LatLng(destinationLat, destinationLng));
+
+      // Fetch directions
+      final polylineCoordinates = await getDirections(
+        LatLng(userLocation!.latitude, userLocation!.longitude),
+        LatLng(destinationLat, destinationLng),
+        'driving',
+      );
+
+      if (polylineCoordinates.isNotEmpty) {
+        drawPolyline(polylineCoordinates);
+      } else {
+        print('No polyline coordinates received');
+      }
+
+      closeDialog();
+    }
+  }
+
   void clearPolylines() {
-    //clear polyline ..
     setState(() {
       polylines.clear();
     });
+  }
+
+  void moveToClinic(String clinicName) {
+    for (Marker marker in myMarker) {
+      if (marker.infoWindow.title == clinicName) {
+        _controller.future.then((controller) {
+          controller.animateCamera(CameraUpdate.newLatLng(marker.position));
+        });
+
+        _searchController.clear();
+        suggestions.clear();
+        return;
+      }
+    }
+  }
+
+  void closeDialog() {
+    Navigator.of(context).pop();
   }
 
   void drawPolyline(List<LatLng> polylineCoordinates) {
@@ -247,6 +384,94 @@ class _MapLocationState extends State<MapLocation> {
   }
 
 
+  Future<Map<String, String>> getDistanceAndDuration(
+      LatLng origin, LatLng destination) async {
+    final apiKey = 'AIzaSyBayQdqPuNJaYbS5vOd_ij7WsQdyPojKsk';
+    final apiUrl =
+        'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=${origin.latitude},${origin.longitude}&'
+        'destination=${destination.latitude},${destination.longitude}&'
+        'mode=driving&key=$apiKey';
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final decodedData = json.decode(response.body);
+
+      if (decodedData['status'] == 'OK') {
+        final List<dynamic> routes = decodedData['routes'];
+        if (routes.isNotEmpty) {
+          final List<dynamic> legs = routes[0]['legs'];
+          if (legs.isNotEmpty) {
+            final Map<String, String> result = {
+              'distance': legs[0]['distance']['text'],
+              'duration': legs[0]['duration']['text'],
+            };
+            return result;
+          }
+        }
+      }
+    }
+
+    print('Failed to fetch distance and duration');
+    return {};
+  }
+
+
+  Future<void> searchClinics(String query) async {
+    final response = await http.get(
+      Uri.parse('http://${MyApp.ipAddress}${MyApp.clinicPath}?q=$query'),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      final List<Marker> searchedMarkers = data.map<Marker>((dynamic item) {
+        return Marker(
+          markerId: MarkerId(item['clinicID'].toString()),
+          position: LatLng(
+              double.parse(item['latitude']),
+              double.parse(item['longitude'])),
+          infoWindow: InfoWindow(
+            title: item['clinicName'],
+            snippet: 'Phone: ${item['phone']}\n',
+          ),
+          onTap: () {
+            // Handle tap on the marker's InfoWindow
+            print('Marker tapped: ${item['clinicName']}');
+            showDistanceAndDuration(item);
+
+          },
+        );
+      }).toList();
+
+      setState(() {
+        myMarker.clear();
+        myMarker.addAll(searchedMarkers);
+      });
+    } else {
+      print('Failed to fetch search results');
+    }
+  }
+
+  Future<void> updateSuggestions(String query) async {
+    final response = await http.get(
+      Uri.parse(
+          'http://${MyApp.ipAddress}${MyApp.clinicPath}/suggestions?q=$query'),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      final List<String> clinicNames = data.map<String>((dynamic item) {
+        return item['clinicName'] as String;
+      }).toList();
+
+      setState(() {
+        suggestions = clinicNames;
+      });
+    } else {
+      print('Failed to fetch search suggestions');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -261,19 +486,20 @@ class _MapLocationState extends State<MapLocation> {
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
             },
+            onTap: (_) {
+              // Clear polylines when tapping on the map
+              //clearPolylines();
+            },
           ),
           Positioned(
-            top:10,
+            top: 40,
             left: 0,
             right: 16,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               height: 53,
               decoration: BoxDecoration(
-
-                // Set the background color with opacity
-                borderRadius: BorderRadius.circular(
-                    20.0), // Set the border radius
+                borderRadius: BorderRadius.circular(20.0),
               ),
               child: Row(
                 children: [
@@ -285,31 +511,70 @@ class _MapLocationState extends State<MapLocation> {
                   ),
                   Expanded(
                     child: TextField(
+                      controller: _searchController,
+                      onChanged: (query) {
+                        updateSuggestions(query);
+                      },
                       decoration: InputDecoration(
-                        hintText: 'Search...',
+                        hintText: 'Search Clinic..',
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black), // Set the border color
+                          borderSide: BorderSide(color: Colors.black),
                           borderRadius: BorderRadius.circular(20.0),
                         ),
-                        fillColor: Colors.transparent,
-                        // Set the background color of the text field
-                        filled: false,
+                        fillColor: Colors.white70,
+                        filled: true,
+                        hintStyle: TextStyle(
+                          color: Colors.black54, // You can set any color you prefer
+                        ),
                       ),
-                      // Handle the onChanged or onSubmitted callback as needed
                     ),
                   ),
                 ],
               ),
             ),
           ),
+          if (suggestions.isNotEmpty)
+            Positioned(
+              top: 95,
+              left: 10,
+              right: 10,
+              child: Card(
+                elevation: 5,
+                child: Column(
+                  children: [
+                    for (String suggestion in suggestions)
+                      ListTile(
+                        title: Text(suggestion),
+                        onTap: () {
+                          // You can add logic to handle suggestion selection
+                          _searchController.text = suggestion;
+                          searchClinics(suggestion);
+                          moveToClinic(suggestion);
+                        },
+                      ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.location_searching),
         onPressed: () {
           packData();
+          clearPolylines();
+          fetchMarkers();
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+
     );
   }
+}
+
+int hexColor(String color) {
+  String newColor = '0xff' + color;
+  newColor = newColor.replaceAll('#', '');
+  int finalColor = int.parse(newColor);
+  return finalColor;
 }
