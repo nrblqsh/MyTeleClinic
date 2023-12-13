@@ -219,6 +219,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
      ),
     );
   }
+  //
 }class SuccessPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
