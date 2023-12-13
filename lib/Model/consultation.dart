@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:my_teleclinic/Controller/request_controller.dart';
+import '';
 
 
 class Consultation {
@@ -12,6 +13,8 @@ class Consultation {
   String consultationSymptom;
   String consultationTreatment;
   String consultationStatus;
+  //String? specialistName; // Add specialist's name field
+  //String? specialistTitle;
   //int procedureID;
 
   Consultation({
@@ -22,6 +25,8 @@ class Consultation {
     required this.consultationStatus,
     required this.consultationTreatment,
     required this.consultationSymptom,
+    //this.specialistName,
+   // this.specialistTitle,
   });
 
   factory Consultation.fromJson(Map<String, dynamic> json) {
@@ -32,7 +37,9 @@ class Consultation {
       specialistID: json['specialistID'] as int,
       consultationTreatment: json['consultationTreatment'],
       consultationStatus: json['consultationStatus'],
-        consultationSymptom: json['consultationStatus']
+      consultationSymptom: json['consultationStatus'],
+     // specialistName: json['specialistName'], // Add this field if it exists in the JSON response
+      //specialistTitle: json['specialistTitle'], // Add this field if it exists in the JSON response
     );
   }
 
@@ -44,6 +51,9 @@ class Consultation {
     'consultationTreatment': consultationTreatment,
     'consultationStatus': consultationStatus,
     'consultationSymptom': consultationSymptom,
+    //'specialistName' : specialistName,
+    //'specialistTitle':specialistTitle
+
   };
 
 
@@ -62,7 +72,7 @@ class Consultation {
 
 
 Future<List<Consultation>> fetchConsultations() async {
-  final String url = 'http://192.168.0.116/teleclinic/consultation.php'; // Modify the path accordingly
+  final String url = 'http://192.168.188.129/teleclinic/consultation.php'; // Modify the path accordingly
   final response = await http.get(Uri.parse(url));
 
   if (response.statusCode == 200) {
@@ -70,7 +80,7 @@ Future<List<Consultation>> fetchConsultations() async {
     return responseData.map((data) => Consultation.fromJson(data)).toList();
   } else {
     throw Exception('Failed to fetch consultations');
+    }
   }
 }
 
-}
