@@ -58,7 +58,7 @@ class viewPatientScreen extends StatefulWidget {
 }
 
 Future<List<Patient>> fetchPatient() async {
-  String url = 'http://192.168.0.116/teleclinic/viewPatient.php';
+  String url = 'http://10.131.74.150/teleclinic/viewPatient.php';
   final response = await http.get(Uri.parse(url));
   return patientFromJson(response.body);
 }

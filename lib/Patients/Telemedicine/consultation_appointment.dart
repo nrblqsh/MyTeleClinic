@@ -1,12 +1,13 @@
-// AppForLater.dart
+// consultation_appointment.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:my_teleclinic/Model/consultation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui';
-import '/Model/booking.dart';
-import '../../Patients/Telemedicine/ViewBooking.dart';
+//import '/Model/booking.dart';
+import '../../Patients/Telemedicine/view_appointment.dart';
 
 
 // void main() {
@@ -116,13 +117,6 @@ Future<void> _loadData()  async{
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Select Date and Time', style: TextStyle(fontSize: 16)),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Duration: ', style: TextStyle(fontSize: 16)),
-                        Text('30 minutes', style: TextStyle(fontSize: 16)),
-                      ],
-                    ),
                   ],
                 ),
               ),
@@ -193,20 +187,21 @@ Future<void> _loadData()  async{
                   child: ElevatedButton(
                     onPressed: () async {
                       // Create a new Booking instance with the selected data
-                      Booking newBooking = Booking(
+                      Consultation consult = Consultation(
                         patientID: patientID, // Replace with the actual patient ID
                         specialistID: specialistID,
-                        appointmentDateTime: DateTime(
+                        consultationDateTime: DateTime(
                           selectedDate.year,
                           selectedDate.month,
                           selectedDate.day,
                           selectedTime.hour,
                           selectedTime.minute,
-                        ),
+                        ), consultationStatus: 'Pending', consultationTreatment: '',
+                        consultationSymptom: '',
                       );
 
                       // Save the booking to the database
-                      bool success = await newBooking.save();
+                      bool success = await consult.save();
 
                       // Show the confirmation container only if the booking is successful
                       if (success) {
@@ -219,7 +214,7 @@ Future<void> _loadData()  async{
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
                     ),
-                    child: Text('Book Appointment'),
+                    child: Text('Book Consultation Appointment'),
                   ),
                 ),
               )
@@ -296,7 +291,7 @@ class SuccessPage extends StatelessWidget {
               ),
               SizedBox(height: 20),
               Text(
-                'Your booking is successful!',
+                'Your appointment booking is successful!',
                 style: TextStyle(fontSize: 20),
               ),
               Padding(
@@ -309,7 +304,7 @@ class SuccessPage extends StatelessWidget {
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
                   ),
-                  child: Text("View Booking"),
+                  child: Text("View Appoinment"),
                 ),
               )
             ]

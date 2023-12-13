@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:my_teleclinic/Patients/Telemedicine/AppForLater.dart';
+import 'package:my_teleclinic/Patients/Telemedicine/consultation_appointment.dart';
 import 'package:my_teleclinic/Patients/Telemedicine/specialist.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../changePassword1.dart';
@@ -27,7 +27,7 @@ class viewSpecialistScreen extends StatefulWidget {
 }
 
 Future<List<Specialist>> fetchSpecialist() async {
-  String url = 'http://10.131.74.150/teleclinic/viewSpecialist.php';
+  String url = 'http://192.168.0.116/teleclinic/viewSpecialist.php';
   final response = await http.get(Uri.parse(url));
   return specialistFromJson(response.body);
 }

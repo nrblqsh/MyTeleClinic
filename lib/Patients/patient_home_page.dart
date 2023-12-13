@@ -6,6 +6,7 @@ import 'package:my_teleclinic/Chatbox/chatbox.dart';
 import '../Map/mapLocation.dart';
 import 'EMR/add_vital_info.dart';
 import 'EMR/vital_info_report.dart';
+import 'Telemedicine/view_appointment.dart';
 import 'Telemedicine/view_specialist.dart';
 import 'settings.dart';
 
@@ -232,7 +233,7 @@ class _HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              viewSpecialistScreen()),
+                              ViewAppointmentScreen()),
                     );
                   },
                   child: Column(

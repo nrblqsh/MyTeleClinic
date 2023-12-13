@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:flutter/material.dart';
 
+import 'add_vital_info.dart';
+
 void main() {
   runApp(MaterialApp(
     home: VitalInfoReportScreen(patientID: 0),
@@ -43,7 +45,7 @@ class _VitalInfoReportScreenState extends State<VitalInfoReportScreen> {
 
   Future<List<VitalInfo>> generateVitalInfoList() async {
     try {
-      var url = 'http://10.131.78.189/teleclinic/vitalInfoReport.php?patientID=$patientID';
+      var url = 'http://10.131.74.150/teleclinic/vitalInfoReport.php?patientID=$patientID';
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
@@ -183,6 +185,13 @@ class _VitalInfoReportScreenState extends State<VitalInfoReportScreen> {
                   color: Colors.black,
                 ),
               ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddVitalInfoScreen( patientID: patientID)));
+
+              },
+              child: Text("Add Vital Info "),
             ),
             ListTile(
               title: Padding(
