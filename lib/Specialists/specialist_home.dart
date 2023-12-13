@@ -20,17 +20,8 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
   int _currentIndex = 2;
   late int specialistID;
   late String specialistName;
-
-  final List<Widget> _pages = [
-    viewPatientScreen(),  //index 0
-    //TeleMedicineScreen(),
-    //SpecialistHomeScreen(),
-    //viewBookingScreen(),
-    SettingsScreen(), //should be in last
-
-    MenuScreen(),
-  ];
-
+  late String logStatus;
+  late List<Widget> _pages = [];
 
   @override
   void initState() {
@@ -38,15 +29,30 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
     _loadSpecialistDetails();
   }
 
-
   Future<void> _loadSpecialistDetails() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       specialistID = pref.getInt("specialistID") ?? 0;
       specialistName = pref.getString("specialistName") ?? '';
+      logStatus = pref.getString("logStatus") ?? 'OFFLINE';
       print(specialistName);
       print(specialistID);
+      print(logStatus);
+
+      // Add createMenuScreen() after loading specialist details
+      _pages = [
+        viewPatientScreen(),  //index 0
+        SettingsScreen(), //should be in last
+        createMenuScreen(),
+      ];
     });
+  }
+
+  MenuScreen createMenuScreen() {
+    return MenuScreen(
+      specialistName: specialistName,
+      logStatus: logStatus,
+    );
   }
 
   @override
@@ -64,6 +70,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
     );
   }
 }
+
 class BottomNavigationBarWidget extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
@@ -106,9 +113,16 @@ class BottomNavigationBarWidget extends StatelessWidget {
     );
   }
 }
-
 class MenuScreen extends StatelessWidget {
-  @override
+
+  final String specialistName;
+  final String logStatus;
+
+  MenuScreen({
+    required this.specialistName,
+    required this.logStatus
+  });
+
   Widget customIconWithLabel(IconData icon, double size, Color iconColor, String label) {
     int bgColor = hexColor('A34040');
 
@@ -169,10 +183,13 @@ class MenuScreen extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  "Services",
+                  "${specialistName}, ${logStatus ?? 'OFFLINE'} Services",
                   style: GoogleFonts.roboto(
                     fontWeight: FontWeight.bold,
-                    textStyle: const TextStyle(fontSize: 22, color: Colors.black),
+                    textStyle: TextStyle(
+                      fontSize: 22,
+                      color: logStatus == 'ONLINE' ? Colors.green : Colors.red,
+                    ),
                   ),
                 ),
                 Icon(
@@ -182,7 +199,7 @@ class MenuScreen extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 10), // Adjust the spacing based on your preference
+            SizedBox(height: 10),
             Container(
               height: 180,
               width: 380,
@@ -195,11 +212,16 @@ class MenuScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    customIconWithLabel(Icons.people_alt, 30, Colors.white, 'View Patient'),
+                    customIconWithLabel(Icons.people_alt, 30, Colors.white,
+                        'View Patient'),
+
                     SizedBox(width: 30),
-                    customIconWithLabel(Icons.assignment_outlined, 30, Colors.white, 'ni untuk apa eh'),
+                    customIconWithLabel(Icons.assignment_outlined, 30,
+                        Colors.white, 'ni untuk apa eh'),
+
                     SizedBox(width: 30),
-                    customIconWithLabel(Icons.calendar_month, 30, Colors.white, 'Appointment List eh '),
+                    customIconWithLabel(Icons.calendar_month, 30,
+                        Colors.white, 'Appointment List eh '),
                     // Add more icons with labels as needed
                   ],
                 ),

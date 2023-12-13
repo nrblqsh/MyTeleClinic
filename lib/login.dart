@@ -67,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
           await pref.setString("phone", phoneController.text);
           await pref.setString("password", passwordController.text);
           await pref.setString("patientName", patientName);
-          await pref.setInt("patientID", patientID);//
+          await pref.setInt("patientID", patientID);
           // Save patient name in SharedPreferences
 
           Navigator.push(
@@ -86,12 +86,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
           String specialistName = data["specialistName"];
           int specialistID = int.parse(data["specialistID"]);
+          String logStatus = data["logStatus"] ?? 'OFFLINE'; // Use null-aware operator
+
 
           final SharedPreferences pref = await SharedPreferences.getInstance();
           await pref.setString("phone", phoneController.text);
           await pref.setString("password", passwordController.text);
           await pref.setString("specialistName", specialistName);
           await pref.setInt("specialistID", specialistID);
+          await pref.setString("logStatus", logStatus);
 
           Navigator.push(
               context, MaterialPageRoute(builder: (context) =>

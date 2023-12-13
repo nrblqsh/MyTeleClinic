@@ -27,7 +27,7 @@ class viewSpecialistScreen extends StatefulWidget {
 }
 
 Future<List<Specialist>> fetchSpecialist() async {
-  String url = 'http://192.168.0.116/teleclinic/viewSpecialist.php';
+  String url = 'http://192.168.8.186/teleclinic/viewSpecialist.php';
   final response = await http.get(Uri.parse(url));
   return specialistFromJson(response.body);
 }
@@ -97,6 +97,8 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                       shrinkWrap: true,
                       itemBuilder: (BuildContext context, index) {
                         Specialist specialist = specialists[index];
+                        bool isSpecialistOnline = specialist.logStatus == 'ONLINE';
+
                         return Card(
                           child: GestureDetector(
                             onTap: () {
@@ -152,13 +154,21 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                               height: 90,
                                             ),
                                           ),
+
                                           Padding(
-                                            padding: const EdgeInsets.only(bottom: 5.0),
-                                            child: Text(
-                                              '${specialist.specialistName}',
-                                              style: TextStyle(fontSize: 20),
+                                            padding: const EdgeInsets.only(bottom: 5.0, ),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  '${specialist.specialistName}',
+                                                  style: TextStyle(fontSize: 20),
+
+                                                ),
+                                                SizedBox(width: 10), // Adjust the spacing between image and indicator
+                                                _buildOnlineIndicator
+                                                  (isSpecialistOnline),
+                                              ],
                                             ),
-                                            //
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.only(bottom: 15.0),
@@ -169,6 +179,8 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                               ),
                                             ),
                                           ),
+
+
                                           Padding(
                                             padding: const EdgeInsets.only(right: 4,left: 4, bottom: 40.0),
                                             child: Text(
@@ -180,15 +192,24 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                               ),
                                             ),
                                           ),
+                                          if (_buildOnlineIndicator(isSpecialistOnline) != null)
                                           ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.push(
-                                                    context, MaterialPageRoute(builder: (context) => SuccessRequestScreen(),));
-                                              },
+                                            onPressed: isSpecialistOnline
+                                                ? () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => SuccessRequestScreen(),
+                                                ),
+                                              );
+                                            }
+                                                : null, // Disable the button if specialist is offline
                                             style: ButtonStyle(
-                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                                              backgroundColor: MaterialStateProperty.all<Color>(
+                                                isSpecialistOnline ? Colors.red : Colors.grey,
+                                              ),
                                             ),
-                                              child: Text("Request Consultation Now"),
+                                            child: Text("Request Consultation Now"),
                                           ),
                                           ElevatedButton(
                                             onPressed: () {
@@ -242,18 +263,27 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          Text(
-                                            '${specialist.specialistName}',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                            ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                '${specialist.specialistName}',
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+                                              SizedBox(width: 5),
+                                              _buildOnlineIndicator
+                                                (isSpecialistOnline),
+                                            ],
                                           ),
+
                                           Text(
                                             '${specialist.specialistTitle}',
                                             style: TextStyle(
                                               fontSize: 14,
                                             ),
                                           ),
+
                                         ],
                                       ),
                                     ),
@@ -293,6 +323,22 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
   late int patientID;
   late int specialistID;
 }
+
+Widget _buildOnlineIndicator(bool isOnline) {
+
+
+  Color indicatorColor = isOnline ? Colors.green : Colors.red;
+  return Container(
+    width: 10,
+    height: 10,
+    margin: EdgeInsets.only(left: 5),
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: indicatorColor,
+    ),
+  );
+}
+
 
 class SuccessRequestScreen extends StatefulWidget {
   const SuccessRequestScreen({super.key});
