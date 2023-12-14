@@ -53,7 +53,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
   Future<void> _loadData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     int storedID = prefs.getInt("patientID") ?? 0;
-    int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
+   // int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
     String storedPhone = prefs.getString("phone") ?? "";
     String storedName = prefs.getString("patientName") ?? "";
 
@@ -61,7 +61,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
       patientID = storedID;
       phone = storedPhone;
       patientName = storedName;
-      specialistID = storedSpecialistID;
+     // specialistID = storedSpecialistID;
     });
   }
 

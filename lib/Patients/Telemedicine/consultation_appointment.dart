@@ -275,7 +275,8 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
 
 
 class SuccessPage extends StatelessWidget {
-  late int patientID;
+  late final int patientID=0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

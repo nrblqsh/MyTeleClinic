@@ -269,7 +269,8 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
                       patientName: '',
                     )));
           } else if (index == 3) {
-            // Add your navigation logic here
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ViewAppointmentScreen(patientID: patientID)));
           } else if (index == 4) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => SettingsScreen(patientID: patientID,)));
