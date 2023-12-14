@@ -249,7 +249,7 @@ class _HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                          CurrentVitalInfoScreen(patientID: patientID,)),
+                          ViewAppointmentScreen(patientID: patientID,)),
                     );
                   },
                   child: Column(
