@@ -1,189 +1,175 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_teleclinic/Patients/EMR/vital_info_report.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    home: eMedicalRecordScreen(),
-  ));
-}
+import '../Telemedicine/view_specialist.dart';
+import '../patient_home_page.dart';
+import '../settings.dart';
+import 'add_vital_info.dart';
+import 'current_vital.dart';
 
-class eMedicalRecordScreen extends StatefulWidget {
-  const eMedicalRecordScreen({super.key});
+// void main() {
+//   runApp(MedicalRecordScreen(patientID: 0 ));
+// }
+
+class MedicalRecordScreen extends StatefulWidget {
+  final int patientID;
+
+  MedicalRecordScreen({required this.patientID});
 
   @override
-  _eMedicalRecordScreenState createState() => _eMedicalRecordScreenState();
+  _MedicalRecordScreenState createState() => _MedicalRecordScreenState();
 }
 
-class _eMedicalRecordScreenState extends State<eMedicalRecordScreen> {
+class _MedicalRecordScreenState extends State<MedicalRecordScreen> {
+  late int patientID;
+  late String patientName;
 
-  var _infos = [
-    {
-      "Info": "Weight",
-      "Image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRz1kwv1DTXkYiC_Z0TqiogSf3HHbqlpTJmuA&usqp=CAU"
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
 
-    },
-    {
-      "Info": "Height",
-      "Image": "https://cdn-icons-png.flaticon.com/512/3209/3209114.png"
-    },
-    {
-      "Info": "Waist Circumference",
-      "Image": "https://us.123rf.com/450wm/vectorwin/vectorwin2003/vectorwin200300678/141472597-waist-circumference-icon-vector-thin-line-sign-isolated-contour-symbol-illustration.jpg"
-    },
-    {
-      "Info": "Blood Glucose",
-      "Image": "https://st3.depositphotos.com/32990740/36636/v/450/depositphotos_366360024-stock-illustration-blood-drop-with-medical-cross.jpg"
-    },
-    {
-      "Info": "Blood Pressure",
-      "Image": "https://www.shutterstock.com/image-vector/blood-pressure-concept-meter-heart-600nw-659070700.jpg"
-    },
-    {
-      "Info": "Heart Rate",
-      "Image": "https://cdn-icons-png.flaticon.com/512/4583/4583463.png"
-    },
-  ];
+  Future<void> _loadData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int storedID = prefs.getInt("patientID") ?? 0;
+   // String storedName = prefs.getString("patientID") ?? "";
+
+    setState(() {
+      patientID = storedID;
+     //patientName = widget.patientName;
+      //print(patientID);
+      //patientIDController.text = patientID.toString();
+    });
+  }
+
+  //const MedicalRecordScreen({Key? key, required int patientID}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(
-      toolbarHeight: 98,
-      backgroundColor: Colors.white,
-      title: Center(child: Image.asset(
-        "asset/MYTeleClinic.png",
-        width: 594,
-        height: 258,
-      ),
-      ),
-    ),
-      body: Container(
-        padding: EdgeInsets.all(15),
-        child: Column(
-            children: [
-              Padding(
-               padding: const EdgeInsets.only(right: 500,top:25),
-                child: Text("Vital Info",
-                  style: GoogleFonts.roboto(
-                    fontWeight: FontWeight. bold,
-                    textStyle: const TextStyle(fontSize: 38, color:Colors.black),),),
-              ), //<------------
-              // Expanded(
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: 778,
-                    height: 400.0,
-                    child: Container(
-                      padding: EdgeInsets.all(24),
-                      // alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.blueAccent),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(24.0) ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blueGrey,
-                            offset: const Offset(
-                              5.0,
-                              5.0,
-                            ),
-                            blurRadius: 10.0,
-                            spreadRadius: 2.0,
-                          ), //BoxShadow
-                          BoxShadow(
-                            color: Colors.white,
-                            offset: const Offset(0.0, 0.0),
-                            blurRadius: 0.0,
-                            spreadRadius: 0.0,
-                          ), //BoxShadow
-                        ],//                 <--- border radius here
-                        ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(3.0),
-                        child: GridView.builder(
-                          itemCount: _infos.length,
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount:3,
-                              mainAxisSpacing: 1.0,
-                              crossAxisSpacing: 50.0,
-                          ),
-                          itemBuilder: (context,index){
-                            return ListTile(
-                                title: Row(
-                                  children: [
-                                    Image.network(_infos[index]["Image"]!,
-                                            width: 90,height: 90,),
-                                  ],
-                                ),
-
-                                subtitle:
-                                 Row(
-                                   children: [
-                                     Column(
-                                       children: [
-                                          Text(_infos[index]["Info"]!,
-                                                    style: const TextStyle(fontSize: 16, color:Colors.black),),
-                                       ],
-                                     ),
-                                   ],
-                                 ),
-
-
-                            );
-                          }, ),
-                      ),
-                    ),
-
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.only(right: 300,top:14),
-                child: Text("Consultation History",
-                  style: GoogleFonts.roboto(
-                    fontWeight: FontWeight. bold,
-                    textStyle: const TextStyle(fontSize: 38, color:Colors.black),),),
+    return Scaffold(
+      body: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 78,
+            backgroundColor: Colors.white,
+            title: Center(
+              child: Image.asset(
+                "asset/MYTeleClinic.png",
+                width: 594,
+                height: 258,
               ),
-          SizedBox(
-            width: 874,
-            height: 404.0,
-            child: Container(
-                margin: EdgeInsets.all(8),
-                // alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blueAccent),
-                  borderRadius: BorderRadius.all(
-                      Radius.circular(24.0) ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.blueGrey,
-                      offset: const Offset(
-                        5.0,
-                        5.0,
-                      ),
-                      blurRadius: 10.0,
-                      spreadRadius: 2.0,
-                    ), //BoxShadow
-                    BoxShadow(
-                      color: Colors.white,
-                      offset: const Offset(0.0, 0.0),
-                      blurRadius: 0.0,
-                      spreadRadius: 0.0,
-                    ), //BoxShadow
-                  ],//                 <--- border radius here
+            ),
+            bottom: TabBar(
+              unselectedLabelColor: Colors.orangeAccent,
+              labelColor: Colors.blueGrey,
+              //
+              indicatorColor: Colors.blueGrey,
+              // Set the color for the selected label
+              tabs: [
+                CustomTab(
+                  text: 'Current Vital Info',
                 ),
+                CustomTab(
+                  text: 'Vital Info History',
+                ),
+              ],
             ),
           ),
-            ]
+          body: TabBarView(
+            children: [
+              CurrentVitalInfoScreen(
+                patientID: 0,
+              ),
+              VitalInfoReportScreen(
+                patientID: 0,
+              ),
+            ],
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            //currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() {
+                //_currentIndex = index;
+              });
+
+              if (index == 0) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            MedicalRecordScreen(patientID: patientID)));
+              } else if (index == 1) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => viewSpecialistScreen(patientID: patientID,)));
+              } else if (index == 2) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => HomePage(
+                              patientID: patientID,
+                              phone: '',
+                              patientName: '',
+                            )));
+              } else if (index == 3) {
+                // Add your navigation logic here
+              } else if (index == 4) {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SettingsScreen(patientID: patientID,)));
+              }
+            },
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.medical_services),
+                label: 'EMR',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.health_and_safety),
+                label: 'TeleMedicine',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Menu',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.calendar_today),
+                label: 'View Booking',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.settings),
+                label: 'Settings',
+              ),
+            ],
+            backgroundColor: Colors.grey[700],
+            selectedItemColor: Colors.blueGrey,
+            unselectedItemColor: Colors.grey,
+          ),
         ),
-
-      ), //<---
+      ),
     );
-
-
-
-
-
   }
+}
 
+class CustomTab extends StatelessWidget {
+  //final Icon icon;
+
+  final String text;
+
+  CustomTab({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Tab(
+      icon: Column(
+        children: [
+          const SizedBox(height: 20),
+          Text(text),
+        ],
+      ),
+    );
+  }
 }

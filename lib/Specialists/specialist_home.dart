@@ -42,7 +42,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
       // Add createMenuScreen() after loading specialist details
       _pages = [
         viewPatientScreen(),  //index 0
-        SettingsScreen(), //should be in last
+        SettingsScreen(patientID: 0,), //should be in last
         createMenuScreen(),
       ];
     });

@@ -18,12 +18,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	try{
 
-		$stmt = $db->prepare("INSERT INTO vital_info (`patientID`,`weight`,`height`,`waistCircumference`,
+		$stmt = $db->prepare("INSERT INTO vital_info (`patientID`,`weight`,`height`,`bmi`,`waistCircumference`,
 		`bloodPressure`,`bloodGlucose`,`heartRate`,`latestDate`)
-		VALUES (:patientID, :weight, :height, :waistCircumference, :bloodPressure, :bloodGlucose, :heartRate,
+		VALUES (:patientID, :weight, :height,:bmi, :waistCircumference, :bloodPressure, :bloodGlucose, :heartRate,
 		:latestDate)");
 		$stmt->execute(array(':patientID' => $jsonbody->patientID,':weight' => $jsonbody->weight,':height' => $jsonbody->height,
-		':waistCircumference' => $jsonbody->waistCircumference, ':bloodPressure' => $jsonbody->bloodPressure,
+		':bmi' => $jsonbody->bmi,':waistCircumference' => $jsonbody->waistCircumference, ':bloodPressure' => $jsonbody->bloodPressure,
 		':bloodGlucose' => $jsonbody->bloodGlucose, ':heartRate' => $jsonbody->heartRate,':latestDate' => $jsonbody->latestDate));
 		http_response_code(200);
 	}catch(Exception $ee) {

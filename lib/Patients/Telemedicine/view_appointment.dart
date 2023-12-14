@@ -1,26 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:my_teleclinic/Patients/Telemedicine/view_specialist.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../Model/consultation.dart';
-import '/Patients/Telemedicine/specialist.dart';
+import '../EMR/e_medical_record.dart';
+import '../patient_home_page.dart';
+import '../settings.dart';
+import '../../Model/specialist.dart';
 import 'package:intl/intl.dart';
 
 
-void main() {
-  runApp(const MaterialApp(
-    home: ViewAppointmentScreen(),
-  ));
-}
+// void main() {
+//   runApp(const MaterialApp(
+//     home: ViewAppointmentScreen(),
+//   ));
+// }
 
 class ViewAppointmentScreen extends StatefulWidget {
-  const ViewAppointmentScreen({Key? key}) : super(key: key);
-
+  final int patientID;
+  //const ViewAppointmentScreen({Key? key}) : super(key: key);
+  ViewAppointmentScreen({required this.patientID});
   @override
   _ViewAppointmentScreenState createState() => _ViewAppointmentScreenState();
 }
 
 class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
+  late int patientID;
   late Future<List<Consultation>> futureConsultations;
+
+
+  Future<void> _loadData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int storedID = prefs.getInt("patientID") ?? 0;
+
+    setState(() {
+      patientID = storedID;
+
+    });
+  }
+
 
   String _formatDateTime(String dateTimeString) {
     DateTime dateTime = DateTime.parse(dateTimeString); // Parse the string into a DateTime object
@@ -30,11 +49,12 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
   @override
   void initState() {
     super.initState();
+    _loadData();
     futureConsultations = fetchConsultations();
   }
 
   Future<List<Consultation>> fetchConsultations() async {
-    final String url = 'http://192.168.188.129/teleclinic/consultation.php';
+    final String url = 'http://192.168.0.116/teleclinic/consultation.php';
 
     final response = await http.get(Uri.parse(url));
 
@@ -47,7 +67,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
   }
 
   Future<void> cancelAppointment(int consultationID, int patientID) async {
-    final String url = 'http://192.168.188.129/teleclinic/cancelAppointment.php?consultationID=$consultationID&patientID=$patientID';
+    final String url = 'http://192.168.0.116/teleclinic/cancelAppointment.php?consultationID=$consultationID&patientID=$patientID';
 
     final response = await http.delete(Uri.parse(url));
 
@@ -65,6 +85,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    int _currentIndex =3;
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 68,
@@ -163,7 +184,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
                                       onPressed: () async {
                                         Navigator.push(
                                           context,
-                                          MaterialPageRoute(builder: (context) => ViewAppointmentScreen()),
+                                          MaterialPageRoute(builder: (context) => ViewAppointmentScreen(patientID: patientID,)),
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
@@ -197,7 +218,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 //Text('Patient ID: ${consultation.patientID}'),
-                                Text('Specialist ID: ${consultation.specialistID}'),
+                                Text('Specialist Name: ${consultation.specialistID}'),
                                 // Add more fields as needed
                               ],
                             ),
@@ -216,10 +237,75 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
         ),
         ),
        ]
+
      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+
+          if (index == 0) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        MedicalRecordScreen(patientID: patientID)));
+          } else if (index == 1) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => viewSpecialistScreen(
+                      patientID: patientID,
+                    )));
+          } else if (index == 2) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => HomePage(
+                      patientID: patientID,
+                      phone: '',
+                      patientName: '',
+                    )));
+          } else if (index == 3) {
+            // Add your navigation logic here
+          } else if (index == 4) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => SettingsScreen(patientID: patientID,)));
+          }
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.medical_services),
+            label: 'EMR',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.health_and_safety),
+            label: 'TeleMedicine',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Menu',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'View Booking',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+        backgroundColor: Colors.grey[700],
+        selectedItemColor: Colors.blueGrey,
+        unselectedItemColor: Colors.grey,
+      ),
     );
+
   }
 }class SuccessPage extends StatelessWidget {
+  late int patientID;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -245,7 +331,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => ViewAppointmentScreen()));
+                        context, MaterialPageRoute(builder: (context) => ViewAppointmentScreen(patientID: patientID,)));
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(Colors.red),

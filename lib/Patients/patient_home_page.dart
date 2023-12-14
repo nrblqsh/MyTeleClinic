@@ -5,6 +5,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:my_teleclinic/Chatbox/chatbox.dart';
 import '../Map/mapLocation.dart';
 import 'EMR/add_vital_info.dart';
+import 'EMR/current_vital.dart';
+import 'EMR/e_medical_record.dart';
 import 'EMR/vital_info_report.dart';
 import 'Telemedicine/view_appointment.dart';
 import 'Telemedicine/view_specialist.dart';
@@ -56,6 +58,9 @@ class _HomePageState extends State<HomePage> {
       patientName = widget.patientName;
       patientID = widget.patientID;
     });
+    print(patientID);
+
+
   }
 
   Future<void> getUserLocation() async {
@@ -92,13 +97,24 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(right: 100.0, bottom: 10),
+                  padding: const EdgeInsets.only(right: 255.0, bottom: 3),
                   child: Text(
-                    "Welcome ${patientName},",
+                    "Welcome,",
                     style: GoogleFonts.roboto(
                       fontWeight: FontWeight.bold,
                       textStyle:
                           const TextStyle(fontSize: 22, color: Colors.black),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 30.0, bottom: 5),
+                  child: Text(
+                    "${patientName}",
+                    style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.bold,
+                      textStyle:
+                      const TextStyle(fontSize: 22, color: Colors.black),
                     ),
                   ),
                 ),
@@ -177,7 +193,7 @@ class _HomePageState extends State<HomePage> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      VitalInfoReportScreen(patientID: 0)),
+                                      MedicalRecordScreen(patientID: patientID)),
                             );
                           },
                           child: Column(
@@ -204,7 +220,7 @@ class _HomePageState extends State<HomePage> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      viewSpecialistScreen()),
+                                      viewSpecialistScreen(patientID: patientID,)),
                             );
                           },
                           child: Column(
@@ -233,7 +249,7 @@ class _HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              ViewAppointmentScreen()),
+                          CurrentVitalInfoScreen(patientID: patientID,)),
                     );
                   },
                   child: Column(
@@ -358,19 +374,22 @@ class _HomePageState extends State<HomePage> {
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        AddVitalInfoScreen(patientID: patientID)));
+                        MedicalRecordScreen(patientID: patientID)));
           } else if (index == 1) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => viewSpecialistScreen()));
+                    builder: (context) => viewSpecialistScreen(patientID: patientID,)));
           } else if (index == 2) {
             Navigator.pushReplacementNamed(context, '/menu');
           } else if (index == 3) {
-            // Add your navigation logic here
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ViewAppointmentScreen(patientID: patientID,)));
           } else if (index == 4) {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => SettingsScreen()));
+                MaterialPageRoute(builder: (context) => SettingsScreen(patientID: patientID,)));
           }
         },
         items: [

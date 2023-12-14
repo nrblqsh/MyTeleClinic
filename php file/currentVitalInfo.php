@@ -18,7 +18,7 @@ if (isset($_GET['patientID'])) {
     }
 
     // Use prepared statement to prevent SQL injection
-    $sql = "SELECT * FROM $table WHERE patientID = ? ORDER BY infoID";
+    $sql = "SELECT * FROM $table WHERE patientID = ? ORDER BY infoID DESC LIMIT 1 ";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $patientID);
 

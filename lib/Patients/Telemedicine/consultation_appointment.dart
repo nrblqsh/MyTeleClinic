@@ -70,10 +70,10 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     _loadData();
   }
 
-Future<void> _loadData()  async{
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  int storedID = prefs.getInt("patientID") ?? 0;
-  //int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
+  Future<void> _loadData()  async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int storedID = prefs.getInt("patientID") ?? 0;
+    //int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
 
     setState(() {
       patientID = storedID;
@@ -186,6 +186,7 @@ Future<void> _loadData()  async{
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
+                      print(specialistID);
                       // Create a new Booking instance with the selected data
                       Consultation consult = Consultation(
                         patientID: patientID, // Replace with the actual patient ID
@@ -274,6 +275,7 @@ Future<void> _loadData()  async{
 
 
 class SuccessPage extends StatelessWidget {
+  late int patientID;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -299,7 +301,7 @@ class SuccessPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => ViewAppointmentScreen()));
+                        context, MaterialPageRoute(builder: (context) => ViewAppointmentScreen(patientID: patientID,)));
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(Colors.red),

@@ -26,7 +26,7 @@ class Consultation {
     required this.consultationTreatment,
     required this.consultationSymptom,
     //this.specialistName,
-   // this.specialistTitle,
+    // this.specialistTitle,
   });
 
   factory Consultation.fromJson(Map<String, dynamic> json) {
@@ -38,7 +38,7 @@ class Consultation {
       consultationTreatment: json['consultationTreatment'],
       consultationStatus: json['consultationStatus'],
       consultationSymptom: json['consultationStatus'],
-     // specialistName: json['specialistName'], // Add this field if it exists in the JSON response
+      // specialistName: json['specialistName'], // Add this field if it exists in the JSON response
       //specialistTitle: json['specialistTitle'], // Add this field if it exists in the JSON response
     );
   }
@@ -71,16 +71,15 @@ class Consultation {
   }
 
 
-Future<List<Consultation>> fetchConsultations() async {
-  final String url = 'http://192.168.188.129/teleclinic/consultation.php'; // Modify the path accordingly
-  final response = await http.get(Uri.parse(url));
+  Future<List<Consultation>> fetchConsultations() async {
+    final String url = 'http://192.168.0.116/teleclinic/consultation.php'; // Modify the path accordingly
+    final response = await http.get(Uri.parse(url));
 
-  if (response.statusCode == 200) {
-    final List<dynamic> responseData = json.decode(response.body);
-    return responseData.map((data) => Consultation.fromJson(data)).toList();
-  } else {
-    throw Exception('Failed to fetch consultations');
+    if (response.statusCode == 200) {
+      final List<dynamic> responseData = json.decode(response.body);
+      return responseData.map((data) => Consultation.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to fetch consultations');
     }
   }
 }
-
