@@ -35,16 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response->error = "Error occurred " . $ee->getMessage();
     }
 }  else if ($_SERVER["REQUEST_METHOD"] == "GET") {
-      try {
-          $stmt = $db->prepare("SELECT * FROM consultation INNER JOIN specialist ON consultation.specialistID = specialist.specialistID;");
-          $stmt->execute();
-          $response = $stmt->fetchAll(PDO::FETCH_ASSOC);
-          http_response_code(200);
-      } catch (Exception $ee) {
-          http_response_code(500);
-          $response->error = "Error occurred " . $ee->getMessage();
-      }
-}
+
 
 echo json_encode($response);
 exit();

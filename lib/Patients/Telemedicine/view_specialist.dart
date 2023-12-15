@@ -6,6 +6,8 @@ import 'package:my_teleclinic/Patients/Telemedicine/consultation_appointment.dar
 import 'package:my_teleclinic/Model/specialist.dart';
 import 'package:my_teleclinic/Patients/Telemedicine/view_appointment.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../Controller/request_controller.dart';
+import '../../Model/consultation.dart';
 import '../../changePassword1.dart';
 import '../EMR/e_medical_record.dart';
 import '../patient_home_page.dart';
@@ -45,15 +47,29 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
   late String phone;
   late String patientName;
 
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
+  bool showConfirmation = false;
+
   @override
   void initState() {
     _loadData();
   }
 
   Future<void> _loadData() async {
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+    //   RequestController req = RequestController(
+    //       path: "/api/timezone/Asia/Kuala_Lumpur",
+    //       server:"http://worldtimeapi.org");
+    //
+    //   req.get().then((value) {
+    //     dynamic res = req.result();
+    //     selectedDate =
+    //         DateTime.parse(res["datetime"].toString().substring(0,19).replaceAll('T',''));
+    //   });
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     int storedID = prefs.getInt("patientID") ?? 0;
-   // int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
+    // int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
     String storedPhone = prefs.getString("phone") ?? "";
     String storedName = prefs.getString("patientName") ?? "";
 
@@ -61,13 +77,13 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
       patientID = storedID;
       phone = storedPhone;
       patientName = storedName;
-     // specialistID = storedSpecialistID;
+      // specialistID = storedSpecialistID;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    int _currentIndex =1;
+    int _currentIndex = 1;
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 68,
@@ -227,7 +243,32 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                             null)
                                           ElevatedButton(
                                             onPressed: isSpecialistOnline
-                                                ? () {
+                                                ? () async {
+                                                    print(specialistID);
+                                                    // Create a new Booking instance with the selected data
+                                                    Consultation consult =
+                                                        Consultation(
+                                                      patientID: patientID,
+                                                      // Replace with the actual patient ID
+                                                      specialistID:
+                                                          specialistID,
+                                                      consultationDateTime:
+                                                          selectedDate,
+                                                      consultationStatus:
+                                                          'Pending',
+                                                      consultationTreatment: '',
+                                                      consultationSymptom: '',
+                                                    );
+                                                    bool success =
+                                                        await consult.save();
+
+                                                    // Show the confirmation container only if the booking is successful
+                                                    if (success) {
+                                                      setState(() {
+                                                        showConfirmation = true;
+                                                      });
+                                                    }
+
                                                     Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
@@ -236,9 +277,13 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                                         ));
                                                   }
                                                 : null,
-                                            style:  ButtonStyle(
-                                              backgroundColor: MaterialStateProperty.all<Color>(
-                                                isSpecialistOnline ? Colors.red : Colors.grey,
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all<
+                                                      Color>(
+                                                isSpecialistOnline
+                                                    ? Colors.red
+                                                    : Colors.grey,
                                               ),
                                             ),
                                             child: Text(
@@ -314,11 +359,10 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                               ),
                                             ),
                                             SizedBox(width: 5),
-                                            _buildOnlineIndicator
-                                              (isSpecialistOnline),
+                                            _buildOnlineIndicator(
+                                                isSpecialistOnline),
                                           ],
                                         ),
-
                                         Text(
                                           '${specialist.specialistTitle}',
                                           style: TextStyle(
@@ -376,12 +420,20 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                           patientName: '',
                         )));
           } else if (index == 3) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ViewAppointmentScreen(patientID: patientID,)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ViewAppointmentScreen(
+                          patientID: patientID,
+                        )));
             // Add your navigation logic here
           } else if (index == 4) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => SettingsScreen(patientID: patientID,)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => SettingsScreen(
+                          patientID: patientID,
+                        )));
           }
         },
         items: [
@@ -445,7 +497,7 @@ Widget _buildOnlineIndicator(bool isOnline) {
 }
 
 class _SuccessRequestState extends State<SuccessRequestScreen> {
-  late String phone; // To store the retrieved phone number
+  late String phone=''; // To store the retrieved phone number
   late String patientName;
   late int patientID;
   late int specialistID;
