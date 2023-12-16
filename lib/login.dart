@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
     else {
       print("tak dapat");
       var url = Uri.http(
-          "192.168.8.186", '/teleclinic/login.php', {'q': '{http}'});
+          "192.168.0.116", '/teleclinic/login.php', {'q': '{http}'});
 
       try {
         var response = await http.post(url, body: {
@@ -62,18 +62,19 @@ class _LoginScreenState extends State<LoginScreen> {
           // Login successful for patient, extract patient name
           String patientName = data["patientName"];
           int patientID = int.parse(data["patientID"]);
+          print(patientID);
 
           final SharedPreferences pref = await SharedPreferences.getInstance();
           await pref.setString("phone", phoneController.text);
           await pref.setString("password", passwordController.text);
           await pref.setString("patientName", patientName);
-          await pref.setInt("patientID", patientID);//
+          await pref.setInt("patientID", patientID);
           // Save patient name in SharedPreferences
 
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => HomePage(phone: '', patientName: '', patientID: 0,),
+              builder: (context) => HomePage(phone: '', patientName: patientName, patientID: patientID,),
 
             ),
           );
@@ -86,12 +87,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
           String specialistName = data["specialistName"];
           int specialistID = int.parse(data["specialistID"]);
+          String logStatus = data["logStatus"] ?? 'OFFLINE'; // Use null-aware operator
+
 
           final SharedPreferences pref = await SharedPreferences.getInstance();
           await pref.setString("phone", phoneController.text);
           await pref.setString("password", passwordController.text);
           await pref.setString("specialistName", specialistName);
           await pref.setInt("specialistID", specialistID);
+          await pref.setString("logStatus", logStatus);
 
           Navigator.push(
               context, MaterialPageRoute(builder: (context) =>

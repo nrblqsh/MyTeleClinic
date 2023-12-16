@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 
 import 'add_vital_info.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: VitalInfoReportScreen(patientID: 0),
-  ));
-}
+// void main() {
+//   runApp(MaterialApp(
+//     home: VitalInfoReportScreen(patientID: 0),
+//   ));
+// }
 
 class VitalInfoReportScreen extends StatefulWidget {
   final int patientID;
@@ -45,7 +45,7 @@ class _VitalInfoReportScreenState extends State<VitalInfoReportScreen> {
 
   Future<List<VitalInfo>> generateVitalInfoList() async {
     try {
-      var url = 'http://10.131.74.150/teleclinic/vitalInfoReport.php?patientID=$patientID';
+      var url = 'http://192.168.0.116/teleclinic/vitalInfoReport.php?patientID=$patientID';
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
@@ -161,17 +161,17 @@ class _VitalInfoReportScreenState extends State<VitalInfoReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 98,
-        backgroundColor: Colors.white,
-        title: Center(
-          child: Image.asset(
-            "asset/MYTeleClinic.png",
-            width: 594,
-            height: 258,
-          ),
-        ),
-      ),
+      // appBar: AppBar(
+      //   toolbarHeight: 98,
+      //   backgroundColor: Colors.white,
+      //   title: Center(
+      //     child: Image.asset(
+      //       "asset/MYTeleClinic.png",
+      //       width: 594,
+      //       height: 258,
+      //     ),
+      //   ),
+      // ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -186,13 +186,13 @@ class _VitalInfoReportScreenState extends State<VitalInfoReportScreen> {
                 ),
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AddVitalInfoScreen( patientID: patientID)));
-
-              },
-              child: Text("Add Vital Info "),
-            ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     Navigator.push(context, MaterialPageRoute(builder: (context) => AddVitalInfoScreen( patientID: patientID)));
+            //
+            //   },
+            //   child: Text("Add Vital Info "),
+            // ),
             ListTile(
               title: Padding(
                 padding: EdgeInsets.only(top: 30, bottom: 30),
@@ -241,8 +241,20 @@ class _VitalInfoReportScreenState extends State<VitalInfoReportScreen> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddVitalInfoScreen(patientID: patientID),
+            ),
+          );
+        },
+        child: Icon(Icons.add),
+      ),
     );
   }
+
 }
 
 class VitalInfoDataSource extends DataGridSource {
@@ -261,7 +273,7 @@ class VitalInfoDataSource extends DataGridSource {
   void buildDataGridRow() {
     _vitalInfoDataGridRows = vitalInfos
         .map<DataGridRow>((e) => DataGridRow(cells: [
-     // DataGridCell<int>(columnName: 'infoID', value: e.infoID),
+      // DataGridCell<int>(columnName: 'infoID', value: e.infoID),
       DataGridCell<double>(columnName: 'weight', value: e.weight),
       DataGridCell<double>(columnName: 'height', value: e.height),
       DataGridCell<double>(
@@ -274,7 +286,7 @@ class VitalInfoDataSource extends DataGridSource {
       DataGridCell<double>(columnName: 'heartRate', value: e.heartRate),
       DataGridCell<String>(
           columnName: 'latestDate', value: e.latestDate),
-    //  DataGridCell<int>(columnName: 'patientID', value: e.patientID),
+      //  DataGridCell<int>(columnName: 'patientID', value: e.patientID),
     ]))
         .toList();
   }

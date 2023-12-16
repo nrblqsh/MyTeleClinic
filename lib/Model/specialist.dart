@@ -15,6 +15,7 @@ class Specialist {
   String specialistTitle;
   String phone;
   String password;
+  String logStatus;
 
   Specialist({
     required this.specialistID,
@@ -23,6 +24,8 @@ class Specialist {
     required this.specialistTitle,
     required this.phone,
     required this.password,
+    required this.logStatus
+
   });
 
   factory Specialist.fromJson(Map<String, dynamic> json) => Specialist(
@@ -32,6 +35,8 @@ class Specialist {
     specialistTitle: json["specialistTitle"],
     phone: json["phone"],
     password: json["password"],
+    logStatus: json["logStatus"],
+
   );
 
   Map<String, dynamic> toJson() => {
@@ -41,5 +46,7 @@ class Specialist {
     "specialistTitle": specialistTitle,
     "phone": phone,
     "password": password,
+    "logStatus": logStatus,
+
   };
 }

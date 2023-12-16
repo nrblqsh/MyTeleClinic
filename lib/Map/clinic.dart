@@ -8,8 +8,8 @@ class Clinic {
   double longitude;
   String clinicType;
   String phone;
-  String operationHour;
-  String clinicEmail;
+
+
 
   Clinic({
     required this.clinicId,
@@ -19,8 +19,6 @@ class Clinic {
     required this.longitude,
     required this.clinicType,
     required this.phone,
-    required this.operationHour,
-    required this.clinicEmail,
   });
 
   factory Clinic.fromJson(Map<String, dynamic> json) => Clinic(
@@ -31,8 +29,7 @@ class Clinic {
     longitude: json["longitude"],
     clinicType: json["clinicType"],
     phone: json["phone"],
-    operationHour: json["operationHour"],
-    clinicEmail: json["clinicEmail"],
+
   );
 
   Map<String, dynamic> toJson() => {
@@ -43,7 +40,6 @@ class Clinic {
     "longitude": longitude,
     "clinicType": clinicType,
     "phone": phone,
-    "operationHour": operationHour,
-    "clinicEmail": clinicEmail,
+
   };
 }

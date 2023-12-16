@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/request_controller.dart';
+import '../../Model/vital_info.dart';
 import '../../changePassword1.dart';
 import '../patient_home_page.dart';
 import '../patient_home.dart';
@@ -14,62 +15,62 @@ void main() {
   ));
 }
 
-class VitalInfo {
-  final double weight;
-  final double height;
-  final double waistCircumference;
-  final double bloodPressure;
-  final double bloodGlucose;
-  final double heartRate;
-  final String latestDate;
-  final int patientID;
-
-
-  VitalInfo(
-      this.weight,
-      this.height,
-      this.bloodPressure,
-      this.bloodGlucose,
-      this.heartRate,
-      this.waistCircumference,
-      this.latestDate, this.patientID,
-      );
-
-  VitalInfo.fromJson(Map<String, dynamic> json)
-      : patientID = int.parse(json['patientID'].toString()),
-        weight = json['weight'],
-        height = json['height'],
-        waistCircumference = json['waistCircumference'],
-        bloodGlucose = json['bloodGlucose'],
-        bloodPressure = json['bloodPressure'],
-        heartRate = json['heartRate'],
-        latestDate = json['latestDate'];
-
-  // toJson will be automatically called by jsonEncode when necessary
-  Map<String, dynamic> toJson() => {'patientID': patientID,'weight': weight, 'height': height,
-    'waistCircumference': waistCircumference,  'bloodPressure': bloodPressure,
-    'bloodGlucose': bloodGlucose,  'heartRate': heartRate, 'latestDate': latestDate};
-
-
-  Future<bool> save() async {
-    RequestController req = RequestController(path: "/teleclinic/vitalInfo.php?");
-    req.setBody(toJson());
-    await req.post();
-    return req.status() == 200;
-  }
-
-  static Future<List<VitalInfo>> loadAll() async {
-    List<VitalInfo> result = [];
-    RequestController req = RequestController(path: "/teleclinic/vitalInfo.php");
-    await req.get();
-    if (req.status() == 200 && req.result() != null) {
-      for (var item in req.result()) {
-        result.add(VitalInfo.fromJson(item));
-      }
-    }
-    return result;
-  }
-}
+// class VitalInfo {
+//   final double weight;
+//   final double height;
+//   final double waistCircumference;
+//   final double bloodPressure;
+//   final double bloodGlucose;
+//   final double heartRate;
+//   final String latestDate;
+//   final int patientID;
+//
+//
+//   VitalInfo(
+//       this.weight,
+//       this.height,
+//       this.bloodPressure,
+//       this.bloodGlucose,
+//       this.heartRate,
+//       this.waistCircumference,
+//       this.latestDate, this.patientID,
+//       );
+//
+//   VitalInfo.fromJson(Map<String, dynamic> json)
+//       : patientID = int.parse(json['patientID'].toString()),
+//         weight = json['weight'],
+//         height = json['height'],
+//         waistCircumference = json['waistCircumference'],
+//         bloodGlucose = json['bloodGlucose'],
+//         bloodPressure = json['bloodPressure'],
+//         heartRate = json['heartRate'],
+//         latestDate = json['latestDate'];
+//
+//   // toJson will be automatically called by jsonEncode when necessary
+//   Map<String, dynamic> toJson() => {'patientID': patientID,'weight': weight, 'height': height,
+//     'waistCircumference': waistCircumference,  'bloodPressure': bloodPressure,
+//     'bloodGlucose': bloodGlucose,  'heartRate': heartRate, 'latestDate': latestDate};
+//
+//
+//   Future<bool> save() async {
+//     RequestController req = RequestController(path: "/teleclinic/vitalInfo.php?");
+//     req.setBody(toJson());
+//     await req.post();
+//     return req.status() == 200;
+//   }
+//
+//   static Future<List<VitalInfo>> loadAll() async {
+//     List<VitalInfo> result = [];
+//     RequestController req = RequestController(path: "/teleclinic/vitalInfo.php");
+//     await req.get();
+//     if (req.status() == 200 && req.result() != null) {
+//       for (var item in req.result()) {
+//         result.add(VitalInfo.fromJson(item));
+//       }
+//     }
+//     return result;
+//   }
+// }
 
 class AddVitalInfoScreen extends StatefulWidget {
   final int patientID;
@@ -109,8 +110,8 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
         dateController.text =
             res["date"].toString().substring(0, 19).replaceAll('T', '');
       });
-    //super.initState();
-    _loadData();
+      //super.initState();
+      _loadData();
       //patientID.addAll(await VitalInfo.loadAll());
       weights.addAll(await VitalInfo.loadAll());
       heights.addAll(await VitalInfo.loadAll());
@@ -141,7 +142,7 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
 
   Future<void> _loadData()  async{
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-     int storedID = prefs.getInt("patientID") ?? 0;
+    int storedID = prefs.getInt("patientID") ?? 0;
 
     setState(() {
       patientID = storedID;
@@ -164,13 +165,13 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
         heartRate.isNotEmpty &&
         waistCircumference.isNotEmpty) {
       VitalInfo vitalInfo = VitalInfo(
-        double.parse(weight),
-        double.parse(height),
-        double.parse(waistCircumference),
-        double.parse(bloodPressure),
-        double.parse(bloodGlucose),
-        double.parse(heartRate),
-        dateController.text, int.parse(patientIDController.text));
+          double.parse(weight),
+          double.parse(height),
+          double.parse(waistCircumference),
+          double.parse(bloodPressure),
+          double.parse(bloodGlucose),
+          double.parse(heartRate),
+          dateController.text, int.parse(patientIDController.text));
 
       if (await vitalInfo.save()) {
         setState(() {
@@ -187,8 +188,8 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
           // bloodGlucoseController.clear();
           // heartRateController.clear();
           Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => SuccessAddScreen()),);
+            context,
+            MaterialPageRoute(builder: (context) => SuccessAddScreen()),);
         });
       } else {
         _showMessage("Failed to save Vital Info data");

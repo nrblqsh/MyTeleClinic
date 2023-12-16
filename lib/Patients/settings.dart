@@ -1,21 +1,33 @@
+import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:my_teleclinic/Patients/patient_home_page.dart';
 import 'package:my_teleclinic/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../changePassword1.dart';
+import 'EMR/e_medical_record.dart';
+import 'Telemedicine/view_appointment.dart';
+import 'Telemedicine/view_specialist.dart';
 import 'editProfile.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: SettingsScreen(),
-  ));
-}
+// void main() {
+//   runApp(MaterialApp(
+//     home: SettingsScreen(),
+//   ));
+// }
 
 class SettingsScreen extends StatefulWidget {
+   final int patientID;
+       int _currentIndex = 4;
+
+
+  SettingsScreen({required this.patientID});
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  late int patientID;
   void showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -25,6 +37,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
+  }
+  @override
+  void initState() {
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int storedID = prefs.getInt("patientID") ?? 0;
+    int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
+    String storedPhone = prefs.getString("phone") ?? "";
+    String storedName = prefs.getString("patientName") ?? "";
+
+    setState(() {
+      patientID = storedID;
+    });
   }
 
   Widget settings(String label, VoidCallback onTap) {
@@ -110,6 +138,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    int _currentIndex =4;
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 70,
@@ -351,6 +380,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
+        bottomNavigationBar: BottomNavigationBar(
+
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+
+            if (index == 0) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MedicalRecordScreen(patientID: patientID)));
+            } else if (index == 1) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => viewSpecialistScreen(patientID: patientID,)));
+            } else if (index == 2) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomePage(patientID: patientID, phone: '', patientName: '',)));
+            } else if (index == 3) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ViewAppointmentScreen(patientID: patientID,)));
+            } else if (index == 4) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => SettingsScreen(patientID: patientID,)));
+            }
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.medical_services),
+              label: 'EMR',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.health_and_safety),
+              label: 'TeleMedicine',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Menu',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
+              label: 'View Booking',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+          backgroundColor: Colors.grey[700],
+          selectedItemColor: Colors.blueGrey,
+          unselectedItemColor: Colors.grey,
+        )
     );
   }
 }
@@ -406,6 +495,7 @@ class GeneralPage extends StatelessWidget {
           ),
         ],
       ),
+
     );
   }
 }

@@ -35,11 +35,16 @@ if ($count == 1) {
     $specialistName = $row['specialistName'];
     $specialistID = $row['specialistID'];
 
+    // Update the logStatus to 'online' when a specialist logs in
+    $update_status_sql = "UPDATE specialist SET logStatus = 'ONLINE' WHERE specialistID = $specialistID";
+    mysqli_query($db, $update_status_sql);
+
     // Create an associative array to send as JSON response for specialist
     $response = array(
         "status" => "success specialist",
         "specialistName" => $specialistName,
-        "specialistID" => $specialistID
+        "specialistID" => $specialistID,
+	"logStatus" => "ONLINE"
     );
     echo json_encode($response);
 } else {
