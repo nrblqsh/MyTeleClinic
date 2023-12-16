@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:my_teleclinic/Controller/request_controller.dart';
 import '';
 
-
+//
 class Consultation {
   int? consultationID; // Assuming it's nullable and auto-incremented
   int patientID;
@@ -13,7 +13,7 @@ class Consultation {
   String consultationSymptom;
   String consultationTreatment;
   String consultationStatus;
-  //String? specialistName; // Add specialist's name field
+  String? specialistName; // Add specialist's name field
   //String? specialistTitle;
   //int procedureID;
 
@@ -25,7 +25,7 @@ class Consultation {
     required this.consultationStatus,
     required this.consultationTreatment,
     required this.consultationSymptom,
-    //this.specialistName,
+    this.specialistName,
     // this.specialistTitle,
   });
 
@@ -38,7 +38,7 @@ class Consultation {
       consultationTreatment: json['consultationTreatment'],
       consultationStatus: json['consultationStatus'],
       consultationSymptom: json['consultationStatus'],
-      // specialistName: json['specialistName'], // Add this field if it exists in the JSON response
+      specialistName: json['specialistName'], // Add this field if it exists in the JSON response
       //specialistTitle: json['specialistTitle'], // Add this field if it exists in the JSON response
     );
   }
@@ -51,7 +51,7 @@ class Consultation {
     'consultationTreatment': consultationTreatment,
     'consultationStatus': consultationStatus,
     'consultationSymptom': consultationSymptom,
-    //'specialistName' : specialistName,
+    'specialistName' : specialistName,
     //'specialistTitle':specialistTitle
 
   };
@@ -72,7 +72,7 @@ class Consultation {
 
 
   Future<List<Consultation>> fetchConsultations() async {
-    final String url = 'http://192.168.0.116/teleclinic/consultation.php'; // Modify the path accordingly
+    final String url = 'http://192.168.200.150/teleclinic/consultation.php'; // Modify the path accordingly
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
