@@ -34,9 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         http_response_code(500);
         $response->error = "Error occurred " . $ee->getMessage();
     }
-}  else if ($_SERVER["REQUEST_METHOD"] == "GET") {
-
-
+}
 echo json_encode($response);
 exit();
 ?>

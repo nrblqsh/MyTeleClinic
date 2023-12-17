@@ -13,7 +13,8 @@ class Consultation {
   String consultationSymptom;
   String consultationTreatment;
   String consultationStatus;
-  String? specialistName; // Add specialist's name field
+  String? specialistName;
+  String? patientName;// Add specialist's name field
   //String? specialistTitle;
   //int procedureID;
 
@@ -26,6 +27,7 @@ class Consultation {
     required this.consultationTreatment,
     required this.consultationSymptom,
     this.specialistName,
+    this.patientName,
     // this.specialistTitle,
   });
 
@@ -37,8 +39,9 @@ class Consultation {
       specialistID: json['specialistID'] as int,
       consultationTreatment: json['consultationTreatment'],
       consultationStatus: json['consultationStatus'],
-      consultationSymptom: json['consultationStatus'],
-      specialistName: json['specialistName'], // Add this field if it exists in the JSON response
+      consultationSymptom: json['consultationSymptom'],
+      specialistName: json['specialistName'],
+      patientName: json['patientName'], // Add this field if it exists in the JSON response
       //specialistTitle: json['specialistTitle'], // Add this field if it exists in the JSON response
     );
   }
@@ -52,6 +55,7 @@ class Consultation {
     'consultationStatus': consultationStatus,
     'consultationSymptom': consultationSymptom,
     'specialistName' : specialistName,
+    'patientName' : patientName,
     //'specialistTitle':specialistTitle
 
   };
@@ -70,7 +74,6 @@ class Consultation {
     }
   }
 
-
   Future<List<Consultation>> fetchConsultations() async {
     final String url = 'http://192.168.200.150/teleclinic/consultation.php'; // Modify the path accordingly
     final response = await http.get(Uri.parse(url));
@@ -82,4 +85,6 @@ class Consultation {
       throw Exception('Failed to fetch consultations');
     }
   }
+
+
 }

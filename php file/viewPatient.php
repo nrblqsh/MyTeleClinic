@@ -6,7 +6,7 @@
     $dbname = "teleclinic";
 
   // Give your table name
-    $table = "patient"; // lets create a table named Employees.
+    $table = "patient";
 
     // Create Connection
     $conn = new mysqli($servername, $username, $password, $dbname);
@@ -15,22 +15,19 @@
         die("Connection Failed: " . $conn->connect_error);
         return;
     }
-
-    // Get all records from the database
-    $sql = "SELECT * from $table ";
-    $db_data = array();
-    $result = $conn->query($sql);
-    if($result->num_rows > 0){
-        while($row = $result->fetch_assoc()){
-            $db_data[] = $row;
-        }
-        // Send back the complete records as a json
-        echo json_encode($db_data);
-    }else{
-        echo "error";
+ if ($_SERVER["REQUEST_METHOD"] == "GET") {
+ try {
+        $stmt = $db->prepare("SELECT consultation.*, patient.patientName
+                              FROM consultation
+                              INNER JOIN patient ON consultation.patientID = patient.patientID
+                              WHERE consultation.specialistID = ? AND consultation.consultationStatus = 'Accepted'
+                              GROUP BY consultation.patientID;");
+        $stmt->execute();
+        $response = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        http_response_code(200);
+    } catch (Exception $ee) {
+        http_response_code(500);
+        $response->error = "Error occurred " . $ee->getMessage();
     }
-    $conn->close();
-
-    return;
-
+}
 ?>

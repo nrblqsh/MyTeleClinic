@@ -9,6 +9,7 @@ void main() {
     home: SpecialistHomeScreen(),
   ));
 }
+
 class SpecialistHomeScreen extends StatefulWidget {
   const SpecialistHomeScreen({Key? key}) : super(key: key);
 
@@ -41,8 +42,10 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
 
       // Add createMenuScreen() after loading specialist details
       _pages = [
-        viewPatientScreen(),  //index 0
-        SettingsScreen(patientID: 0,), //should be in last
+        viewPatientScreen(specialistID: specialistID ), //index 0
+        SettingsScreen(
+          patientID: 0,
+        ), //should be in last
         createMenuScreen(),
       ];
     });
@@ -52,6 +55,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
     return MenuScreen(
       specialistName: specialistName,
       logStatus: logStatus,
+      specialistID: specialistID,
     );
   }
 
@@ -113,17 +117,16 @@ class BottomNavigationBarWidget extends StatelessWidget {
     );
   }
 }
-class MenuScreen extends StatelessWidget {
 
+class MenuScreen extends StatelessWidget {
+  final int specialistID;
   final String specialistName;
   final String logStatus;
 
-  MenuScreen({
-    required this.specialistName,
-    required this.logStatus
-  });
+  MenuScreen({required this.specialistName, required this.logStatus, required this.specialistID});
 
-  Widget customIconWithLabel(IconData icon, double size, Color iconColor, String label) {
+  Widget customIconWithLabel(
+      IconData icon, double size, Color iconColor, String label) {
     int bgColor = hexColor('A34040');
 
     return Expanded(
@@ -180,15 +183,25 @@ class MenuScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              "Welcome",
+              style: GoogleFonts.roboto(
+                fontWeight: FontWeight.bold,
+                textStyle: TextStyle(
+                  fontSize: 22,
+                  //color: logStatus == 'ONLINE' ? Colors.green : Colors.red,
+                ),
+              ),
+            ),
             Row(
               children: [
                 Text(
-                  "${specialistName}, ${logStatus ?? 'OFFLINE'} Services",
+                  "${specialistName},",
                   style: GoogleFonts.roboto(
                     fontWeight: FontWeight.bold,
                     textStyle: TextStyle(
                       fontSize: 22,
-                      color: logStatus == 'ONLINE' ? Colors.green : Colors.red,
+                      //color: logStatus == 'ONLINE' ? Colors.green : Colors.red,
                     ),
                   ),
                 ),
@@ -208,21 +221,46 @@ class MenuScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20.0),
               ),
               child: Padding(
-                padding: const EdgeInsets.only(top: 35, right: 15),
+                padding: const EdgeInsets.only(top: 25, right: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    customIconWithLabel(Icons.people_alt, 30, Colors.white,
-                        'View Patient'),
-
-                    SizedBox(width: 30),
-                    customIconWithLabel(Icons.assignment_outlined, 30,
-                        Colors.white, 'ni untuk apa eh'),
-
-                    SizedBox(width: 30),
-                    customIconWithLabel(Icons.calendar_month, 30,
-                        Colors.white, 'Appointment List eh '),
-                    // Add more icons with labels as needed
+                    GestureDetector(
+                      child: customIconWithLabel(
+                          Icons.people_alt, 30, Colors.white, 'View Patient'),
+                      onTap: ()  {
+                        print (specialistID);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => viewPatientScreen(specialistID: specialistID,)),
+                        );
+                      },
+                    ),
+                    GestureDetector(
+                      //child: SizedBox(width: 30),
+                      child: customIconWithLabel(Icons.assignment_outlined, 30,
+                          Colors.white, 'Consultation\nHistory'),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => viewPatientScreen(specialistID: specialistID,)),
+                        );
+                      },
+                    ),
+                    GestureDetector(
+                      //SizedBox(width: 30),
+                      child: customIconWithLabel(Icons.calendar_month, 30,
+                          Colors.white, 'Upcoming\nAppointment'),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => viewPatientScreen(specialistID: specialistID,)),
+                        );
+                      },
+                    ) // Add more icons with labels as needed
                   ],
                 ),
               ),
