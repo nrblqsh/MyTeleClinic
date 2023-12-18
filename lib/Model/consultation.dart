@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:my_teleclinic/Controller/request_controller.dart';
 import '';
+import '../main.dart';
 
 //
 class Consultation {
@@ -60,6 +61,51 @@ class Consultation {
 
   };
 
+  Consultation updateStatus(String newStatus) {
+    // Create a new instance of Consultation with updated status
+    return Consultation(
+      consultationID: this.consultationID,
+      specialistID: this.specialistID,
+      consultationStatus: newStatus,
+      consultationSymptom: this.consultationSymptom,
+      consultationTreatment: this.consultationTreatment,
+      consultationDateTime: this.consultationDateTime,
+      patientID: this.patientID,
+      patientName: this.patientName,
+    );
+  }
+
+  Future<List<Consultation>> fetchTodayConsultations(int specialistID) async {
+    final String url = 'http://${MyApp.ipAddress}/teleclinic/getTodayConsultation.php?specialistID=$specialistID';
+    final response = await http.get(Uri.parse(url));
+    print(specialistID);
+    print('Response Status Code: ${response.statusCode}');
+    print('Content-Type: ${response.headers['content-type']}');
+    print('Response Body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      try {
+        dynamic responseBody = json.decode(response.body);
+
+        // Check if the response is a JSON object
+        if (responseBody is Map<String, dynamic> && responseBody.containsKey('data')) {
+          List<Consultation> consultations = List<Consultation>.from(responseBody['data']
+              .map((consultationData) => Consultation.fromJson(consultationData)));
+          return consultations;
+        } else {
+          print('Unexpected response format. Body is not a JSON object.');
+          return [];
+        }
+
+      } catch (e) {
+        print('Error parsing response: $e');
+        throw Exception('Error parsing response: $e');
+      }
+    } else {
+      print('Failed to fetch today\'s consultations. Status Code: ${response.statusCode}');
+      throw Exception('Failed to fetch today\'s consultations. Status Code: ${response.statusCode}');
+    }
+  }
 
   //add save
   Future<bool> save() async {
@@ -83,6 +129,32 @@ class Consultation {
       return responseData.map((data) => Consultation.fromJson(data)).toList();
     } else {
       throw Exception('Failed to fetch consultations');
+    }
+  }
+
+  Future<List<Consultation>> fetchUpcomingConsultations(int specialistID) async {
+    final String url = 'http://${MyApp.ipAddress}/teleclinic/getUpcomingAppointment.php?specialistID=$specialistID';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      try {
+        dynamic responseBody = json.decode(response.body);
+
+        if (responseBody is Map<String, dynamic> && responseBody.containsKey('data')) {
+          List<Consultation> consultations = List<Consultation>.from(responseBody['data']
+              .map((consultationData) => Consultation.fromJson(consultationData)));
+          return consultations;
+        } else {
+          print('Unexpected response format. Body is not a JSON object.');
+          return [];
+        }
+      } catch (e) {
+        print('Error parsing response: $e');
+        throw Exception('Error parsing response: $e');
+      }
+    } else {
+      print('Failed to fetch upcoming consultations. Status Code: ${response.statusCode}');
+      throw Exception('Failed to fetch upcoming consultations. Status Code: ${response.statusCode}');
     }
   }
 
