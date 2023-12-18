@@ -17,7 +17,7 @@
     }
  if ($_SERVER["REQUEST_METHOD"] == "GET") {
  try {
-        $stmt = $db->prepare("SELECT consultation.*, patient.patientName
+        $stmt = $db->prepare("SELECT consultation.*, patient.*
                               FROM consultation
                               INNER JOIN patient ON consultation.patientID = patient.patientID
                               WHERE consultation.specialistID = ? AND consultation.consultationStatus = 'Accepted'

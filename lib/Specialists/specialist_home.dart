@@ -306,7 +306,7 @@ class _MenuScreenState extends State<MenuScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    viewPatientScreen(specialistID: widget.specialistID),
+                                    ViewUpcomingAppointment(),
                               ),
                             );
                           },

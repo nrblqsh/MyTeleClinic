@@ -15,7 +15,11 @@ class Consultation {
   String consultationTreatment;
   String consultationStatus;
   String? specialistName;
-  String? patientName;// Add specialist's name field
+  String? patientName;
+  String? icNum;
+  String? gender;
+  DateTime? birthDate;
+  String? phone;// Add specialist's name field
   //String? specialistTitle;
   //int procedureID;
 
@@ -29,6 +33,10 @@ class Consultation {
     required this.consultationSymptom,
     this.specialistName,
     this.patientName,
+    this.icNum,
+    this.gender,
+    this.birthDate,
+    this.phone,
     // this.specialistTitle,
   });
 
@@ -42,7 +50,13 @@ class Consultation {
       consultationStatus: json['consultationStatus'],
       consultationSymptom: json['consultationSymptom'],
       specialistName: json['specialistName'],
-      patientName: json['patientName'], // Add this field if it exists in the JSON response
+      patientName: json['patientName'],
+      icNum: json['icNumber'],
+      gender: json['gender'],
+      birthDate : json['birthDate'] != null
+          ? DateTime.tryParse(json['birthDate'])
+          : DateTime.parse('0000-00-00'),
+      phone: json['phone'],// Add this field if it exists in the JSON response
       //specialistTitle: json['specialistTitle'], // Add this field if it exists in the JSON response
     );
   }
@@ -57,6 +71,10 @@ class Consultation {
     'consultationSymptom': consultationSymptom,
     'specialistName' : specialistName,
     'patientName' : patientName,
+    'icNumber': icNum,
+    'gender': gender,
+    'birthDate': birthDate.toString(),
+    'phone': phone,
     //'specialistTitle':specialistTitle
 
   };
@@ -121,7 +139,19 @@ class Consultation {
   }
 
   Future<List<Consultation>> fetchConsultations() async {
-    final String url = 'http://192.168.200.150/teleclinic/consultation.php'; // Modify the path accordingly
+    final String url = 'http://${MyApp.ipAddress}/teleclinic/consultation.php'; // Modify the path accordingly
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> responseData = json.decode(response.body);
+      return responseData.map((data) => Consultation.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to fetch consultations');
+    }
+  }
+
+  Future<List<Consultation>> fetchConsultationByPatient(int specialistID, int patientID) async {
+    final String url = 'http://${MyApp.ipAddress}/teleclinic/patientConsultation.php?patientID=$patientID&&specialistID=$specialistID'; // Modify the path accordingly
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
