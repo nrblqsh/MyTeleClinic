@@ -55,7 +55,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
     _createPages();
   }
 
-  Future<void> _fetchTodayConsultations() async {
+  Future<List<Consultation>> _fetchTodayConsultations() async {
     try {
       final List<Consultation> fetchedConsultations = await Consultation(
         specialistID: specialistID,
@@ -66,30 +66,14 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
         patientID: patientID,
       ).fetchTodayConsultations(specialistID);
 
-      setState(() {
-        todayConsultations = fetchedConsultations;
-      });
-
-      print('Today\'s Consultations:');
-      if (todayConsultations.isNotEmpty) {
-        for (Consultation consultation in todayConsultations) {
-          print(consultation.patientName);
-          print('Consultation ID: ${consultation.consultationID}');
-          print('Patient ID: ${consultation.patientID}');
-          print('Consultation Date and Time: ${consultation.consultationDateTime}');
-          print('Consultation Status: ${consultation.consultationStatus}');
-          print('Consultation Symptom: ${consultation.consultationSymptom}');
-          print('Consultation Treatment: ${consultation.consultationTreatment}');
-          print('Specialist ID: ${consultation.specialistID}');
-          print('------------------------');
-        }
-      } else {
-        print('No consultations for today.');
-      }
+      return fetchedConsultations;
     } catch (e) {
       print('Error fetching today\'s consultations: $e');
+      return []; // Return an empty list in case of an error
     }
   }
+
+
 
   void _navigateToPage(int index) {
     setState(() {
@@ -187,7 +171,7 @@ class MenuScreen extends StatefulWidget {
   final String specialistName;
   final String logStatus;
   int? patientID;
-  final List<Consultation> todayConsultations;
+   List<Consultation> todayConsultations;
   final Future<void> Function() fetchTodayConsultations;
   final Function(int) navigateToPage;
 
@@ -206,6 +190,16 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
+  late Future<List<Consultation>>? futureConsultations;
+
+
+  @override
+  void initState() {
+    super.initState();
+    futureConsultations =
+    widget.fetchTodayConsultations() as Future<List<Consultation>>?;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -275,7 +269,8 @@ class _MenuScreenState extends State<MenuScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    viewPatientScreen(specialistID: widget.specialistID),
+                                    viewPatientScreen(specialistID:
+                                    widget.specialistID),
                               ),
                             );
                           },
@@ -284,7 +279,11 @@ class _MenuScreenState extends State<MenuScreen> {
                       Expanded(
                         child: GestureDetector(
                           child: customIconWithLabel(
-                              Icons.assignment_outlined, 30, Colors.white, 'Consultation\nHistory'),
+                              Icons.assignment_outlined,
+                              30,
+                              Colors.white,
+                              'Consultation\nHistory'),
+
                           onTap: () async {
                             Navigator.push(
                               context,
@@ -357,50 +356,86 @@ class _MenuScreenState extends State<MenuScreen> {
                             ),
                           ],
                         ),
-                        child: FutureBuilder<void>(
-                          future: widget.fetchTodayConsultations(),
-                          builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                        child:FutureBuilder<List<Consultation>>(
+                          future: futureConsultations,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<List<Consultation>> snapshot) {
+
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+
                               return CircularProgressIndicator(); // Display a loading indicator while fetching data
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}');
                             } else {
-                              // Data has been successfully fetched, build the ListView
+                              widget.todayConsultations = snapshot.data ?? [];
                               return ListView.builder(
                                 itemCount: widget.todayConsultations.length,
                                 shrinkWrap: true,
                                 itemBuilder: (BuildContext context, index) {
-                                  Consultation consult = widget.todayConsultations[index];
+
+                                  Consultation consult =
+                                  widget.todayConsultations[index];
+
                                   return Card(
                                     child: Container(
                                       padding: EdgeInsets.all(10),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+
                                         children: [
                                           Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 '${consult.patientName}\n'
 
-                                                    'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
-                                                    'Time: ${DateFormat(' hh:mm a').format(consult.consultationDateTime)}\n'
+                                                    'Date: '
+                                                    '${DateFormat('dd/MM/yyyy').
+                                                format(consult.
+                                                consultationDateTime)}'
+                                                    '\n'
 
-                                                    'Status: ${consult.consultationStatus}\n',
+                                                    'Time: ${DateFormat
+                                                  (' hh:mm a').format
+                                                  (consult.
+                                                consultationDateTime)}'
+                                                    '\n'
+
+                                                    'Status:'
+                                                    ' ${
+                                                    consult.consultationStatus}'
+                                                    '\n',
                                               ),
                                             ],
                                           ),
-                                          if (consult.consultationStatus != 'ACCEPTED')  // Show icon only if status is not 'ACCEPTED'
+                                          if (consult.consultationStatus !=
+                                              'ACCEPTED' &&
+                                              consult.consultationStatus !=
+                                                  'DECLINE')
                                             Container(
                                               child: IconButton(
                                                 icon: Icon(Icons.done),
                                                 onPressed: () async {
                                                   try {
-                                                    int consultationID = consult.consultationID ?? 0;
-                                                    String newStatus = 'ACCEPTED';
+                                                    int consultationID
+                                                    = consult.consultationID
+                                                        ?? 0;
 
-                                                    final response = await http.get(Uri.parse(
-                                                      'http://${MyApp.ipAddress}/teleclinic/updateConsultationStatus.php?consultationID=$consultationID&updateConsultationStatus=$newStatus',
+                                                    String newStatus =
+                                                        'ACCEPTED';
+
+                                                    final response = await
+                                                    http.get(Uri.parse(
+                                                      'http://${MyApp.ipAddress}'
+                                                          '/teleclinic/'
+                                                          'updateConsultationStatus'
+                                                          '.php?consultationID='
+                                                          '$consultationID&'
+                                                          'updateConsultationStatus='
+                                                          '$newStatus',
                                                     ));
 
                                                     if (response.statusCode == 200) {
@@ -408,9 +443,12 @@ class _MenuScreenState extends State<MenuScreen> {
                                                       await Future.delayed(Duration(seconds: 1)); // Add a delay of 1 second (adjust as needed)
                                                       await widget.fetchTodayConsultations();
                                                       widget.navigateToPage(3);
-                                                      setState(() {});
                                                     } else {
-                                                      print('Failed to update status. Status Code: ${response.statusCode}');
+                                                      print(
+                                                          'Failed to update '
+                                                              'status. Status'
+                                                              ' Code: '
+                                                              '${response.statusCode}');
                                                     }
                                                   } catch (e) {
                                                     print('Error updating status: $e');

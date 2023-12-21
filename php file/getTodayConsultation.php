@@ -14,6 +14,9 @@ header('Content-Type: application/json');
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     try {
+        // Set the timezone to Malaysia (Asia/Kuala_Lumpur)
+        date_default_timezone_set('Asia/Kuala_Lumpur');
+
         // Create a MySQLi connection
         $conn = new mysqli($hostname, $username, $password, $database);
 
@@ -22,7 +25,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             die("Connection failed: " . $conn->connect_error);
         }
 
+        // Use CURDATE() to get the current date without the time part
         $today = date("Y-m-d");
+
         $specialistID = isset($_GET['specialistID']) ? $_GET['specialistID'] : null;
 
         // Check if 'specialistID' is not null before using it
@@ -31,9 +36,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             $stmt = $conn->prepare("SELECT c.*, p.patientName
                                    FROM consultation c
                                    LEFT JOIN patient p ON c.patientID = p.patientID
-                                   WHERE DATE(c.consultationDateTime) = ? AND c.specialistID = ?
+                                   WHERE c.consultationDateTime >= ? AND c.consultationDateTime < DATE_ADD(?, INTERVAL 1 DAY) AND c.specialistID = ?
                                    ORDER BY c.consultationDateTime ASC"); // ASC for ascending order
-            $stmt->bind_param("ss", $today, $specialistID);
+            $stmt->bind_param("sss", $today, $today, $specialistID);
 
             // Execute the statement
             if (!$stmt->execute()) {
@@ -60,9 +65,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         http_response_code(500);
         $response->error = "Error occurred " . $ee->getMessage();
     }
-
-    // Remove the var_dump() statement
-    // var_dump($response);
 
     // Echo only the JSON-encoded response
     echo json_encode($response, JSON_UNESCAPED_UNICODE);
