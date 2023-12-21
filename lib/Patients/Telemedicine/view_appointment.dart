@@ -55,7 +55,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
   }
 
   Future<List<Consultation>> fetchConsultations() async {
-    final String url = 'http://192.168.200.150/teleclinic/consultation.php'; // Modify the path accordingly
+    final String url = 'http://192.168.0.179/teleclinic/consultation.php'; // Modify the path accordingly
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -74,7 +74,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
   }
 
   Future<Specialist?> fetchSpecialistByID(String specialistID) async {
-    final String url = 'http://192.168.200.150/teleclinic/viewSpecialist.php';
+    final String url = 'http://192.168.0.179/teleclinic/viewSpecialist.php';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -86,7 +86,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
   }
 
   Future<void> cancelAppointment(int consultationID, int patientID) async {
-    final String url = 'http://192.168.200.150/teleclinic/cancelAppointment.php?consultationID=$consultationID&patientID=$patientID';
+    final String url = 'http://192.168.0.179/teleclinic/cancelAppointment.php?consultationID=$consultationID&patientID=$patientID';
 
     final response = await http.delete(Uri.parse(url));
 
@@ -118,162 +118,162 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
         ),
       ),
       body:
-          FutureBuilder<List<Consultation>>(
-            future: futureConsultations,
-            builder: (context, snapshot) {
-              return snapshot.connectionState == ConnectionState.waiting
-                  ? Center(child: CircularProgressIndicator())
-                  : snapshot.hasData
-                  ? SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Center(
-                        child: Text(
-                          'LIST APPOINTMENT',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+      FutureBuilder<List<Consultation>>(
+        future: futureConsultations,
+        builder: (context, snapshot) {
+          return snapshot.connectionState == ConnectionState.waiting
+              ? Center(child: CircularProgressIndicator())
+              : snapshot.hasData
+              ? SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                    child: Text(
+                      'LIST APPOINTMENT',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Center(
-                      child: Column(
-                        children: (snapshot.data as List<Consultation>)
-                            .map((consultation) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Center(
-                                        child: Text('Appointment Details'),
+                  ),
+                ),
+                Center(
+                  child: Column(
+                    children: (snapshot.data as List<Consultation>)
+                        .map((consultation) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Center(
+                                    child: Text('Appointment Details'),
+                                  ),
+                                  content: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Center(
+                                        child: Text(
+                                          '${_formatDateTime(consultation.consultationDateTime.toString())}',
+                                          style: TextStyle(
+                                            fontWeight:
+                                            FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
-                                      content: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Center(
-                                            child: Text(
-                                              '${_formatDateTime(consultation.consultationDateTime.toString())}',
-                                              style: TextStyle(
-                                                fontWeight:
-                                                FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding:
-                                            const EdgeInsets.all(25.0),
-                                            child: Text(
-                                              'Are you sure to cancel your appointment? You can set up another appointment later.',
-                                            ),
-                                          ),
-                                          Center(
-                                            child: ElevatedButton(
-                                              onPressed: () async {
-                                                if (consultation
-                                                    .consultationID !=
-                                                    null) {
-                                                  await cancelAppointment(
-                                                    consultation
-                                                        .consultationID!,
-                                                    consultation
-                                                        .patientID,
-                                                  );
-                                                  Navigator.pop(
-                                                      context);
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                      SuccessPage(patientID: patientID)),
-                                                  );
-                                                } else {
-                                                  print(
-                                                      'Consultation ID is null');
-                                                }
-                                              },
-                                              style: ElevatedButton
-                                                  .styleFrom(
-                                                backgroundColor:
-                                                Colors.red,
-                                              ),
-                                              child: Text(
-                                                  'Cancel Appointment'),
-                                            ),
-                                          ),
-                                          Center(
-                                            child: ElevatedButton(
-                                              onPressed: () async {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(builder: (context) => ViewAppointmentScreen(patientID: patientID,)),
-                                                );
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.red, // Change the background color here
-                                              ),
-                                              child: Text('Back to view Appointment'),
-                                            ),
-                                          ),
-                                        ],
+                                      Padding(
+                                        padding:
+                                        const EdgeInsets.all(25.0),
+                                        child: Text(
+                                          'Are you sure to cancel your appointment? You can set up another appointment later.',
+                                        ),
                                       ),
-                                    );
-                                  },
+                                      Center(
+                                        child: ElevatedButton(
+                                          onPressed: () async {
+                                            if (consultation
+                                                .consultationID !=
+                                                null) {
+                                              await cancelAppointment(
+                                                consultation
+                                                    .consultationID!,
+                                                consultation
+                                                    .patientID,
+                                              );
+                                              Navigator.pop(
+                                                  context);
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SuccessPage(patientID: patientID)),
+                                              );
+                                            } else {
+                                              print(
+                                                  'Consultation ID is null');
+                                            }
+                                          },
+                                          style: ElevatedButton
+                                              .styleFrom(
+                                            backgroundColor:
+                                            Colors.red,
+                                          ),
+                                          child: Text(
+                                              'Cancel Appointment'),
+                                        ),
+                                      ),
+                                      Center(
+                                        child: ElevatedButton(
+                                          onPressed: () async {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => ViewAppointmentScreen(patientID: patientID,)),
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red, // Change the background color here
+                                          ),
+                                          child: Text('Back to view Appointment'),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 );
                               },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 3,
-                                      blurRadius: 7,
-                                      offset: Offset(0, 3),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 3,
+                                  blurRadius: 7,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Card(
+                              child: ListTile(
+                                title: Text(
+                                  '${_formatDateTime(consultation.consultationDateTime.toString())}',
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Specialist Name: ${consultation.specialistName}',
+                                    ),
+                                    Text(
+                                      'Status: ${consultation.consultationStatus}',
                                     ),
                                   ],
                                 ),
-                                child: Card(
-                                  child: ListTile(
-                                    title: Text(
-                                      '${_formatDateTime(consultation.consultationDateTime.toString())}',
-                                    ),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Specialist Name: ${consultation.specialistName}',
-                                        ),
-                                        Text(
-                                          'Status: ${consultation.consultationStatus}',
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
                               ),
                             ),
-                          );
-                        }).toList(),
-                      ),
-                     )
-                    ],
-                   ),
-                  )
-                  : Center(
-                      child: Text('No appointments found'),
+                          ),
+                        ),
                       );
-            },
-          ),
+                    }).toList(),
+                  ),
+                )
+              ],
+            ),
+          )
+              : Center(
+            child: Text('No appointments found'),
+          );
+        },
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
