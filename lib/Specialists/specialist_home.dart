@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:my_teleclinic/Specialists/patient_consultation_history.dart';
+import 'package:my_teleclinic/Specialists/specialist_consultation_history.dart';
 import 'package:my_teleclinic/Specialists/viewUpcomingAppointment.dart';
 import 'package:my_teleclinic/Specialists/view_patient.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -290,7 +292,7 @@ class _MenuScreenState extends State<MenuScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => viewPatientScreen(
+                                builder: (context) => SpecialistConsultationHistory(
                                   specialistID: widget.specialistID,
                                 ),
                               ),
@@ -335,8 +337,8 @@ class _MenuScreenState extends State<MenuScreen> {
                   children: [
                     SizedBox(height: 10),
                     SizedBox(
-                      width: 700,
-                      height: 350,
+                      width: 500,
+                      height: 300,
                       child: Container(
                         padding: EdgeInsets.only(left: 12, right: 12, top: 10),
                         decoration: BoxDecoration(
@@ -374,18 +376,22 @@ class _MenuScreenState extends State<MenuScreen> {
                                   Consultation consult = consultations![index];
                                   return Card(
                                     child: Container(
-                                      padding: EdgeInsets.all(10),
+                                      padding: EdgeInsets.all(0),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                '${consult.patientName}\n'
-                                                    'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
-                                                    'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}\n'
-                                                    'Status: ${consult.consultationStatus}\n',
+                                              SizedBox(
+
+                                                child: Text(
+                                                  '${consult.patientName}\n'
+                                                      'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
+                                                      'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}\n'
+                                                      'Status: ${consult.consultationStatus}\n',
+                                                ),
+                                                  width:200
                                               ),
                                             ],
                                           ),
