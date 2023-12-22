@@ -204,16 +204,43 @@ class _ViewUpcomingAppointmentState extends State<ViewUpcomingAppointment> {
   void _showConsultationDetailsDialog(BuildContext context,
       Consultation consultation) {
 
-    bool isCallNowPressed = false;
-    bool isApproved = consultation.consultationStatus == 'ACCEPTED';
+    bool isApproved = consultation.consultationStatus == 'Accepted';
     bool isDecline = false;
 
     Future<void> _handleApproval() async {
       // Check if the consultation status is 'PENDING'
-      if (consultation.consultationStatus == 'PENDING') {
-        // Implement the logic for approval here
+      if (consultation.consultationStatus == 'Pending') {
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Are you sure you want to call now?'),
+            SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    isApproved = true;
+
+                    Navigator.pop(context);
+                  },
+                  child: Text('Confirm Call'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+
+                    setState(() {
+                      isApproved = false;
+                    });
+                  },
+                  child: Text('Cancel'),
+                ),
+              ],
+            ),
+          ],
+        );
         final consultationID = consultation.consultationID;
-        final newStatus = 'ACCEPTED';
+        final newStatus = 'Accepted';
 
         final response = await http.get(Uri.parse(
           'http://${MyApp.ipAddress}/teleclinic/'
@@ -226,8 +253,6 @@ class _ViewUpcomingAppointmentState extends State<ViewUpcomingAppointment> {
 
           // Update the UI with the new status
           consultation.consultationStatus = newStatus;
-          isApproved = true; // Update the approval status
-
           // Close the existing dialog and show the updated one
           Navigator.pop(context);
           _showConsultationDetailsDialog(context, consultation);
@@ -238,7 +263,7 @@ class _ViewUpcomingAppointmentState extends State<ViewUpcomingAppointment> {
     Future<void> _handleDecline() async {
       // Implement the logic for declining here
       final consultationID = consultation.consultationID;
-      final newStatus = 'DECLINE';
+      final newStatus = 'Decline';
 
       final response = await http.get(Uri.parse(
         'http://${MyApp.ipAddress}/'
@@ -249,7 +274,7 @@ class _ViewUpcomingAppointmentState extends State<ViewUpcomingAppointment> {
       ));
 
       if (response.statusCode == 200) {
-        print('Status updated to DECLINE successfully');
+        print('Status updated to Decline successfully');
 
 
         consultation.consultationStatus = newStatus;
@@ -284,44 +309,24 @@ class _ViewUpcomingAppointmentState extends State<ViewUpcomingAppointment> {
 
                   SizedBox(height: 16),
 
-                  if (consultation.consultationStatus != 'DECLINE')
+                  if (consultation.consultationStatus != 'Decline')
                     Container(
                       margin: EdgeInsets.only(bottom: 8),
                       child: ElevatedButton(
-                        onPressed: _handleApproval,
+                        onPressed: isApproved ? null : _handleApproval,
                         style: ButtonStyle(
-                          backgroundColor: isApproved ?
-                          MaterialStateProperty.all(Colors.grey) : null,
+                          backgroundColor: isApproved
+                              ? MaterialStateProperty.all(Colors.grey)
+                              : null,
                         ),
                         child: Text('Approve'),
                       ),
                     ),
 
-                  if (!isCallNowPressed &&
-                      consultation.consultationStatus != 'DECLINE')
 
-                    Container(
-                      margin: EdgeInsets.only(bottom: 8),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Handle the "Call Now" action
-                          setState(() {
-                            isCallNowPressed = true;
-                          });
-                        },
-                        style: ButtonStyle(
-                          backgroundColor:
-                          (consultation.consultationStatus == 'PENDING'
-                              && !isApproved)
 
-                              ? MaterialStateProperty.all(Colors.grey)
-                              : null,
-                        ),
-                        child: Text('Call Now'),
-                      ),
-                    ),
 
-                  if (consultation.consultationStatus != 'DECLINE')
+                  if (consultation.consultationStatus != 'Decline')
                     Container(
                       margin: EdgeInsets.only(bottom: 8),
                       child: ElevatedButton(
@@ -334,7 +339,8 @@ class _ViewUpcomingAppointmentState extends State<ViewUpcomingAppointment> {
                       ),
                     ),
 
-                  if (isCallNowPressed)
+                  if (isApproved && consultation.consultationStatus == 'Pending'&&
+                      consultation.consultationStatus != 'Accepted' )
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -345,6 +351,7 @@ class _ViewUpcomingAppointmentState extends State<ViewUpcomingAppointment> {
                           children: [
                             ElevatedButton(
                               onPressed: () {
+                                isApproved = true;
 
                                 Navigator.pop(context);
                               },
@@ -354,7 +361,7 @@ class _ViewUpcomingAppointmentState extends State<ViewUpcomingAppointment> {
                               onPressed: () {
 
                                 setState(() {
-                                  isCallNowPressed = false;
+                                  isApproved = false;
                                 });
                               },
                               child: Text('Cancel'),

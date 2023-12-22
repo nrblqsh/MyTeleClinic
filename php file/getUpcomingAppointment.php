@@ -12,24 +12,27 @@ header('Content-Type: application/json');
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     try {
+        // Set the timezone to 'Asia/Kuala_Lumpur' (or the desired timezone)
+        date_default_timezone_set('Asia/Kuala_Lumpur');
+
         $conn = new mysqli($hostname, $username, $password, $database);
 
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        // Retrieve upcoming consultations for a specific specialist with patientName using a join
+        // Retrieve consultations starting from the day after today for a specific specialist with patientName using a join
         if (isset($_GET['specialistID'])) {
             $specialistID = $_GET['specialistID'];
 
-            $currentDate = date('Y-m-d H:i:s');
-            $stmt = $conn->prepare("SELECT consultation.*, patient.patientName 
-                                   FROM consultation 
+            $nextDayDateTime = date('Y-m-d H:i:s', strtotime('+1 day')); // Adjusted to +1 day to start from tomorrow
+            $stmt = $conn->prepare("SELECT consultation.*, patient.patientName
+                                   FROM consultation
                                    INNER JOIN patient ON consultation.patientID = patient.patientID
-                                   WHERE consultation.specialistID = ? 
-                                   AND consultation.consultationDateTime > ? 
+                                   WHERE consultation.specialistID = ?
+                                   AND consultation.consultationDateTime >= ?
                                    ORDER BY consultation.consultationDateTime ASC");
-            $stmt->bind_param("ss", $specialistID, $currentDate);
+            $stmt->bind_param("ss", $specialistID, $nextDayDateTime); // Use "ss" instead of "si"
 
             if ($stmt->execute()) {
                 $result = $stmt->get_result();

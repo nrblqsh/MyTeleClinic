@@ -88,6 +88,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
         SettingsScreen(patientID: 0), // should be in last
         createMenuScreen(
           todayConsultations: todayConsultations,
+          fetchTodayConsultations: _fetchTodayConsultations, // Add this line
           navigateToPage: _navigateToPage,
         ),
         ViewUpcomingAppointment(), // Pass the consultations
@@ -97,6 +98,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
 
   MenuScreen createMenuScreen({
     required List<Consultation> todayConsultations,
+    required Future<List<Consultation>> Function() fetchTodayConsultations,
     required Function(int) navigateToPage,
   }) {
     return MenuScreen(
@@ -104,7 +106,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
       logStatus: logStatus,
       specialistID: specialistID,
       todayConsultations: todayConsultations,
-      fetchTodayConsultations: _fetchTodayConsultations,
+      fetchTodayConsultations: fetchTodayConsultations,
       navigateToPage: navigateToPage,
     );
   }
@@ -172,7 +174,7 @@ class MenuScreen extends StatefulWidget {
   final String logStatus;
   int? patientID;
    List<Consultation> todayConsultations;
-  final Future<void> Function() fetchTodayConsultations;
+  final Future<List<Consultation>> Function() fetchTodayConsultations;
   final Function(int) navigateToPage;
 
   MenuScreen({
@@ -356,104 +358,251 @@ class _MenuScreenState extends State<MenuScreen> {
                             ),
                           ],
                         ),
-                        child:FutureBuilder<List<Consultation>>(
-                          future: futureConsultations,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List<Consultation>> snapshot) {
-
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-
-                              return CircularProgressIndicator(); // Display a loading indicator while fetching data
+                        child: FutureBuilder<List<Consultation>>(
+                          future: widget.fetchTodayConsultations(), // Assuming this is the correct method
+                          builder: (BuildContext context, AsyncSnapshot<List<Consultation>> snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
                             } else if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
-                            } else {
-                              widget.todayConsultations = snapshot.data ?? [];
+                              return Center(child: Text('Error: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              List<Consultation>? consultations = snapshot.data;
+
                               return ListView.builder(
-                                itemCount: widget.todayConsultations.length,
-                                shrinkWrap: true,
+                                itemCount: consultations?.length ?? 0,
                                 itemBuilder: (BuildContext context, index) {
-
-                                  Consultation consult =
-                                  widget.todayConsultations[index];
-
+                                  Consultation consult = consultations![index];
                                   return Card(
                                     child: Container(
                                       padding: EdgeInsets.all(10),
                                       child: Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Column(
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 '${consult.patientName}\n'
-
-                                                    'Date: '
-                                                    '${DateFormat('dd/MM/yyyy').
-                                                format(consult.
-                                                consultationDateTime)}'
-                                                    '\n'
-
-                                                    'Time: ${DateFormat
-                                                  (' hh:mm a').format
-                                                  (consult.
-                                                consultationDateTime)}'
-                                                    '\n'
-
-                                                    'Status:'
-                                                    ' ${
-                                                    consult.consultationStatus}'
-                                                    '\n',
+                                                    'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
+                                                    'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}\n'
+                                                    'Status: ${consult.consultationStatus}\n',
                                               ),
                                             ],
                                           ),
-                                          if (consult.consultationStatus !=
-                                              'ACCEPTED' &&
-                                              consult.consultationStatus !=
-                                                  'DECLINE')
+                                          if (consult.consultationStatus != 'Accepted' &&
+                                              consult.consultationStatus != 'Decline')
                                             Container(
-                                              child: IconButton(
-                                                icon: Icon(Icons.done),
-                                                onPressed: () async {
-                                                  try {
-                                                    int consultationID
-                                                    = consult.consultationID
-                                                        ?? 0;
+                                              child: Column(
+                                                children: [
+                                                  Container(
+                                                    child: IconButton(
+                                                      icon: Icon(Icons.cancel),
+                                                      onPressed: () async {
+                                                        bool confirmed = await showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext context) {
+                                                            return AlertDialog(
+                                                              title: Text('Confirm Decline'),
+                                                              content: Text('Are you sure you want to decline this consultation?'),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed: () {
+                                                                    Navigator.of(context).pop(false);
+                                                                  },
+                                                                  child: Text('Cancel'),
+                                                                ),
+                                                                TextButton(
+                                                                  onPressed: () {
+                                                                    Navigator.of(context).pop(true);
+                                                                  },
+                                                                  child: Text('Confirm'),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
 
-                                                    String newStatus =
-                                                        'ACCEPTED';
+                                                        if (confirmed == true) {
+                                                          try {
+                                                            int consultationID = consult.consultationID ?? 0;
+                                                            String newStatus = 'Decline';
 
-                                                    final response = await
-                                                    http.get(Uri.parse(
-                                                      'http://${MyApp.ipAddress}'
-                                                          '/teleclinic/'
-                                                          'updateConsultationStatus'
-                                                          '.php?consultationID='
-                                                          '$consultationID&'
-                                                          'updateConsultationStatus='
-                                                          '$newStatus',
-                                                    ));
+                                                            final response = await http.get(Uri.parse(
+                                                              'http://${MyApp.ipAddress}/teleclinic/'
+                                                                  'updateConsultationStatus.php?consultationID='
+                                                                  '$consultationID&updateConsultationStatus=$newStatus',
+                                                            ));
 
-                                                    if (response.statusCode == 200) {
-                                                      print('Status updated successfully');
-                                                      await Future.delayed(Duration(seconds: 1)); // Add a delay of 1 second (adjust as needed)
-                                                      await widget.fetchTodayConsultations();
-                                                      widget.navigateToPage(3);
-                                                    } else {
-                                                      print(
-                                                          'Failed to update '
-                                                              'status. Status'
-                                                              ' Code: '
-                                                              '${response.statusCode}');
-                                                    }
-                                                  } catch (e) {
-                                                    print('Error updating status: $e');
-                                                  }
-                                                },
+                                                            if (response.statusCode == 200) {
+                                                              print('Status updated successfully');
+                                                              // Fetch updated data and trigger a rebuild
+                                                              setState(() {});
+                                                            } else {
+                                                              print('Failed to update status. Status Code: ${response.statusCode}');
+                                                            }
+                                                          } catch (e) {
+                                                            print('Error updating status: $e');
+                                                          }
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Text('Decline'),
+                                                ],
+                                              ),
+                                            ),
+
+                                          if (consult.consultationStatus
+                                              == 'Accepted')
+
+                                            Container(
+                                              child: Column(
+                                                children: [
+                                                  Container(
+                                                    child: IconButton(
+                                                      icon: Icon(Icons.call),
+                                                      onPressed: () async {
+                                                        bool confirmed =
+                                                        await showDialog(
+
+                                                          context: context,
+                                                          builder:
+                                                              (BuildContext
+                                                          context) {
+
+                                                            return AlertDialog(
+                                                              title:
+                                                              Text('Confirm'
+                                                                  ' Call'
+                                                                  ' Patient'),
+
+                                                              content:
+                                                              Text('Are you sure'
+                                                                  ' you want to '
+                                                                  'call this '
+                                                                  'patient?'),
+
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed: () {
+                                                                    Navigator.
+                                                                    of(context)
+                                                                        .pop
+                                                                      (false);
+                                                                  },
+                                                                  child:
+                                                                  Text('Cancel'),
+                                                                ),
+                                                                TextButton(
+                                                                  onPressed: () {
+                                                                    Navigator.of
+                                                                      (context).
+                                                                    pop(true);
+                                                                  },
+                                                                  child: Text('Confirm'),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+
+                                                        if (confirmed == true) {
+                                                          try {
+                                                            print("call");
+                                                          } catch (e) {
+                                                            print('Error '
+                                                                'updating'
+                                                                ' status: $e');
+                                                          }
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Text('Call Now'),
+                                                ],
+                                              ),
+                                            ),
+                                          if (consult.consultationStatus
+                                              != 'Accepted' &&
+                                              consult.consultationStatus
+                                                  != 'Decline')
+
+                                            Container(
+                                              child: Column(
+                                                children: [
+                                                  Container(
+                                                    child: IconButton(
+                                                      icon: Icon(Icons.done),
+                                                      onPressed: () async {
+                                                        bool confirmed =
+                                                        await showDialog(
+                                                          context: context,
+                                                          builder:
+                                                              (BuildContext
+                                                          context) {
+                                                            return AlertDialog(
+                                                              title:
+                                                              Text('Confirm '
+                                                                  'Status '
+                                                                  'Update'),
+
+                                                              content: Text('Are'
+                                                                  ' you sure you'
+                                                                  ' want to'
+                                                                  ' update the '
+                                                                  'status to '
+                                                                  '"Accepted"?'),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed: () {
+                                                                    Navigator.
+                                                                    of(context).
+                                                                    pop(false);
+                                                                  },
+                                                                  child: Text('Cancel'),
+                                                                ),
+                                                                TextButton(
+                                                                  onPressed: () {
+                                                                    Navigator.
+                                                                    of(context).
+                                                                    pop(true);
+                                                                  },
+                                                                  child:
+                                                                  Text('Confirm'),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+
+                                                        if (confirmed == true) {
+                                                          try {
+                                                            int consultationID = consult.consultationID ?? 0;
+                                                            String newStatus = 'Accepted';
+
+                                                            final response = await http.get(Uri.parse(
+                                                              'http://${MyApp.ipAddress}/teleclinic/'
+                                                                  'updateConsultationStatus.php?consultationID='
+                                                                  '$consultationID&updateConsultationStatus=$newStatus',
+                                                            ));
+
+                                                            if (response.statusCode == 200) {
+                                                              print('Status updated successfully');
+                                                              // Fetch updated data and trigger a rebuild
+                                                              setState(() {});
+                                                            } else {
+                                                              print(
+                                                                  'Failed to update status. Status Code: ${response.statusCode}');
+                                                            }
+                                                          } catch (e) {
+                                                            print('Error updating status: $e');
+                                                          }
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Text('Accept'),
+                                                ],
                                               ),
                                             ),
                                         ],
@@ -463,9 +612,13 @@ class _MenuScreenState extends State<MenuScreen> {
                                 },
                               );
 
+
+                            } else {
+                              return Center(child: Text('No data available'));
                             }
                           },
-                        )
+                        ),
+
 
                       ),
                     ),
