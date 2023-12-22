@@ -188,5 +188,32 @@ class Consultation {
     }
   }
 
+  Future<List<Consultation>> fetchSpecialistConsultationHistory(int specialistID) async {
+    final String url = 'http://${MyApp.ipAddress}/teleclinic/getSpecialistConsultationHistory.php?specialistID=$specialistID';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      try {
+        dynamic responseBody = json.decode(response.body);
+
+        if (responseBody is Map<String, dynamic> && responseBody.containsKey('data')) {
+          List<Consultation> consultations = List<Consultation>.from(responseBody['data']
+              .map((consultationData) => Consultation.fromJson(consultationData)));
+          return consultations;
+        } else {
+          print('Unexpected response format. Body is not a JSON object.');
+          return [];
+        }
+      } catch (e) {
+        print('Error parsing response: $e');
+        throw Exception('Error parsing response: $e');
+      }
+    } else {
+      print('Failed to fetch consultation history. Status Code: ${response.statusCode}');
+      throw Exception('Failed to fetch consultation history. Status Code: ${response.statusCode}');
+    }
+  }
+
+
 
 }
