@@ -10,6 +10,8 @@ import '../Patients/Telemedicine/view_appointment.dart';
 import '../Patients/settings.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 import '../main.dart';
 
@@ -86,14 +88,17 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
   void _createPages() {
     setState(() {
       _pages = [
-        viewPatientScreen(specialistID: specialistID), // index 0
-        SettingsScreen(patientID: 0), // should be in last
+        viewPatientScreen(specialistID: specialistID,
+          ),
+        SpecialistConsultationHistory(specialistID: specialistID,),// index 0
+
         createMenuScreen(
           todayConsultations: todayConsultations,
           fetchTodayConsultations: _fetchTodayConsultations, // Add this line
           navigateToPage: _navigateToPage,
         ),
-        ViewUpcomingAppointment(), // Pass the consultations
+        ViewUpcomingAppointment(),
+        SettingsScreen(patientID: 0)// Pass the consultations
       ];
     });
   }
@@ -148,7 +153,7 @@ class BottomNavigationBarWidget extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.assignment_outlined),
-          label: 'Schedule List',
+          label: 'Consultation History',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
@@ -156,7 +161,7 @@ class BottomNavigationBarWidget extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.calendar_month),
-          label: 'View Booking',
+          label: 'Upcoming Appointment',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.settings),
@@ -224,19 +229,11 @@ class _MenuScreenState extends State<MenuScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Welcome",
-                style: GoogleFonts.roboto(
-                  fontWeight: FontWeight.bold,
-                  textStyle: TextStyle(
-                    fontSize: 22,
-                  ),
-                ),
-              ),
+
               Row(
                 children: [
                   Text(
-                    "${widget.specialistName},",
+                    "Service",
                     style: GoogleFonts.roboto(
                       fontWeight: FontWeight.bold,
                       textStyle: TextStyle(
@@ -267,14 +264,14 @@ class _MenuScreenState extends State<MenuScreen> {
                       Expanded(
                         child: GestureDetector(
                           child: customIconWithLabel(
-                              Icons.people_alt, 30, Colors.white, 'View Patient'),
+                              Icons.people_alt, 30, Colors.white, 'Patient List'),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    viewPatientScreen(specialistID:
-                                    widget.specialistID),
+                                builder: (context) => viewPatientScreen(
+                                  specialistID: widget.specialistID,
+                                ),
                               ),
                             );
                           },
@@ -287,7 +284,6 @@ class _MenuScreenState extends State<MenuScreen> {
                               30,
                               Colors.white,
                               'Consultation\nHistory'),
-
                           onTap: () async {
                             Navigator.push(
                               context,
@@ -309,7 +305,8 @@ class _MenuScreenState extends State<MenuScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    ViewUpcomingAppointment(),
+                                    ViewUpcomingAppointment(
+                                     ),
                               ),
                             );
                           },
@@ -329,306 +326,300 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
                 ),
               ),
-              Container(
-                height: 400,
-                color: Colors.grey[200],
-                padding: EdgeInsets.only(left: 15, right: 15, top: 10),
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    SizedBox(
-                      width: 500,
-                      height: 300,
-                      child: Container(
-                        padding: EdgeInsets.only(left: 12, right: 12, top: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.blueAccent),
-                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.blueGrey,
-                              offset: const Offset(5.0, 5.0),
-                              blurRadius: 10.0,
-                              spreadRadius: 2.0,
-                            ),
-                            BoxShadow(
-                              color: Colors.white,
-                              offset: const Offset(0.0, 0.0),
-                              blurRadius: 0.0,
-                              spreadRadius: 0.0,
-                            ),
-                          ],
-                        ),
-                        child: FutureBuilder<List<Consultation>>(
-                          future: widget.fetchTodayConsultations(), // Assuming this is the correct method
-                          builder: (BuildContext context, AsyncSnapshot<List<Consultation>> snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Error: ${snapshot.error}'));
-                            } else if (snapshot.hasData) {
-                              List<Consultation>? consultations = snapshot.data;
+              SizedBox(height: 10),
+              SingleChildScrollView(
+                child: Container(
+                  height: 407,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  padding: EdgeInsets.only(left: 15, right: 15, top: 2),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        SizedBox(height: 10),
+                        SizedBox(
+                          width: 550,
+                          height: 500,
+                          child: FutureBuilder<List<Consultation>>(
+                            future: widget.fetchTodayConsultations(),
+                            builder: (BuildContext context, AsyncSnapshot<List<Consultation>> snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return Center(child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return Center(child: Text('Error: ${snapshot.error}'));
+                              } else if (snapshot.hasData) {
+                                List<Consultation>? consultations = snapshot.data;
 
-                              return ListView.builder(
-                                itemCount: consultations?.length ?? 0,
-                                itemBuilder: (BuildContext context, index) {
-                                  Consultation consult = consultations![index];
-                                  return Card(
-                                    child: Container(
-                                      padding: EdgeInsets.all(0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              SizedBox(
-
-                                                child: Text(
-                                                  '${consult.patientName}\n'
-                                                      'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
-                                                      'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}\n'
-                                                      'Status: ${consult.consultationStatus}\n',
-                                                ),
-                                                  width:200
-                                              ),
-                                            ],
-                                          ),
-                                          if (consult.consultationStatus != 'Accepted' &&
-                                              consult.consultationStatus != 'Decline')
-                                            Container(
-                                              child: Column(
-                                                children: [
-                                                  Container(
-                                                    child: IconButton(
-                                                      icon: Icon(Icons.cancel),
-                                                      onPressed: () async {
-                                                        bool confirmed = await showDialog(
-                                                          context: context,
-                                                          builder: (BuildContext context) {
-                                                            return AlertDialog(
-                                                              title: Text('Confirm Decline'),
-                                                              content: Text('Are you sure you want to decline this consultation?'),
-                                                              actions: [
-                                                                TextButton(
-                                                                  onPressed: () {
-                                                                    Navigator.of(context).pop(false);
-                                                                  },
-                                                                  child: Text('Cancel'),
-                                                                ),
-                                                                TextButton(
-                                                                  onPressed: () {
-                                                                    Navigator.of(context).pop(true);
-                                                                  },
-                                                                  child: Text('Confirm'),
-                                                                ),
-                                                              ],
-                                                            );
-                                                          },
-                                                        );
-
-                                                        if (confirmed == true) {
-                                                          try {
-                                                            int consultationID = consult.consultationID ?? 0;
-                                                            String newStatus = 'Decline';
-
-                                                            final response = await http.get(Uri.parse(
-                                                              'http://${MyApp.ipAddress}/teleclinic/'
-                                                                  'updateConsultationStatus.php?consultationID='
-                                                                  '$consultationID&updateConsultationStatus=$newStatus',
-                                                            ));
-
-                                                            if (response.statusCode == 200) {
-                                                              print('Status updated successfully');
-                                                              // Fetch updated data and trigger a rebuild
-                                                              setState(() {});
-                                                            } else {
-                                                              print('Failed to update status. Status Code: ${response.statusCode}');
-                                                            }
-                                                          } catch (e) {
-                                                            print('Error updating status: $e');
-                                                          }
-                                                        }
-                                                      },
-                                                    ),
-                                                  ),
-                                                  Text('Decline'),
-                                                ],
-                                              ),
-                                            ),
-
-                                          if (consult.consultationStatus
-                                              == 'Accepted')
-
-                                            Container(
-                                              child: Column(
-                                                children: [
-                                                  Container(
-                                                    child: IconButton(
-                                                      icon: Icon(Icons.call),
-                                                      onPressed: () async {
-                                                        bool confirmed =
-                                                        await showDialog(
-
-                                                          context: context,
-                                                          builder:
-                                                              (BuildContext
-                                                          context) {
-
-                                                            return AlertDialog(
-                                                              title:
-                                                              Text('Confirm'
-                                                                  ' Call'
-                                                                  ' Patient'),
-
-                                                              content:
-                                                              Text('Are you sure'
-                                                                  ' you want to '
-                                                                  'call this '
-                                                                  'patient?'),
-
-                                                              actions: [
-                                                                TextButton(
-                                                                  onPressed: () {
-                                                                    Navigator.
-                                                                    of(context)
-                                                                        .pop
-                                                                      (false);
-                                                                  },
-                                                                  child:
-                                                                  Text('Cancel'),
-                                                                ),
-                                                                TextButton(
-                                                                  onPressed: () {
-                                                                    Navigator.of
-                                                                      (context).
-                                                                    pop(true);
-                                                                  },
-                                                                  child: Text('Confirm'),
-                                                                ),
-                                                              ],
-                                                            );
-                                                          },
-                                                        );
-
-                                                        if (confirmed == true) {
-                                                          try {
-                                                            print("call");
-                                                          } catch (e) {
-                                                            print('Error '
-                                                                'updating'
-                                                                ' status: $e');
-                                                          }
-                                                        }
-                                                      },
-                                                    ),
-                                                  ),
-                                                  Text('Call Now'),
-                                                ],
-                                              ),
-                                            ),
-                                          if (consult.consultationStatus
-                                              != 'Accepted' &&
-                                              consult.consultationStatus
-                                                  != 'Decline')
-
-                                            Container(
-                                              child: Column(
-                                                children: [
-                                                  Container(
-                                                    child: IconButton(
-                                                      icon: Icon(Icons.done),
-                                                      onPressed: () async {
-                                                        bool confirmed =
-                                                        await showDialog(
-                                                          context: context,
-                                                          builder:
-                                                              (BuildContext
-                                                          context) {
-                                                            return AlertDialog(
-                                                              title:
-                                                              Text('Confirm '
-                                                                  'Status '
-                                                                  'Update'),
-
-                                                              content: Text('Are'
-                                                                  ' you sure you'
-                                                                  ' want to'
-                                                                  ' update the '
-                                                                  'status to '
-                                                                  '"Accepted"?'),
-                                                              actions: [
-                                                                TextButton(
-                                                                  onPressed: () {
-                                                                    Navigator.
-                                                                    of(context).
-                                                                    pop(false);
-                                                                  },
-                                                                  child: Text('Cancel'),
-                                                                ),
-                                                                TextButton(
-                                                                  onPressed: () {
-                                                                    Navigator.
-                                                                    of(context).
-                                                                    pop(true);
-                                                                  },
-                                                                  child:
-                                                                  Text('Confirm'),
-                                                                ),
-                                                              ],
-                                                            );
-                                                          },
-                                                        );
-
-                                                        if (confirmed == true) {
-                                                          try {
-                                                            int consultationID = consult.consultationID ?? 0;
-                                                            String newStatus = 'Accepted';
-
-                                                            final response = await http.get(Uri.parse(
-                                                              'http://${MyApp.ipAddress}/teleclinic/'
-                                                                  'updateConsultationStatus.php?consultationID='
-                                                                  '$consultationID&updateConsultationStatus=$newStatus',
-                                                            ));
-
-                                                            if (response.statusCode == 200) {
-                                                              print('Status updated successfully');
-                                                              // Fetch updated data and trigger a rebuild
-                                                              setState(() {});
-                                                            } else {
-                                                              print(
-                                                                  'Failed to update status. Status Code: ${response.statusCode}');
-                                                            }
-                                                          } catch (e) {
-                                                            print('Error updating status: $e');
-                                                          }
-                                                        }
-                                                      },
-                                                    ),
-                                                  ),
-                                                  Text('Accept'),
-                                                ],
-                                              ),
-                                            ),
-                                        ],
+                                return ListView.builder(
+                                  itemCount: consultations?.length ?? 0,
+                                  itemBuilder: (BuildContext context, index) {
+                                    Consultation consult = consultations![index];
+                                    return Card(
+                                      elevation: 4,
+                                      margin: EdgeInsets.all(8.0),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12.0),
+                                        side: BorderSide(color: Colors.blueAccent),
                                       ),
-                                    ),
-                                  );
-                                },
-                              );
+                                      child: SizedBox(
+                                        height: 123,
+                                        child: Flexible(
+                                          child: Container(
+                                            padding: EdgeInsets.only(left: 12, right: 12, top: 10),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.blueGrey,
+                                                  offset: const Offset(5.0, 5.0),
+                                                  blurRadius: 10.0,
+                                                  spreadRadius: 2.0,
+                                                ),
+                                                BoxShadow(
+                                                  color: Colors.white,
+                                                  offset: const Offset(0.0, 0.0),
+                                                  blurRadius: 0.0,
+                                                  spreadRadius: 0.0,
+                                                ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Flexible(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        '${consult.patientName}',
+                                                        style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 18,
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 3,),
+                                                      Text(
+                                                        'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}',
+                                                      ),
+                                                      SizedBox(height: 3,),
+                                                      Text(
+                                                        'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}',
+                                                      ),
+                                                      SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Container(
+                                                        height: 23,
+                                                        width: 75,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(20),
+                                                          color: Color(_getStatusColor(consult.consultationStatus)),
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            '${consult.consultationStatus}',
+                                                            style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight: FontWeight.normal,
+                                                              color: Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Container(
+                                                  width: 150,
+                                                  height: 200,// Adjust the width as needed
+                                                  child: Align(
+                                                    alignment: Alignment.bottomRight,
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        if (consult.consultationStatus != 'Accepted' &&
+                                                            consult.consultationStatus != 'Decline')
+                                                          Column(
+                                                            children: [
+                                                              IconButton(
+                                                                icon: Icon(Icons.cancel,
+                                                                size: 30,
+                                                                    color: Colors.red,),
+                                                                onPressed: () async {
+                                                                  bool confirmed = await showDialog(
+                                                                    context: context,
+                                                                    builder: (BuildContext context) {
+                                                                      return AlertDialog(
+                                                                        shape: RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.circular(10.0),
+                                                                        ),
+                                                                        title: Text('Confirm Decline'),
+                                                                        content: Text('Are you sure you want to decline this consultation?'),
+                                                                        actions: [
+                                                                          TextButton(
+                                                                            onPressed: () {
+                                                                              Navigator.of(context).pop(false);
+                                                                            },
+                                                                            child: Text('Cancel'),
+                                                                          ),
+                                                                          TextButton(
+                                                                            onPressed: () {
+                                                                              Navigator.of(context).pop(true);
+                                                                            },
+                                                                            child: Text('Confirm'),
+                                                                          ),
+                                                                        ],
+                                                                      );
+                                                                    },
+                                                                  );
 
+                                                                  if (confirmed == true) {
+                                                                    try {
+                                                                      int consultationID = consult.consultationID ?? 0;
+                                                                      String newStatus = 'Decline';
 
-                            } else {
-                              return Center(child: Text('No data available'));
-                            }
-                          },
+                                                                      final response = await http.get(Uri.parse(
+                                                                        'http://${MyApp.ipAddress}/teleclinic/'
+                                                                            'updateConsultationStatus.php?consultationID='
+                                                                            '$consultationID&updateConsultationStatus=$newStatus',
+                                                                      ));
+
+                                                                      if (response.statusCode == 200) {
+                                                                        print('Status updated successfully');
+                                                                        // Fetch updated data and trigger a rebuild
+                                                                        setState(() {});
+                                                                      } else {
+                                                                        print('Failed to update status. Status Code: ${response.statusCode}');
+                                                                      }
+                                                                    } catch (e) {
+                                                                      print('Error updating status: $e');
+                                                                    }
+                                                                  }
+                                                                },
+                                                              ),
+                                                              Text('Decline',
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                FontWeight.w400,
+                                                                fontSize: 15
+                                                              ),),
+                                                            ],
+                                                          ),
+                                                        Spacer(),
+                                                        if (consult.consultationStatus == 'Accepted')
+                                                          Expanded(
+                                                            child: Column(
+                                                              children: [
+                                                                IconButton(
+                                                                  icon: Icon(Icons.add_ic_call_sharp,
+                                                                    size: 30,
+                                                                    color: Color(hexColor("228B22"),)),
+                                                                  onPressed: () async {
+                                                                    bool confirmed = await showDialog(
+                                                                      context: context,
+                                                                      builder: (BuildContext context) {
+                                                                        return AlertDialog(
+                                                                          shape: RoundedRectangleBorder(
+                                                                            borderRadius: BorderRadius.circular(10.0),
+                                                                          ),
+                                                                          title: Text('Confirm Call Patient'),
+                                                                          content: Text('Are you sure you want to call this patient?'),
+                                                                          actions: [
+                                                                            TextButton(
+                                                                              onPressed: () {
+                                                                                Navigator.of(context).pop(false);
+                                                                              },
+                                                                              child: Text('Cancel'),
+                                                                            ),
+                                                                            TextButton(
+                                                                              onPressed: () {
+                                                                                Navigator.of(context).pop(true);
+                                                                              },
+                                                                              child: Text('Confirm'),
+                                                                            ),
+                                                                          ],
+                                                                        );
+                                                                      },
+                                                                    );
+
+                                                                    if (confirmed == true) {
+                                                                      try {
+                                                                        print("call");
+                                                                      } catch (e) {
+                                                                        print('Error updating status: $e');
+                                                                      }
+                                                                    }
+                                                                  },
+                                                                ),
+                                                                Text('Call Now'),
+                                                              ],
+                                                            ),
+                                                          ),
+
+                                                        if (consult.consultationStatus != 'Accepted' &&
+                                                            consult.consultationStatus != 'Decline')
+                                                          Column(
+                                                            children: [
+                                                              IconButton(
+                                                                icon: Icon(Icons.done,
+                                                                size: 35,
+                                                                    color: Colors.green,),
+                                                                onPressed: () async {
+                                                                  try {
+                                                                    int consultationID = consult.consultationID ?? 0;
+                                                                    String newStatus = 'Accepted';
+
+                                                                    final response = await http.get(Uri.parse(
+                                                                      'http://${MyApp.ipAddress}/teleclinic/'
+                                                                          'updateConsultationStatus.php?consultationID='
+                                                                          '$consultationID&updateConsultationStatus=$newStatus',
+                                                                    ));
+
+                                                                    if (response.statusCode == 200) {
+                                                                      print('Status updated successfully');
+                                                                      // Fetch updated data and trigger a rebuild
+                                                                      setState(() {});
+                                                                    } else {
+                                                                      print('Failed to update status. Status Code: ${response.statusCode}');
+                                                                    }
+                                                                  } catch (e) {
+                                                                    print('Error updating status: $e');
+                                                                  }
+                                                                },
+                                                              ),
+                                                              Text('Accept',
+                                                              style: TextStyle
+                                                                (fontWeight:
+                                                              FontWeight.w400,
+                                                              fontSize: 15)
+                                                                ,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              } else {
+                                return Center(child: Text('No data available'));
+                              }
+                            },
+                          ),
                         ),
-
-
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -637,6 +628,7 @@ class _MenuScreenState extends State<MenuScreen> {
       ),
     );
   }
+
 
   Widget customIconWithLabel(
       IconData icon, double size, Color iconColor, String label) {
@@ -675,10 +667,28 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
+  int _getStatusColor(String status) {
+    switch (status) {
+      case 'Accepted':
+        return Colors.green.value;
+      case 'Decline':
+        return Colors.red.value;
+      case 'Pending':
+      // Use your hexColor function here for the desired color
+        return hexColor('FFC000');
+      case 'CustomColor': // Add a case for a custom color
+        return hexColor('1A2B3C'); // Replace with your custom hexadecimal color
+      default:
+        return Colors.transparent.value; // Default color
+    }
+  }
+
   int hexColor(String color) {
     String newColor = '0xff' + color;
     newColor = newColor.replaceAll('#', '');
     int finalColor = int.parse(newColor);
     return finalColor;
   }
+
+
 }

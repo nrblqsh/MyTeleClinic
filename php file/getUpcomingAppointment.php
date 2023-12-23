@@ -21,18 +21,18 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        // Retrieve consultations starting from the day after today for a specific specialist with patientName using a join
-        if (isset($_GET['specialistID'])) {
-            $specialistID = $_GET['specialistID'];
+       if (isset($_GET['specialistID'])) {
+    $specialistID = $_GET['specialistID'];
 
-            $nextDayDateTime = date('Y-m-d H:i:s', strtotime('+1 day')); // Adjusted to +1 day to start from tomorrow
-            $stmt = $conn->prepare("SELECT consultation.*, patient.patientName
-                                   FROM consultation
-                                   INNER JOIN patient ON consultation.patientID = patient.patientID
-                                   WHERE consultation.specialistID = ?
-                                   AND consultation.consultationDateTime >= ?
-                                   ORDER BY consultation.consultationDateTime ASC");
-            $stmt->bind_param("ss", $specialistID, $nextDayDateTime); // Use "ss" instead of "si"
+    $nextDayDateTime = date('Y-m-d 00:00:00', strtotime('+1 day'));
+    $stmt = $conn->prepare("SELECT consultation.*, patient.patientName
+                           FROM consultation
+                           INNER JOIN patient ON consultation.patientID = patient.patientID
+                           WHERE consultation.specialistID = ?
+                           AND consultation.consultationDateTime >= ?
+                           ORDER BY consultation.consultationDateTime ASC");
+    $stmt->bind_param("ss", $specialistID, $nextDayDateTime);
+
 
             if ($stmt->execute()) {
                 $result = $stmt->get_result();
