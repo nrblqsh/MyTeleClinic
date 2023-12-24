@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 
 
+import '../VideoCall/videocall_page.dart';
 import '../main.dart';
 
 void main() {
@@ -536,7 +537,14 @@ class _MenuScreenState extends State<MenuScreen> {
                                                                             ),
                                                                             TextButton(
                                                                               onPressed: () {
-                                                                                Navigator.of(context).pop(true);
+                                                                                Navigator.push(
+                                                                                  context,
+                                                                                  MaterialPageRoute(
+                                                                                    builder: (context) =>
+                                                                                        CallPage(
+                                                                                        ),
+                                                                                  ),
+                                                                                );
                                                                               },
                                                                               child: Text('Confirm'),
                                                                             ),
