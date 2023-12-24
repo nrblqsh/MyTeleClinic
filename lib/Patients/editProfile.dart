@@ -53,7 +53,7 @@ class _EditProfileState extends State<EditProfile1> {
    int? patientID;
 
   List<String> dropDownState= ['Perak','Kedah','Penang'];
-  List<String> dropDownGender= ['Male','Female'];
+  List<String> dropDownGender= ['MALE','FEMALE'];
 
 
   TextEditingController phoneController = TextEditingController();
@@ -79,10 +79,10 @@ class _EditProfileState extends State<EditProfile1> {
       icNum: icNum,
       gender: _gender ?? '',
       birthDate: _selectedDate ?? DateTime.now(),
-      address: address,
+      //address: address,
       password: '', // You might want to update this if necessary
-      state: _selectedState ?? '',
-      postcode: _postCodeController.text.trim(),
+      //state: _selectedState ?? '',
+     // postcode: _postCodeController.text.trim(),
     );
 
     bool success = await updatedPatient.save();
@@ -149,9 +149,9 @@ class _EditProfileState extends State<EditProfile1> {
       _icNum=patients.first.patientName;
       _birthDate = patients.first.birthDate;
      // _phone = patients.first.phone;
-      _address = patients.first.address;
-      _postCode = patients.first.postcode;
-      _state = patients.first.state;
+     // _address = patients.first.address;
+    //  _postCode = patients.first.postcode;
+     // _state = patients.first.state;
 
       _selectedDate = _birthDate ?? DateTime.now();
       _dateController.text = _formatDate(_selectedDate ?? DateTime.now());
@@ -166,14 +166,14 @@ class _EditProfileState extends State<EditProfile1> {
   //   final response = await http.get(Uri.parse('YOUR_PHP_API_URL?phone=$phone'));
   //
   //   if (response.statusCode == 200) {
-  //     // If the server returns a 200 OK response, parse the patient data
+  //     // If the server returns a 200 OK response, parse the viewPatient.php data
   //     List<dynamic> data = json.decode(response.body);
   //     // Display the data as needed
   //     print(data);
   //   } else {
   //     // If the server did not return a 200 OK response,
   //     // throw an exception.
-  //     throw Exception('Failed to load patient data');
+  //     throw Exception('Failed to load viewPatient.php data');
   //   }
   // }
 

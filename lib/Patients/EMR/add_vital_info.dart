@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -81,7 +83,9 @@ class AddVitalInfoScreen extends StatefulWidget {
   _AddVitalInfoScreenState createState() => _AddVitalInfoScreenState();
 }
 
+
 class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
+  VitalInfo? vitalInfo ;
   late int patientID;
   final List<VitalInfo> weights = [];
   final List<VitalInfo> heights = [];
@@ -100,7 +104,25 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
 
   @override
   void initState() {
+    super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await _loadData(); // Call _loadData method to retrieve patientID
+      print("test $patientID");
+
+      // Rest of your code...
+
+      vitalInfo = (await generateVitalInfo())!;
+      print("ni ha");
+      print(vitalInfo);
+     // dateController.text= vitalInfo!.latestDate.toString();
+      weightController.text = vitalInfo!.weight.toString();
+      heightController.text = vitalInfo!.height.toString();
+      waistCircumferenceController.text = vitalInfo!.waistCircumference.toString();
+      bloodGlucoseController.text = vitalInfo!.bloodGlucose.toString();
+      bloodPressureController.text = vitalInfo!.bloodPressure.toString();
+      heartRateController.text = vitalInfo!.heartRate.toString();
+
       RequestController req = RequestController(
         path: "/api/timezone/Asia/Kuala_Lumpur",
         server: "http://worldtimeapi.org",
@@ -110,17 +132,20 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
         dateController.text =
             res["date"].toString().substring(0, 19).replaceAll('T', '');
       });
-      //super.initState();
-      _loadData();
-      //patientID.addAll(await VitalInfo.loadAll());
+
+      // The rest of your code...
       weights.addAll(await VitalInfo.loadAll());
       heights.addAll(await VitalInfo.loadAll());
       waistCircumferences.addAll(await VitalInfo.loadAll());
       bloodPressures.addAll(await VitalInfo.loadAll());
       bloodGlucoses.addAll(await VitalInfo.loadAll());
       heartRates.addAll(await VitalInfo.loadAll());
+
+      // Ensure the widget is rebuilt with the new patientID
+      setState(() {});
     });
   }
+
 
   _selectDate() async {
     final DateTime? pickedDate = await showDatePicker(
@@ -142,12 +167,50 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
 
   Future<void> _loadData()  async{
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    int storedID = prefs.getInt("patientID") ?? 0;
+    patientID  = prefs.getInt("patientID") ?? 0;
+    double weight=0.0;
+    // patientID = storedID;
+    patientIDController.text = patientID.toString();
+    // print(patientID);
 
-    setState(() {
-      patientID = storedID;
-      patientIDController.text = patientID.toString();
-    });
+    // setState(() {
+    //   patientID = storedID;
+    //   patientIDController.text = patientID.toString();
+    //   print(patientID);
+    //   //weightController.text= weight;
+    // });
+  }
+
+  Future<VitalInfo?> generateVitalInfo() async {
+    try {
+      var url =
+          'http://192.168.0.116/teleclinic/currentVitalInfo.php?patientID=$patientID';
+      final response = await http.get(Uri.parse(url));
+      print(url);
+
+      if (response.statusCode == 200) {
+        var list = json.decode(response.body);
+        print('Received Data: $list');
+
+        List<VitalInfo> _vitalInfos = list
+            .map<VitalInfo>((json) => VitalInfo.fromJson(json))
+            .toList();
+
+        if (_vitalInfos.isNotEmpty) {
+          vitalInfo = _vitalInfos.first;
+          print('Parsed Data: $vitalInfo');
+          return vitalInfo;
+        } else {
+          return null;
+        }
+      } else {
+        print('HTTP Error: ${response.statusCode}');
+        return null;
+      }
+    } catch (error) {
+      print('Error: $error');
+      return null;
+    }
   }
 
   Future<void> _addVitalInfo() async {
@@ -165,13 +228,15 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
         heartRate.isNotEmpty &&
         waistCircumference.isNotEmpty) {
       VitalInfo vitalInfo = VitalInfo(
-          double.parse(weight),
-          double.parse(height),
-          double.parse(waistCircumference),
-          double.parse(bloodPressure),
-          double.parse(bloodGlucose),
-          double.parse(heartRate),
-          dateController.text, int.parse(patientIDController.text));
+          weight: double.parse(weight),
+        height: double.parse(height),
+        waistCircumference: double.parse(waistCircumference),
+        bloodPressure: double.parse(bloodPressure),
+        bloodGlucose: double.parse(bloodGlucose),
+        heartRate:double.parse(heartRate),
+        latestDate:dateController.text,
+        patientID :int.parse(patientIDController.text),
+        infoID:0,);
 
       if (await vitalInfo.save()) {
         setState(() {
@@ -227,7 +292,7 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 25, right: 154),
               child: Text(
-                "Add Vital Info ",
+                "Update Vital Info ",
                 style: GoogleFonts.roboto(
                   fontWeight: FontWeight.bold,
                   textStyle: const TextStyle(fontSize: 28, color: Colors.black),
