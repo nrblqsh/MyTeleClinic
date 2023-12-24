@@ -248,41 +248,41 @@ class _CurrentVitalInfoScreenState extends State<CurrentVitalInfoScreen> {
   }
 }
 
-class VitalInfo {
-  int infoID;
-  double weight;
-  double height;
-  double waistCircumference;
-  double bloodPressure;
-  double bloodGlucose;
-  double heartRate;
-  String latestDate;
-  int patientID;
-
-  VitalInfo({
-    required this.weight,
-    required this.height,
-    required this.bloodPressure,
-    required this.bloodGlucose,
-    required this.heartRate,
-    required this.waistCircumference,
-    required this.latestDate,
-    required this.patientID,
-    required this.infoID,
-  });
-
-  factory VitalInfo.fromJson(Map<String, dynamic> json) {
-    return VitalInfo(
-      infoID: int.parse(json['infoID'].toString()),
-      weight: double.parse(json['weight'].toString()),
-      height: double.parse(json['height'].toString()),
-      bloodPressure: double.parse(json['bloodPressure'].toString()),
-      bloodGlucose: double.parse(json['bloodGlucose'].toString()),
-      heartRate: double.parse(json['heartRate'].toString()),
-      waistCircumference:
-      double.parse(json['waistCircumference'].toString()),
-      latestDate: json['latestDate'],
-      patientID: int.parse(json['patientID'].toString()),
-    );
-  }
-}
+// class VitalInfo {
+//   int infoID;
+//   double weight;
+//   double height;
+//   double waistCircumference;
+//   double bloodPressure;
+//   double bloodGlucose;
+//   double heartRate;
+//   String latestDate;
+//   int patientID;
+//
+//   VitalInfo({
+//     required this.weight,
+//     required this.height,
+//     required this.bloodPressure,
+//     required this.bloodGlucose,
+//     required this.heartRate,
+//     required this.waistCircumference,
+//     required this.latestDate,
+//     required this.patientID,
+//     required this.infoID,
+//   });
+//
+//   factory VitalInfo.fromJson(Map<String, dynamic> json) {
+//     return VitalInfo(
+//       infoID: int.parse(json['infoID'].toString()),
+//       weight: double.parse(json['weight'].toString()),
+//       height: double.parse(json['height'].toString()),
+//       bloodPressure: double.parse(json['bloodPressure'].toString()),
+//       bloodGlucose: double.parse(json['bloodGlucose'].toString()),
+//       heartRate: double.parse(json['heartRate'].toString()),
+//       waistCircumference:
+//       double.parse(json['waistCircumference'].toString()),
+//       latestDate: json['latestDate'],
+//       patientID: int.parse(json['patientID'].toString()),
+//     );
+//   }
+// }

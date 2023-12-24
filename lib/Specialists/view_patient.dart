@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:my_teleclinic/Patients/patient_home.dart';
 import 'package:my_teleclinic/Specialists/patient_consultation_history.dart';
 import 'package:my_teleclinic/Specialists/patient_info_screen.dart';
+import 'package:my_teleclinic/Specialists/patient_search.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/request_controller.dart';
 import '../../changePassword1.dart';
@@ -43,12 +44,29 @@ class viewPatientScreen extends StatefulWidget {
 
 class _viewPatientScreenState extends State<viewPatientScreen> {
   late Map<int, String> patientNames = {};
+  late List<Consultation> filteredPatients = [];
   late int specialistID;
 
   @override
   void initState() {
     super.initState();
     _loadSpecialistDetails();
+  }
+
+  void filterPatients(String query) {
+    fetchBySpecialist().then((consultations) {
+      setState(() {
+        filteredPatients = consultations.where((consultation) {
+          return consultation.patientName
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase());
+        }).toList();
+      });
+    }).catchError((error) {
+      // Handle error
+      print('Error fetching patients: $error');
+    });
   }
 
   Future<void> _loadSpecialistDetails() async {
@@ -94,17 +112,43 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
               height: 258,
             ),
           ),
+
         ),
         body: SingleChildScrollView(
             child: Column(children: [
+
           Padding(
             padding: const EdgeInsets.only(top: 25, right: 100),
-            child: Text(
-              "Patient List ",
-              style: GoogleFonts.roboto(
-                fontWeight: FontWeight.bold,
-                textStyle: const TextStyle(fontSize: 28, color: Colors.black),
-              ),
+            child: Row(
+              children: [
+                Text(
+                  "Patient List ",
+                  style: GoogleFonts.roboto(
+                    fontWeight: FontWeight.bold,
+                    textStyle: const TextStyle(fontSize: 28, color: Colors.black),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Text(
+                    'Search',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () async {
+                    final String? result = await showSearch(
+                      context: context,
+                      delegate: PatientSearch(filteredPatients),
+                    );
+
+                    if (result != null && result.isNotEmpty) {
+                      filterPatients(result);
+                    }
+                  },
+                ),
+              ],
             ),
           ),
           Container(
@@ -306,8 +350,8 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                                     ),
                                                     Padding(
                                                       padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 10.0),
+                                                          const EdgeInsets.only(
+                                                              bottom: 10.0),
                                                       child: Column(
                                                         //crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
@@ -335,7 +379,10 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                                             MaterialPageRoute(
                                                                 builder:
                                                                     (context) =>
-                                                                        PatientInfoScreen(patientID: consult.patientID,)));
+                                                                        PatientInfoScreen(
+                                                                          patientID:
+                                                                              consult.patientID,
+                                                                        )));
                                                       },
                                                       style: ButtonStyle(
                                                         backgroundColor:
@@ -353,7 +400,12 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                                             MaterialPageRoute(
                                                                 builder:
                                                                     (context) =>
-                                                                        PatientConsultationHistory(patientID: consult.patientID, specialistID: consult.specialistID,)));
+                                                                        PatientConsultationHistory(
+                                                                          patientID:
+                                                                              consult.patientID,
+                                                                          specialistID:
+                                                                              consult.specialistID,
+                                                                        )));
                                                       },
                                                       style: ButtonStyle(
                                                         backgroundColor:
@@ -364,24 +416,6 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                                       child: Text(
                                                           "View Consultation History"),
                                                     ),
-                                                    ElevatedButton(
-                                                      onPressed: () {
-                                                        Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        LoginScreen()));
-                                                      },
-                                                      style: ButtonStyle(
-                                                        backgroundColor:
-                                                            MaterialStateProperty
-                                                                .all<Color>(
-                                                                    Colors.red),
-                                                      ),
-                                                      child:
-                                                          Text("Consult Now!"),
-                                                    )
                                                   ],
                                                 ),
                                               ),
