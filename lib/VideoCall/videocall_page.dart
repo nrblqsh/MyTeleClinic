@@ -1,14 +1,11 @@
-import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 import 'package:my_teleclinic/Specialists/specialist_home.dart';
 
 class CallPage extends StatefulWidget {
-  final String channelName;
-
-  const CallPage({Key? key, required this.channelName}) : super(key: key);
-
   @override
   State<CallPage> createState() => _CallPageState();
 }
@@ -21,11 +18,20 @@ class _CallPageState extends State<CallPage> {
   double xPosition = 0;
   double yPosition = 0;
   bool muted = false;
+  bool isMaximized = false;
+  late String dynamicChannelName; // New dynamic channel name variable
 
   @override
   void initState() {
     super.initState();
+    dynamicChannelName = generateRandomString(8); // Generate a dynamic channel name
     initializeAgora();
+  }
+
+  // Function to generate a random string
+  String generateRandomString(int length) {
+    const charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    return List.generate(length, (index) => charset[index % charset.length]).join();
   }
 
   @override
@@ -43,22 +49,22 @@ class _CallPageState extends State<CallPage> {
     await _engine.setChannelProfile(ChannelProfile.Communication);
     _engine.setEventHandler(RtcEngineEventHandler(
       joinChannelSuccess: (channel, uid, elapsed) {
-        print("Channel joined");
+        print("Channel joined: $channel");
       },
       userJoined: (uid, elapsed) {
-        print("Userjoined: $uid");
+        print("User joined: $uid");
         setState(() {
           _remoteUids.add(uid);
         });
       },
       userOffline: (uid, elapsed) {
-        print("Useroffline: $uid");
+        print("User offline: $uid");
         setState(() {
           _remoteUids.remove(uid);
         });
       },
     ));
-    await _engine.joinChannel(null, widget.channelName, null, 0);
+    await _engine.joinChannel(null, dynamicChannelName, null, 0);
     setState(() {
       loading = false;
     });
@@ -67,33 +73,65 @@ class _CallPageState extends State<CallPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: (loading)
-          ? const Center(
-            child: CircularProgressIndicator(),
-      )
-          : Stack(
-            children: [
-            Center(
-              child: renderRemoteView(context),
+      appBar: AppBar(
+        toolbarHeight: 72,
+        backgroundColor: Colors.white,
+        title: Center(
+          child: Image.asset(
+            "asset/MYTeleClinic.png",
+            width: 594,
+            height: 258,
           ),
-            Positioned(
-              top: yPosition,
-              left: xPosition,
-              child: GestureDetector(
-                onPanUpdate: (tapInfo) {
-                  setState(() {
-                    xPosition += tapInfo.delta.dx;
-                    yPosition += tapInfo.delta.dy;
-                  });
+        ),
+      ),
+      body: Stack(
+        children: [
+          Center(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  isMaximized = !isMaximized;
+                });
               },
-                child: Container(
-                  width: 100,
-                  height: 130,
-                  child: const RtcLocalView.SurfaceView(),
+              child: Container(
+                width: isMaximized ? MediaQuery.of(context).size.width : 200,
+                height: isMaximized ? MediaQuery.of(context).size.height : 300,
+                child: renderRemoteView(context),
               ),
             ),
           ),
-            _toolbar(),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Symptom'),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Enter your symptoms',
+                    ),
+                  ),
+                  Text('Treatment'),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Enter the treatment details',
+                    ),
+                  ),
+                  Text('Medication'),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Enter the medication details',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          _toolbar(),
         ],
       ),
     );
@@ -104,18 +142,18 @@ class _CallPageState extends State<CallPage> {
       if (_remoteUids.length == 1) {
         return RtcRemoteView.SurfaceView(
           uid: _remoteUids[0],
-          channelId: widget.channelName,
+          channelId: dynamicChannelName,
         );
       } else if (_remoteUids.length == 2) {
         return Column(
           children: [
             RtcRemoteView.SurfaceView(
               uid: _remoteUids[0],
-              channelId: widget.channelName,
+              channelId: dynamicChannelName,
             ),
             RtcRemoteView.SurfaceView(
               uid: _remoteUids[1],
-              channelId: widget.channelName,
+              channelId: dynamicChannelName,
             ),
           ],
         );
@@ -139,7 +177,7 @@ class _CallPageState extends State<CallPage> {
                 ),
                 child: RtcRemoteView.SurfaceView(
                   uid: _remoteUids[index],
-                  channelId: widget.channelName,
+                  channelId: dynamicChannelName,
                 ),
               );
             },
@@ -148,7 +186,7 @@ class _CallPageState extends State<CallPage> {
         );
       }
     } else {
-      return const Text("Waiting for other user to join");
+      return const Text("Waiting for other users to join");
     }
   }
 
