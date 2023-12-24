@@ -5,6 +5,16 @@ import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 import 'package:my_teleclinic/Specialists/specialist_home.dart';
 
+//letak kat CallNow
+//SizedBox(height 30,),
+//InkWell(
+//onTap:() async{
+//await [Permission.camera, Permission.microphone].request().then((value){
+//Navigator.push(context, MaterialPageRoute(builder: (context)=>CallPage(channelName: _controller.text.trim())));
+//});
+//},
+
+
 class CallPage extends StatefulWidget {
   @override
   State<CallPage> createState() => _CallPageState();
@@ -105,8 +115,8 @@ class _CallPageState extends State<CallPage> {
             left: 0,
             right: 0,
             child: Container(
-              padding: EdgeInsets.all(16),
-              child: Column(
+              padding: const EdgeInsets.all(16),
+              child: const Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('Symptom'),
