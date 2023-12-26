@@ -5,6 +5,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 import '../main.dart';
 
@@ -176,6 +178,17 @@ class _MapLocationState extends State<MapLocation> {
     }
   }
 
+
+  Future<void> openInMaps(String latitude, String longitude) async {
+    final url = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+
   Widget buildDialog(dynamic item) {
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -215,16 +228,44 @@ class _MapLocationState extends State<MapLocation> {
                       ),
                     ),
 
-                    if(distance!= null && duration !=null)
+                    if (distance != null && duration != null)
+                      SizedBox(height: 30,),
+                    Row(
+                      children: [
+                        // Car icon next to distance
+                        Row(
+                          children: [
+                            Icon(Icons.directions_car, size: 20, color: Colors.blue),
+                            SizedBox(width: 7),
+                            Text(
+                              distance!,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
 
-                        SizedBox(height: 30,),
-                        Text(
-                          ' $distance                            \t\t         $duration',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )
+                          ],
+                        ),
+                        SizedBox(width:240), // Add some spacing between distance and duration
+                        // Clock icon next to duration
+                        Row(
+                          children: [
+                            SizedBox(width: 15),
+                            Icon(Icons.access_time, size: 20, color: Colors.green),
+                            SizedBox(width: 10), // Add some spacing
+                            Text(
+                              duration!,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                          ],
+                        ),
+                      ],
+                    )
 
                   ],
                 ),
@@ -252,8 +293,38 @@ class _MapLocationState extends State<MapLocation> {
                   ),
                 ),
               ),
+              SizedBox(height: 10,),
+              Container(
+                height: 45,
+                width: 145,
+                child: ElevatedButton(
+                  onPressed: () {
+                    openInMaps(item['latitude'], item['longitude']);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    backgroundColor: Color(hexColor('7393B3')),
+                    fixedSize: Size.fromHeight(45),
+
+
+                  ),
+                  child: Text(
+                    'Open in Maps',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+
             ],
           ),
+
           Positioned(
             top: 8.0,
             right: 8.0,
@@ -455,8 +526,7 @@ class _MapLocationState extends State<MapLocation> {
 
   Future<void> updateSuggestions(String query) async {
     final response = await http.get(
-      Uri.parse(
-          'http://${MyApp.ipAddress}${MyApp.clinicPath}/suggestions?q=$query'),
+      Uri.parse('http://${MyApp.ipAddress}${MyApp.clinicPath}/suggestions?q=$query'),
     );
 
     if (response.statusCode == 200) {
@@ -467,11 +537,14 @@ class _MapLocationState extends State<MapLocation> {
 
       setState(() {
         suggestions = clinicNames;
+
+        searchClinics(query);
       });
     } else {
       print('Failed to fetch search suggestions');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -524,7 +597,7 @@ class _MapLocationState extends State<MapLocation> {
                         fillColor: Colors.white70,
                         filled: true,
                         hintStyle: TextStyle(
-                          color: Colors.black54, // You can set any color you prefer
+                          color: Colors.black54,
                         ),
                       ),
                     ),
@@ -545,13 +618,17 @@ class _MapLocationState extends State<MapLocation> {
                     for (String suggestion in suggestions)
                       ListTile(
                         title: Text(suggestion),
-                        onTap: () {
-                          // You can add logic to handle suggestion selection
-                          _searchController.text = suggestion;
-                          searchClinics(suggestion);
+                        onTap: () async {
+                          setState(() {
+                            _searchController.text = suggestion;
+                          });
+                          // Search clinics based on the selected suggestion
+                          await searchClinics(suggestion);
                           moveToClinic(suggestion);
                         },
                       ),
+
+
                   ],
                 ),
               ),
@@ -560,12 +637,14 @@ class _MapLocationState extends State<MapLocation> {
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.location_searching),
-        onPressed: () {
+        onPressed: () async {
           packData();
           clearPolylines();
+          // Fetch all markers
           fetchMarkers();
         },
       ),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
 
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_teleclinic/Specialists/patient_consultation_history.dart';
+import 'package:my_teleclinic/Specialists/settingSpecialist.dart';
 import 'package:my_teleclinic/Specialists/specialist_consultation_history.dart';
 import 'package:my_teleclinic/Specialists/viewUpcomingAppointment.dart';
 import 'package:my_teleclinic/Specialists/view_patient.dart';
@@ -99,7 +100,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
           navigateToPage: _navigateToPage,
         ),
         ViewUpcomingAppointment(),
-        SettingsScreen(patientID: 0)// Pass the consultations
+        SettingsSpecialistScreen(specialistID: specialistID,)// Pass the consultations
       ];
     });
   }
@@ -350,6 +351,8 @@ class _MenuScreenState extends State<MenuScreen> {
                                 return Center(child: CircularProgressIndicator());
                               } else if (snapshot.hasError) {
                                 return Center(child: Text('Error: ${snapshot.error}'));
+                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                return Center(child: Text('No Data for Appointment Today'));
                               } else if (snapshot.hasData) {
                                 List<Consultation>? consultations = snapshot.data;
 

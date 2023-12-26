@@ -14,12 +14,19 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch clinic information from your database
-$sql = "SELECT * FROM clinic";
+// Check if the 'q' parameter is set
+if (isset($_GET['q'])) {
+    $searchQuery = $conn->real_escape_string($_GET['q']);
+
+    $sql = "SELECT * FROM clinic WHERE clinicName LIKE '%$searchQuery%'";
+} else {
+    // Fetch all clinic information
+    $sql = "SELECT * FROM clinic";
+}
+
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
-    // Output data as JSON
     $data = array();
     while ($row = $result->fetch_assoc()) {
         $data[] = $row;
