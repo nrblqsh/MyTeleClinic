@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Check if both parameters are present
         if ($patientID !== null && $specialistID !== null) {
-            $stmt = $db->prepare("SELECT * FROM consultation WHERE patientID=:patientID AND specialistID=:specialistID");
+            $stmt = $db->prepare("SELECT * FROM consultation WHERE patientID=:patientID AND specialistID=:specialistID AND consultationStatus = 'Done'");
             $stmt->bindParam(':patientID', $patientID, PDO::PARAM_INT);
             $stmt->bindParam(':specialistID', $specialistID, PDO::PARAM_INT);
             $stmt->execute();
