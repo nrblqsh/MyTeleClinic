@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,39 +10,30 @@ class Patient {
    int? patientID;
    String? patientName;
    String? phone;
-   String? icNum;
+   String? icNumber;
    String? gender;
    DateTime? birthDate;
-   String? address;
    String? password;
-   String? state;
-   String? postcode;
+
+
 
   Patient({
     required this.patientID,
     required this.patientName,
     required this.phone,
-    required this.icNum,
+    required this.icNumber,
     required this.gender,
     required this.birthDate,
-    required this.address,
     required this.password,
-    required this.state,
-    required this.postcode
   });
 
-
-  Patient.fromJson(Map<String, dynamic> json)
-      :
-        patientName = json['patientName'] as String?,
-        phone = json['phone'] as String? ,
-        icNum = json['icNumber'] as String?,
-        gender = json['gender'] as String ?,
-        birthDate = _parseDateTime(json['birthDate'] as dynamic),
-        address = json['patientAddress'] as String?,
-        state = json['state'] as String?,
-        postcode = json['postcode'] as String?,
-        password = json['password'] as String?;
+   Patient.fromJson(Map<String, dynamic> json)
+       : patientName = json['patientName'] as String?,
+         phone = json['phone'] as String?,
+         icNumber = json['icNumber'] as String?,
+         gender = json['gender'] as String?,
+         birthDate = _parseDateTime(json['birthDate'] as dynamic),
+         password = json['password'] as String?;
 
 
    static DateTime? _parseDateTime(dynamic dateTimeString) {
@@ -50,7 +42,12 @@ class Patient {
      }
 
      try {
-       return DateTime.parse(dateTimeString.toString());
+       if (dateTimeString is String) {
+         return DateTime.parse(dateTimeString);
+       } else {
+         print("Error parsing date string: $dateTimeString");
+         return null;
+       }
      } catch (e) {
        print("Error parsing date string: $dateTimeString");
        print("Error details: $e");
@@ -58,74 +55,81 @@ class Patient {
      }
    }
 
-  Map<String, dynamic> toJson() =>
+
+   Map<String, dynamic> toJson() =>
       {
         'patientName': patientName,
         'phone': phone,
-        'icNumber': icNum,
+        'icNumber': icNumber,
         'gender': gender,
         'birthDate': birthDate?.toString(), // Convert DateTime to string
-        'patientAddress': address,
-        'state': state,
-        'postcode': postcode,
         'password': password
       };
 
-  Future<bool> save() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int storedID = prefs.getInt("patientID") ?? 0;
-    print("patinetttt $storedID");
+   Future<bool> save() async {
+     SharedPreferences prefs = await SharedPreferences.getInstance();
+     int storedID = prefs.getInt("patientID") ?? 0;
+     print("patient ID: $storedID");
 
-    RequestController req = RequestController(
-        path: "/teleclinic/editprofile.php?patientID=$storedID");
-    req.setBody(toJson());
-    await req.post();
-    if (req.status() == 200) {
-      return true;
-    }
-    else {
-      print("tak dapat bro");
-      return false;
-    }
-  }
+     RequestController req = RequestController(
+         path: "/teleclinic/editprofile.php?patientID=$storedID");
+     req.setBody(toJson());
+     await req.put();
+     print("PUT URL: ${req.path}"); // Assuming 'path' is the property representing the URL
+
+     if (req.status() == 200) {
+       return true;
+     } else {
+       print("Failed to update profile. Status: ${req.status()}");
+       return false;
+     }
+   }
+
+
 
    static Future<List<Patient>> loadAll() async {
      SharedPreferences prefs = await SharedPreferences.getInstance();
-     int storedID = prefs.getInt("patientID") ?? 0;
-
-     print("patient $storedID");
-
-     List<Patient> result = [];
+     int patientID = prefs.getInt("patientID") ?? 0;
 
      // Instantiate RequestController
      RequestController req = RequestController(
-       path: "/teleclinic/editprofile.php?patientID=$storedID",
+       path: "/teleclinic/editprofile.php",
      );
 
+     // Add patientID as a query parameter
+     req.path = "${req.path}?patientID=$patientID";
+
      // Make a GET request
+     print("Request URL: ${req.path}");
+
      await req.get();
+     print("Response Status: ${req.status()}");
+     print("Response Body: ${req.result()}");
 
      if (req.status() == 200 && req.result() != null) {
        dynamic resultData = req.result();
 
-       if (resultData is Iterable) {
-         for (var item in resultData) {
-           result.add(Patient.fromJson(item));
-           print("sini 1");
+       print("Raw JSON Data: $resultData");
+
+       try {
+         if (resultData is Map<String, dynamic> && resultData.containsKey('data')) {
+           // Handle the case when the result is an array or a single object
+           print("1");
+           var dataList = resultData['data'] as List<dynamic>;
+           return dataList.map((item) => Patient.fromJson(item)).toList();
+         } else {
+           print('Unexpected response format. Body is not a JSON object.');
+           return [];
          }
-       } else if (resultData is Map<String, dynamic>) {
-         // Handle the case when the result is a single object (not iterable)
-         result.add(Patient.fromJson(resultData));
-         print("sini 2");
-       } else {
-         // Handle the case when the result is neither an iterable nor a map
-         print('Unexpected result type: ${resultData.runtimeType}');
+       } catch (e) {
+         print('Error parsing response: $e');
+         return [];
        }
+     } else {
+       // Handle the case when the request failed
+       print('Error loading patients: ${req.status()}');
+       return [];
      }
-     else{
-       print("tak dapat weh");
-     }
-     return result;
    }
 
 

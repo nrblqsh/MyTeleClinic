@@ -8,8 +8,9 @@ class RequestController {
   final Map<dynamic, dynamic> _body = {};
   final Map<String, String> _headers = {};
   dynamic _resultData;
+  Map<dynamic, dynamic> get requestBody => _body;
 
-  RequestController({required this.path, this.server = "http://192.168.182.198"});
+  RequestController({required this.path, this.server = "http://192.168.8.186"});
 
   setBody(Map<String, dynamic> data) {
     _body.clear();
@@ -19,7 +20,7 @@ class RequestController {
 
   Future<void> post() async {
     _res = await http.post(
-      Uri.parse(server + path),
+      Uri.parse(_getUrl()),
       headers: _headers,
       body: jsonEncode(_body),
     );
@@ -36,20 +37,33 @@ class RequestController {
 
   Future<void> put() async {
     _res = await http.put(
-      Uri.parse(server + path),
+      Uri.parse(_getUrl()),
       headers: _headers,
       body: jsonEncode(_body),
     );
     _parseResult();
   }
 
+  String _getUrl() {
+    return (Uri.parse(server + path)).toString();  // Corrected line
+  }
   void _parseResult() {
     try {
-      print("raw response: ${_res?.body}");
-      _resultData = jsonDecode(_res?.body ?? "");
-    } catch (ex) {
-      _resultData = _res?.body;
-      print("exception in http result parsing ${ex}");
+      if (_res != null) {
+        if (_res!.body.isEmpty) {
+          _resultData = null;
+        } else {
+          _resultData = jsonDecode(_res!.body);
+        }
+      } else {
+        print("No response received");
+        _resultData = null;
+      }
+    } catch (ex, stackTrace) {
+      print("Exception in HTTP result parsing: $ex");
+      print("StackTrace: $stackTrace");
+      print("Response body: ${_res?.body}");
+      _resultData = null;
     }
   }
 

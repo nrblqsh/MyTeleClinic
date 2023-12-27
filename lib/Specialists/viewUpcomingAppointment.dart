@@ -126,7 +126,7 @@ class _ViewUpcomingAppointmentState extends State<ViewUpcomingAppointment> {
                                 _showConsultationDetailsDialog(
                                     context, consult);
                               },
-                              child: Expanded(
+
                                 child: Container(
                                   padding: EdgeInsets.only(
                                       left: 15, right: 15, top: 10),
@@ -216,7 +216,7 @@ class _ViewUpcomingAppointmentState extends State<ViewUpcomingAppointment> {
                                     ],
                                   ),
                                 ),
-                              ),
+
                             ),
                           );
                         },

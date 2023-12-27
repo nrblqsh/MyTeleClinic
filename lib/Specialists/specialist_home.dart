@@ -43,6 +43,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
   late List<Widget> _pages = [];
   late List<Consultation> todayConsultations = [];
 
+
   @override
   void initState() {
     super.initState();
@@ -55,7 +56,6 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
       specialistID = pref.getInt("specialistID") ?? 0;
       specialistName = pref.getString("specialistName") ?? '';
       logStatus = pref.getString("logStatus") ?? 'OFFLINE';
-
     });
     await _fetchTodayConsultations();
     _createPages();
@@ -63,7 +63,8 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
 
   Future<List<Consultation>> _fetchTodayConsultations() async {
     try {
-      final List<Consultation> fetchedConsultations = await Consultation(
+      final List<Consultation> fetchedConsultations =
+      await Consultation(
         specialistID: specialistID,
         consultationDateTime: consultationDateTime,
         consultationStatus: consultationStatus,
@@ -79,8 +80,6 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
     }
   }
 
-
-
   void _navigateToPage(int index) {
     setState(() {
       _currentIndex = index;
@@ -90,17 +89,22 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
   void _createPages() {
     setState(() {
       _pages = [
-        viewPatientScreen(specialistID: specialistID,
-          ),
-        SpecialistConsultationHistory(specialistID: specialistID,),// index 0
+        viewPatientScreen(
+          specialistID: specialistID,
+        ),
+        SpecialistConsultationHistory(
+          specialistID: specialistID,
+        ), // index 0
 
         createMenuScreen(
           todayConsultations: todayConsultations,
-          fetchTodayConsultations: _fetchTodayConsultations, // Add this line
+          fetchTodayConsultations: _fetchTodayConsultations,
           navigateToPage: _navigateToPage,
         ),
         ViewUpcomingAppointment(),
-        SettingsSpecialistScreen(specialistID: specialistID,)// Pass the consultations
+        SettingsSpecialistScreen(
+          specialistID: specialistID,
+        ) // Pass the consultations
       ];
     });
   }
@@ -123,7 +127,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: _pages.length > _currentIndex ? _pages[_currentIndex] : Container(),
       bottomNavigationBar: BottomNavigationBarWidget(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -133,6 +137,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
     );
   }
 }
+
 
 class BottomNavigationBarWidget extends StatelessWidget {
   final int currentIndex;

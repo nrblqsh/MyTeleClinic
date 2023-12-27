@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_teleclinic/Patients/register.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -49,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
     else {
       print("tak dapat");
       var url = Uri.http(
-          "192.168.0.116", '/teleclinic/login.php', {'q': '{http}'});
+          "192.168.8.186", '/teleclinic/login.php', {'q': '{http}'});
 
       try {
         var response = await http.post(url, body: {
@@ -127,13 +128,25 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       } catch (error) {
         print("Error: $error");
+        print("Error type: ${error.runtimeType}");
+
+        String errorMessage;
+        String title = 'Login Failed';
+
+        if (error is http.ClientException) {
+          errorMessage = 'Invalid username or password';
+        } else if (error.toString().contains("type 'String' is not a subtype of type 'int' of 'index'")) {
+          errorMessage = 'Wrong phone or password';
+        } else {
+          errorMessage = 'An error occurred while processing your request.';
+        }
+
         showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: const Text('Error'),
-              content: const Text(
-                  'An error occurred while processing your request.'),
+              title: Text(title),
+              content: Text(errorMessage),
               actions: [
                 TextButton(
                   child: const Text('OK'),
@@ -146,6 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
           },
         );
       }
+
     }
   }
 
