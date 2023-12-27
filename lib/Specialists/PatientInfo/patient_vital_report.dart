@@ -5,7 +5,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:flutter/material.dart';
 
 import '../../Main/main.dart';
-import 'add_vital_info.dart';
+
 
 // void main() {
 //   runApp(MaterialApp(
@@ -13,15 +13,15 @@ import 'add_vital_info.dart';
 //   ));
 // }
 
-class VitalInfoReportScreen extends StatefulWidget {
+class PatientVitalReportScreen extends StatefulWidget {
   final int patientID;
-  VitalInfoReportScreen({required this.patientID});
+  PatientVitalReportScreen({required this.patientID});
 
   @override
-  _VitalInfoReportScreenState createState() => _VitalInfoReportScreenState();
+  _PatientVitalReportScreenState createState() => _PatientVitalReportScreenState();
 }
 
-class _VitalInfoReportScreenState extends State<VitalInfoReportScreen> {
+class _PatientVitalReportScreenState extends State<PatientVitalReportScreen> {
   late int patientID;
   late VitalInfoDataSource vitalInfoDataSource;
   late List<GridColumn> _columns;
@@ -242,17 +242,7 @@ class _VitalInfoReportScreenState extends State<VitalInfoReportScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddVitalInfoScreen(patientID: patientID),
-            ),
-          );
-        },
-        child: Icon(Icons.add),
-      ),
+
     );
   }
 

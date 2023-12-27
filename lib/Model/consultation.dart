@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:my_teleclinic/Controller/request_controller.dart';
 import '';
-import '../main.dart';
+import '../Main/main.dart';
 
 //
 class Consultation {

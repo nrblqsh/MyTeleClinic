@@ -3,8 +3,8 @@ import 'package:my_teleclinic/Patients/EMR/vital_info_report.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Telemedicine/view_specialist.dart';
-import '../patient_home_page.dart';
-import '../settings.dart';
+import '../Profile/patient_home_page.dart';
+import '../Profile/settings.dart';
 import 'add_vital_info.dart';
 import 'current_vital.dart';
 

@@ -8,10 +8,11 @@ import 'package:my_teleclinic/Patients/Telemedicine/view_appointment.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/request_controller.dart';
 import '../../Model/consultation.dart';
-import '../../changePassword1.dart';
+import '../../Main/changePassword1.dart';
+import '../../Main/main.dart';
 import '../EMR/e_medical_record.dart';
-import '../patient_home_page.dart';
-import '../settings.dart';
+import '../Profile/patient_home_page.dart';
+import '../Profile/settings.dart';
 
 // void main() {
 //   runApp(const MaterialApp(
@@ -36,7 +37,7 @@ class viewSpecialistScreen extends StatefulWidget {
 }
 
 Future<List<Specialist>> fetchSpecialist() async {
-  String url = 'http://192.168.0.116/teleclinic/viewSpecialist.php';
+  String url = 'http://${MyApp.ipAddress}/teleclinic/viewSpecialist.php';
   final response = await http.get(Uri.parse(url));
   return specialistFromJson(response.body);
 }
@@ -70,6 +71,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     int storedID = prefs.getInt("patientID") ?? 0;
     // int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
+    // int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
     String storedPhone = prefs.getString("phone") ?? "";
     String storedName = prefs.getString("patientName") ?? "";
 
@@ -77,7 +79,6 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
       patientID = storedID;
       phone = storedPhone;
       patientName = storedName;
-      // specialistID = storedSpecialistID;
     });
   }
 
@@ -498,8 +499,8 @@ Widget _buildOnlineIndicator(bool isOnline) {
 
 class _SuccessRequestState extends State<SuccessRequestScreen> {
   late String phone=''; // To store the retrieved phone number
-  late String patientName;
-  late int patientID;
+  late String patientName='';
+  late int patientID=0;
   late int specialistID;
 
   @override

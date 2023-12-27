@@ -5,9 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/request_controller.dart';
 import '../../Model/vital_info.dart';
-import '../../changePassword1.dart';
-import '../patient_home_page.dart';
-import '../patient_home.dart';
+import '../../Main/changePassword1.dart';
+import '../../Main/main.dart';
+//import '../../main.dart';
+import '../Profile/patient_home_page.dart';
 //import 'package:connectivity/connectivity.dart';
 
 
@@ -184,7 +185,7 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
   Future<VitalInfo?> generateVitalInfo() async {
     try {
       var url =
-          'http://192.168.0.116/teleclinic/currentVitalInfo.php?patientID=$patientID';
+          'http://${MyApp.ipAddress}/teleclinic/currentVitalInfo.php?patientID=$patientID';
       final response = await http.get(Uri.parse(url));
       print(url);
 
