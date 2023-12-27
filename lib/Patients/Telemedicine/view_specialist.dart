@@ -8,7 +8,6 @@ import 'package:my_teleclinic/Patients/Telemedicine/view_appointment.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/request_controller.dart';
 import '../../Model/consultation.dart';
-import '../../Main/changePassword1.dart';
 import '../../Main/main.dart';
 import '../EMR/e_medical_record.dart';
 import '../Profile/patient_home_page.dart';

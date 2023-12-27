@@ -1,10 +1,13 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:my_teleclinic/Patients/EMR/vital_info_report.dart';
 import 'package:my_teleclinic/Patients/Profile/patient_home_page.dart';
 import 'package:my_teleclinic/Main/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../Main/changePassword1.dart';
+//import '../../Patients/Main/changePassword1.dart';
+
+//import '../Main/changePassword1.dart';
 import '../EMR/e_medical_record.dart';
 import '../Telemedicine/view_appointment.dart';
 import '../Telemedicine/view_specialist.dart';

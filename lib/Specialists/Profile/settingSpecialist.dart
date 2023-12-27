@@ -4,12 +4,13 @@ import 'package:my_teleclinic/Patients/Profile/patient_home_page.dart';
 import 'package:my_teleclinic/Main/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../Main/changePassword1.dart';
 import '../../Patients/EMR/e_medical_record.dart';
 import '../../Patients/Telemedicine/view_appointment.dart';
 import '../../Patients/Telemedicine/view_specialist.dart';
 import '../../Patients/Profile/editProfile.dart';
 import '../../Patients/Profile/editProfile1.dart';
-import '../../Main/changePassword1.dart';
+//import '../../Patients/Main/changePassword1.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
