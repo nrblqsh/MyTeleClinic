@@ -14,7 +14,7 @@ import '../../Main/main.dart';
 // }
 
 class PatientVitalReportScreen extends StatefulWidget {
-  final int patientID;
+  late final int patientID;
   PatientVitalReportScreen({required this.patientID});
 
   @override
@@ -40,6 +40,7 @@ class _PatientVitalReportScreenState extends State<PatientVitalReportScreen> {
 
     setState(() {
       patientID = storedID;
+      print('patient id dekat vital info ${patientID}');
       //patientIDController.text = patientID.toString();
     });
   }

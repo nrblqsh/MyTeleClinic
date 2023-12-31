@@ -86,6 +86,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
     int _currentIndex = 1;
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 68,
         backgroundColor: Colors.white,
         title: Center(

@@ -19,9 +19,11 @@ class viewPatientScreen extends StatefulWidget {
 }
 
 class _viewPatientScreenState extends State<viewPatientScreen> {
+  Consultation? selectedPatient;
+  int selectedPatientID = 0;
   List<String> suggestions = [];
   final TextEditingController _searchController = TextEditingController();
-  late int patientID;
+  late int patientID =0;
   late int specialistID;
   String query = '';
 
@@ -74,12 +76,19 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       print('ni data $data');
-          onTap: (suggestions) {
-            loadPatient();
-      };
+
+      final int patientIDFromSuggestion = data[0]['patientID'];
+      final Map<String, dynamic> patientData = data[0];
+
       setState(() {
+       // consult = data ;
+        //selectedPatientID = patientIDFromSuggestion;
+       // selectedPatient = selectedPatient;
+        selectedPatient = Consultation.fromJson(patientData);
+        print ('dia pilih patient ni ${selectedPatient!.patientName}');
 
       });
+
     } else {
       print('Failed to fetch search results');
     }
@@ -118,6 +127,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 68,
         backgroundColor: Colors.white,
         title: Center(
@@ -163,36 +173,221 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                 hintStyle: TextStyle(
                   color: Colors.black54,
                 ),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    suggestions.clear();
+                    // Optionally, you can also clear suggestions or perform any other action.
+                  },
+                ),
               ),
             ),
           ),
+
+
           if (suggestions.isNotEmpty)
-            Positioned(
-              top: 95,
-              left: 10,
-              right: 10,
+            Expanded(
               child: Card(
                 elevation: 5,
-                child: Column(
+                child: ListView(
                   children: [
                     for (String suggestion in suggestions)
                       ListTile(
                         title: Text(suggestion),
-                        onTap: () {
+                        onTap: () async {
                           // You can add logic to handle suggestion selection
                           _searchController.text = suggestion;
-                          searchPatients(suggestion);
+                          await searchPatients(suggestion);
+                          setState(() {
+                             patientID = int.parse('${selectedPatient!.patientID}');
+                             print('sekarang dia pilih ${patientID}');
+
+                          });
+                          final SharedPreferences pref = await SharedPreferences.getInstance();
+                          await pref.setInt("patientID", patientID);
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                                ),
+                                child: Container(
+                                  padding: EdgeInsets.only(left: 12, right: 12, top: 10),
+                                  height: 500,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.blueAccent),
+                                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.blueGrey,
+                                        offset: const Offset(5.0, 5.0),
+                                        blurRadius: 10.0,
+                                        spreadRadius: 2.0,
+                                      ),
+                                      BoxShadow(
+                                        color: Colors.white,
+                                        offset: const Offset(0.0, 0.0),
+                                        blurRadius: 0.0,
+                                        spreadRadius: 0.0,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 20.0),
+                                        child: Image.network(
+                                          'https://static.thenounproject.com/png/516749-200.png',
+                                          width: 90,
+                                          height: 90,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 15.0),
+                                        child: Text(
+                                          '${selectedPatient!.patientName}',
+                                          style: TextStyle(fontSize: 20),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 10.0),
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              'IC Number:',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${selectedPatient!.icNum}',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10.0),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Gender:',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${selectedPatient!.gender}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10.0),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Birthdate:',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${_formatDateTime(selectedPatient!.birthDate.toString())}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10.0),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Phone:',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${selectedPatient!.phone}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                      // Add other details...
+
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => PatientInfoScreen(
+                                                patientID: selectedPatient!.patientID,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        style: ButtonStyle(
+                                          backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                                        ),
+                                        child: Text("View Patient Vital Info"),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => PatientConsultationHistory(
+                                                patientID: selectedPatient!.patientID,
+                                                specialistID: selectedPatient!.specialistID,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        style: ButtonStyle(
+                                          backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                                        ),
+                                        child: Text("View Consultation History"),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
                         },
                       ),
                   ],
                 ),
               ),
             ),
+
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(top: 30.0),
               child: FutureBuilder(
-                future: fetchBySpecialist(),
+                future: selectedPatientID == 0
+                    ? fetchBySpecialist()
+                    : fetchPatientDetails(selectedPatientID),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
@@ -235,11 +430,14 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                         ],
                                       ),
                                       child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
+                                        onTap: ()  async {
+                                          setState(()  {
                                             int patientID = int.parse('${consult.patientID}');
                                           });
+                                          final SharedPreferences pref = await SharedPreferences.getInstance();
+                                          await pref.setInt("patientID", consult.patientID);
                                           print('Tapped on patient: ${consult.patientName}');
+
                                           showDialog(
                                             context: context,
                                             builder: (BuildContext context) {
@@ -439,5 +637,19 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
         ],
       ),
     );
+  }
+
+  Future<List<Consultation>> fetchPatientDetails(int patientID) async {
+
+    var url = 'http://${MyApp.ipAddress}/teleclinic/viewPatient.php?specialistID=$specialistID&patientID=$patientID';
+    print ('url ${url}');
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> responseData = json.decode(response.body);
+      return responseData.map((data) => Consultation.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to fetch patient details');
+    }
   }
 }

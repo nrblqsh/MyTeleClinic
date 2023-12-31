@@ -14,7 +14,7 @@ import 'add_vital_info.dart';
 import 'e_medical_record.dart';
 
 class CurrentVitalInfoScreen extends StatefulWidget {
-  final int patientID;
+  late int patientID;
   CurrentVitalInfoScreen({required this.patientID});
 
   @override

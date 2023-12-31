@@ -11,7 +11,7 @@ import '../../Patients/EMR/current_vital.dart';
 // }
 
 class PatientInfoScreen extends StatefulWidget {
-  final int patientID;
+  late int patientID=0;
 
   PatientInfoScreen({required this.patientID});
 
@@ -20,7 +20,7 @@ class PatientInfoScreen extends StatefulWidget {
 }
 
 class _PatientInfoScreenState  extends State<PatientInfoScreen> {
-  late int patientID;
+  late int patientID=0;
   late String patientName;
 
   @override
@@ -36,6 +36,7 @@ class _PatientInfoScreenState  extends State<PatientInfoScreen> {
 
     setState(() {
       patientID = storedID;
+      print('patient id dekat screen vital ${patientID}');
       //patientName = widget.patientName;
       //print(patientID);
       //patientIDController.text = patientID.toString();
@@ -79,10 +80,10 @@ class _PatientInfoScreenState  extends State<PatientInfoScreen> {
           body: TabBarView(
             children: [
               CurrentVitalInfoScreen(
-                patientID: 0,
+                patientID: patientID,
               ),
               PatientVitalReportScreen(
-                patientID: 0,
+                patientID: patientID,
               ),
             ],
           ),

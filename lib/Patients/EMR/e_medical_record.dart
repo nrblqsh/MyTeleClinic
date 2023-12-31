@@ -53,6 +53,7 @@ class _MedicalRecordScreenState extends State<MedicalRecordScreen> {
         length: 3,
         child: Scaffold(
           appBar: AppBar(
+            automaticallyImplyLeading: false,
             toolbarHeight: 78,
             backgroundColor: Colors.white,
             title: Center(

@@ -81,16 +81,22 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 72,
         backgroundColor: Colors.white,
-        title: Center(
-          child: Image.asset(
-            "asset/MYTeleClinic.png",
-            width: 594,
-            height: 258,
+        title: Column(
+            mainAxisAlignment:MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.asset(
+                "asset/MYTeleClinic.png",
+                width: 594,
+                height: 258,
+              ),
+            ],
           ),
         ),
-      ),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -109,8 +115,9 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
+
                 Padding(
-                  padding: const EdgeInsets.only(right: 30.0, bottom: 5),
+                  padding: const EdgeInsets.only(bottom: 5, right: 52),
                   child: Text(
                     "${patientName}",
                     style: GoogleFonts.roboto(
