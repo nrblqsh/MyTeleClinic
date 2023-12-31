@@ -4,7 +4,6 @@ import 'package:my_teleclinic/Patients/Telemedicine/view_specialist.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../Model/consultation.dart';
-import '../../Main/main.dart';
 import '../EMR/e_medical_record.dart';
 import '../Profile/patient_home_page.dart';
 import '../Profile/settings.dart';
@@ -56,7 +55,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
   }
 
   Future<List<Consultation>> fetchConsultations() async {
-    final String url = 'http://${MyApp.ipAddress}/teleclinic/consultation.php'; // Modify the path accordingly
+    final String url = 'http://192.168.229.150/teleclinic/consultation.php'; // Modify the path accordingly
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -75,7 +74,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
   }
 
   Future<Specialist?> fetchSpecialistByID(String specialistID) async {
-    final String url = 'http://${MyApp.ipAddress}/teleclinic/viewSpecialist.php';
+    final String url = 'http://192.168.229.150/teleclinic/viewSpecialist.php';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -87,7 +86,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
   }
 
   Future<void> cancelAppointment(int consultationID, int patientID) async {
-    final String url = 'http://${MyApp.ipAddress}/teleclinic/cancelAppointment.php?consultationID=$consultationID&patientID=$patientID';
+    final String url = 'http://192.168.229.150/teleclinic/cancelAppointment.php?consultationID=$consultationID&patientID=$patientID';
 
     final response = await http.delete(Uri.parse(url));
 
@@ -154,7 +153,19 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
                               builder: (BuildContext context) {
                                 return AlertDialog(
                                   title: Center(
-                                    child: Text('Appointment Details'),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          'Appointment Details',
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 29),
+                                        ),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          '${consultation.specialistName}',
+                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   content: Column(
                                     crossAxisAlignment:
@@ -177,9 +188,17 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
                                           'Are you sure to cancel your appointment? You can set up another appointment later.',
                                         ),
                                       ),
+                                      SizedBox(height: 10),
+                                      Center(
+                                        child: Text(
+                                          'Status: ${consultation.consultationStatus}',
+                                        ),
+                                      ),
                                       Center(
                                         child: ElevatedButton(
-                                          onPressed: () async {
+                                          onPressed: consultation.consultationDateTime.isAfter(DateTime.now()) &&
+                                              consultation.consultationStatus != 'Declined'
+                                              ? () async {
                                             if (consultation
                                                 .consultationID !=
                                                 null) {
@@ -201,7 +220,8 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
                                               print(
                                                   'Consultation ID is null');
                                             }
-                                          },
+                                          }
+                                          : null, // Disable button if overdue
                                           style: ElevatedButton
                                               .styleFrom(
                                             backgroundColor:

@@ -9,7 +9,7 @@ List<Specialist> specialistFromJson(String str) => List<Specialist>.from(json.de
 String specialistToJson(List<Specialist> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Specialist {
-  String specialistID;
+  dynamic specialistID;
   String clinicID;
   String specialistName;
   String specialistTitle;
