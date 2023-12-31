@@ -52,6 +52,9 @@ dependencies:
   permission_handler: ^11.0.1
   agora_rtc_engine: ^5.0.0
   url_launcher: ^6.2.2
+  mysql1: ^0.20.0
+  http_parser: ^4.0.2
+
 
 dev_dependencies:
   flutter_test:
