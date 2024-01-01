@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:my_teleclinic/Patients/EMR/vital_info_report.dart';
 import 'package:my_teleclinic/Patients/Profile/patient_home_page.dart';
@@ -8,10 +9,12 @@ import '../../Main/changePassword1.dart';
 //import '../../Patients/Main/changePassword1.dart';
 
 //import '../Main/changePassword1.dart';
+import '../../Model/patient.dart';
 import '../EMR/e_medical_record.dart';
 import '../Telemedicine/view_appointment.dart';
 import '../Telemedicine/view_specialist.dart';
 import 'editProfile.dart';
+import 'editProfile1.dart';
 
 // void main() {
 //   runApp(MaterialApp(
@@ -31,6 +34,25 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   late int patientID;
+  String? patientName;
+  String? phoneNumber;
+   String phone='';
+   String name = " ";
+  Uint8List? patientImage;
+
+
+  final Patient _patients = Patient(
+    patientID: 0, // You may need to set the correct specialist ID
+    icNumber: '', // You may need to set the correct clinic ID
+    patientName: '', // You may need to set the correct specialist name
+    gender: '', // You may need to set the correct specialist title
+    phone: '', // You may need to set the correct phone number
+    password: '', // You may need to set the correct password
+    birthDate: DateTime.now(), // You may need to set the correct log status
+    patientImage: Uint8List(0), // Empty Uint8List for no image
+  );
+
+
   void showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -43,7 +65,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
   @override
   void initState() {
+    _loadID();
+    _loadPatientImage();
     _loadData();
+  }
+
+  ImageProvider<Object>? _getImageProvider() {
+    if (_patients.patientImage != null && _patients.patientImage!.isNotEmpty) {
+      return MemoryImage(_patients.patientImage!); // Display the existing image
+    } else {
+      return AssetImage('asset/profile image default.jpg');
+    }
+  }
+
+
+  Future<void> _loadID() async {
+    List<Patient> patients = await Patient.loadAll();
+
+    if (patients.isNotEmpty) {
+      Patient firstPatient = patients.first;
+
+      print("Raw JSON Data: ${firstPatient.toJson()}");
+
+      setState(() {
+        patientName = firstPatient.patientName ?? 'N/A';
+        phoneNumber = firstPatient.phone ?? 'N/A';
+
+      });
+
+      print("Patient Information:");
+      print("Name: $patientName");
+      print("Phone: $phoneNumber");
+;
+    } else {
+      print('No patient data available');
+    }
+  }
+
+
+  Future<void> _loadPatientImage() async {
+    try {
+      Uint8List? imageBytes = await Patient.getPatientImage();
+
+      if (imageBytes != null && imageBytes.isNotEmpty) {
+        setState(() {
+          _patients.patientImage = imageBytes;
+        });
+      } else {
+        print('Invalid or empty image data');
+      }
+    } catch (e) {
+      print('Error loading specialist image: $e');
+    }
   }
 
   Future<void> _loadData() async {
@@ -55,85 +128,101 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     setState(() {
       patientID = storedID;
+      name = storedName;
+      phone = storedPhone;
     });
   }
 
+  // Future<void> _loadInfo() async {
+  //   try {
+  //     // Replace the following line with your actual code to load the patient name
+  //
+  //     setState(() {
+  //
+  //       patientName = _patients.patientName;
+  //       print("patient name wehh $patientName");
+  //
+  //       phoneNumber = _patients.phone;
+  //       print("phoneee$phoneNumber");
+  //
+  //     });
+  //   } catch (e) {
+  //     print('Error loading patient name: $e');
+  //   }
+  // }
+
+
   Widget settings(String label, VoidCallback onTap) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Container(
-          padding: EdgeInsets.only(left: 20, right: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 18,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.navigate_next_outlined),
+      child: Container(
+        height: 65,
+        padding: EdgeInsets.only(left: 15, right: 20, top: 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
                     color: Colors.grey,
-                    onPressed: onTap,
+                    fontSize: 18,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
                   ),
-                ],
-              ),
-              Divider(
-                color: Colors.grey,
-                thickness: 1,
-              ),
-            ],
-          ),
+                ),
+                // You can add your own custom icon here if needed
+                Icon(
+                  Icons.navigate_next_outlined,
+                  color: Colors.grey,
+                ),
+              ],
+            ),
+            Divider(
+              color: Colors.grey,
+              thickness: 1,
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget general(String label, VoidCallback onTap,
-      List<GeneralItem> generalItems) {
-    return GestureDetector(
+  Widget general(String label, VoidCallback onTap, List<GeneralItem> generalItems) {
+    return InkWell(
       onTap: onTap,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Container(
-          padding: EdgeInsets.only(left: 20, right: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 18,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.navigate_next_outlined),
+      child: Container(
+        height: 65,
+        padding: EdgeInsets.only(left: 15, right: 20, bottom: 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
                     color: Colors.grey,
-                    onPressed: onTap,
+                    fontSize: 18,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
                   ),
-                ],
-              ),
-              Divider(
-                color: Colors.grey,
-                thickness: 1,
-              ),
-            ],
-          ),
+                ),
+                // You can add your own custom icon here if needed
+                Icon(
+                  Icons.navigate_next_outlined,
+                  color: Colors.grey,
+                ),
+              ],
+            ),
+            Divider(
+              color: Colors.grey,
+              thickness: 1,
+            ),
+          ],
         ),
       ),
     );
@@ -146,13 +235,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         toolbarHeight: 70,
         backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          color: Colors.blue,
-        ),
+
         title: Center(
           child: Image.asset(
             "asset/MYTeleClinic.png",
@@ -169,21 +252,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
               alignment: Alignment.centerLeft,
               child: Container(
                 padding: EdgeInsets.only(left: 20),
-                child: Column(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CircleAvatar(
+                      key: UniqueKey(), // Add this line
                       radius: 45,
-                      backgroundImage: AssetImage("asset/logo.png"),
+                      backgroundImage: _getImageProvider(),
                     ),
                     SizedBox(height: 5),
-                    Text(
-                      "test",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                    Padding(
+                      padding: const EdgeInsets.only(top:25.0, left: 20),
+                      child: Container(
+                        child: Column(
+                          children: [
+                            Container(
+                              child: Text(
+                                patientName?.isEmpty ?? true ? name : patientName!,
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+
+                                 Padding(
+                                   padding: const EdgeInsets.only(right:10.0),
+                                   child: Container(
+
+
+                                     child: Text(
+                                      phoneNumber?.isEmpty ?? true ? "+6$phone" :
+                                      "+6$phoneNumber"!,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
+                                   ),
+                                 ),
+                              ],
+                        ),
                       ),
-                    ),
+                    )
+
                   ],
                 ),
               ),
@@ -204,12 +316,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 16.0),
+            SizedBox(height: 20.0),
 
             settings('Edit Profile', () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EditProfile()),
+                MaterialPageRoute(builder: (context) => EditProfile1()),
               );
             }),
             settings('Change Password', () {
@@ -220,7 +332,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             }),
 
             Padding(
-              padding: const EdgeInsets.only(left: 15.0, top: 10.0),
+              padding: const EdgeInsets.only(left: 15.0, top: 5.0),
               child: Row(
                 children: <Widget>[
                   Text(
@@ -234,7 +346,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 16.0),
+            SizedBox(height: 20.0),
 
             general('Help Centre', () {
               Navigator.push(
@@ -553,7 +665,7 @@ class HelpCenterScreen extends StatelessWidget {
         toolbarHeight: 70,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },

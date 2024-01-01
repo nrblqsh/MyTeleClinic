@@ -1,7 +1,13 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:bottom_picker/resources/arrays.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_picker/bottom_picker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:my_teleclinic/Specialists/editProfileSpecialist.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/patient.dart';
 import 'package:intl/intl.dart';
@@ -31,6 +37,24 @@ class _EditProfile1State extends State<EditProfile1> {
 
   int patientID = 0;
 
+  String imagePath = '';
+
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+
+
+   final Patient _patients = Patient(
+    patientID: 0, // You may need to set the correct specialist ID
+    icNumber: '', // You may need to set the correct clinic ID
+    patientName: '', // You may need to set the correct specialist name
+    gender: '', // You may need to set the correct specialist title
+    phone: '', // You may need to set the correct phone number
+    password: '', // You may need to set the correct password
+    birthDate: DateTime.now(), // You may need to set the correct log status
+    patientImage: Uint8List(0), // Empty Uint8List for no image
+  );
+
+
   TextEditingController phoneController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController icNumController = TextEditingController();
@@ -51,7 +75,7 @@ class _EditProfile1State extends State<EditProfile1> {
       password: _password,
     );
 
-    bool success = await updatedPatientData.save();
+    bool success = await updatedPatientData.editPatient();
 
     if (success) {
       print("Profile updated successfully");
@@ -67,18 +91,23 @@ class _EditProfile1State extends State<EditProfile1> {
   void initState() {
     super.initState();
     _loadID();
-    loadProfilePicture();
+    _loadPatientImage();
+  //  loadProfilePicture();
   }
 
-  ImageProvider loadProfilePicture() {
-    if (_gender == 'Male') {
-      return AssetImage("asset/male1.jpg"); // Change the path accordingly
-    } else if (_gender == 'Female') {
-      return AssetImage("asset/female.png"); // Change the path accordingly
+
+
+
+
+
+  ImageProvider<Object>? _getImageProvider() {
+    if (_patients.patientImage != null && _patients.patientImage!.isNotEmpty) {
+      return MemoryImage(_patients.patientImage!); // Display the existing image
     } else {
-      return AssetImage("asset/male1.jpg"); // Change the path accordingly
+      return AssetImage('asset/profile image default.jpg');
     }
   }
+
 
   Future<void> _loadID() async {
     List<Patient> patients = await Patient.loadAll();
@@ -111,6 +140,92 @@ class _EditProfile1State extends State<EditProfile1> {
   }
 
 
+  Future<void> _loadPatientImage() async {
+
+    try {
+      Uint8List? imageBytes = await Patient.getPatientImage();
+
+      if (imageBytes != null && imageBytes.isNotEmpty) {
+        setState(() {
+          _patients.patientImage = imageBytes;
+        });
+      } else {
+        print('Invalid or empty image data');
+      }
+    } catch (e) {
+      print('Error loading specialist image: $e');
+    }
+  }
+
+
+  Future<void> _pickImage() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Choose from Gallery'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  Uint8List? imageData = await _getImage(ImageSource.gallery);
+                  if (imageData != null) {
+                    setState(() {
+                      _patients.patientImage= imageData;
+                    });
+                  }
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.camera_alt),
+                title: Text('Take a Photo'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  Uint8List? imageData = await _getImage(ImageSource.camera);
+                  if (imageData != null) {
+                    setState(() {
+                      _patients.patientImage= imageData;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+  Future<Uint8List?> _getImage(ImageSource source) async {
+    final ImagePicker _picker = ImagePicker();
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        imageQuality: 50, // Adjust the quality (0 to 100)
+      );
+
+      if (image != null) {
+        Uint8List imageData = await File(image.path).readAsBytes();
+
+        // Call setState to trigger a rebuild
+        setState(() {
+          imagePath = image.path;
+          _imageFile = File(image.path);
+         _patients.patientImage= imageData;
+        });
+
+        return imageData;
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
+    return null;
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,8 +234,35 @@ class _EditProfile1State extends State<EditProfile1> {
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            Navigator.pop(context);
+          onPressed: () async {
+            bool shouldDiscardChanges = await showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Discard Changes?'),
+                  content: Text('Are you sure you want to discard changes?'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(false); // User canceled
+                      },
+                      child: Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(true); // User confirmed
+                      },
+                      child: Text('Yes'),
+                    ),
+                  ],
+                );
+              },
+            );
+
+            if (shouldDiscardChanges ?? false) {
+              // User confirmed to discard changes
+              Navigator.pop(context); // Go back
+            }
           },
           color: Colors.blue,
         ),
@@ -142,22 +284,31 @@ class _EditProfile1State extends State<EditProfile1> {
               child: GestureDetector(
                 onTap: () {
                   print("circle avatar tapped");
-                },
+                  _pickImage();                },
                 child: Stack(
                   children: [
                     CircleAvatar(
+                      key: UniqueKey(), // Add this line
                       radius: 45,
-                      backgroundImage: loadProfilePicture(),
+                      backgroundImage: _getImageProvider(),
                     ),
                     Positioned(
-                      bottom: 20,
-                      right: 20,
-                      child: Icon(
-                        Icons.edit,
-                        color: Colors.grey,
-                        size: 28,
+                      top: 60,
+                      left: 60,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey, // Adjust the color and opacity
+                          borderRadius: BorderRadius.circular(30), // Adjust the radius
+                        ),
+                        padding: EdgeInsets.all(8), // Adjust the padding as needed
+                        child: Icon(
+                          Icons.edit,
+                          color: Colors.white, // Adjust the icon color
+                          size: 10,
+                        ),
                       ),
-                    ),
+                    )
+
                   ],
                 ),
               ),
@@ -172,7 +323,7 @@ class _EditProfile1State extends State<EditProfile1> {
             ),
             SizedBox(height: 15),
             Text(
-              "test",
+              "+6$_phone",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
@@ -184,25 +335,25 @@ class _EditProfile1State extends State<EditProfile1> {
             _buildTitle(15, 'Name'),
             _buildTextField(
               15,
-              19,
+              30,
               _patientName ?? '',
               nameController,
               TextInputType.text,
             ),
 
             _buildTitle(15, 'IC Number'),
-            _buildTextField(
+            _buildICNumberTextField(
               15,
-              10,
+              30,
               _icNum ?? '',
               icNumController,
               TextInputType.phone,
             ),
 
             _buildTitle(15, 'Phone Number'),
-            _buildTextField(
+            _buildPhoneNumberTextField(
               15,
-              10,
+              30,
               _phone ?? '',
               phoneController,
               TextInputType.phone,
@@ -211,28 +362,32 @@ class _EditProfile1State extends State<EditProfile1> {
             _buildTitle(15, 'Gender'),
 
             Padding(
-              padding: const EdgeInsets.only(left: 5, top: 10),
+              padding: const EdgeInsets.only(left: 5, top: 10, right: 30),
               child: Row(
                 children: [
-                  SizedBox(width: 10),
+                  SizedBox(width: 10,
+                  height: 30,),
                   GestureDetector(
                     onTap: _selectGender,
-                    child: Container(
-                      padding:
-                      EdgeInsets.only(top: 10, right: 270),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.grey
+                    child: SizedBox(
+                        height: 40,
+                      child: Container(
+                        padding:
+                        EdgeInsets.only(top: 10, right: 519),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.grey
 
+                            ),
                           ),
                         ),
-                      ),
-                      child: Text(
-                        _gender?? "Enter gender",
-                        style: TextStyle(
-                          fontSize: 16,
+                        child: Text(
+                          _gender?? "Enter gender",
+                          style: TextStyle(
+                            fontSize: 16,
 
+                          ),
                         ),
                       ),
                     ),
@@ -241,16 +396,16 @@ class _EditProfile1State extends State<EditProfile1> {
               ),
             ),
 
-            _buildTitle(10, 'Birthday Date'),
+            _buildTitle(15, 'Birthday Date'),
             Padding(
-              padding: const EdgeInsets.only(left: 20, top: 10.0),
+              padding: const EdgeInsets.only(left: 17, top: 10.0, right:30),
               child: TextFormField(
                 onTap: () {
                   _openDatePicker(context);
                 },
                 controller: TextEditingController(
                   text: _birthDate != null
-                      ? _formatDate(_birthDate!) : _formatDate(_selectedDate),
+                      ? _formatDate(_birthDate) : _formatDate(_selectedDate),
                 ),
 
                 decoration: InputDecoration(
@@ -258,13 +413,13 @@ class _EditProfile1State extends State<EditProfile1> {
 
                   focusedBorder: UnderlineInputBorder(
                     borderSide: BorderSide(
-                      color: Colors.grey
+                      color: Colors.grey.withOpacity(0.5)
                     ),
                   ),
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(
                       color: Color(hexColor('#024352')),
-                      width: 2,
+                      width: 1,
                     ),
                   ),
                 ),
@@ -272,26 +427,89 @@ class _EditProfile1State extends State<EditProfile1> {
             ),
 
 
-
+            SizedBox(height: 20),
             Padding(
-              padding: const EdgeInsets.only(bottom: 300.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  editProfile();
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+              padding: const EdgeInsets.only(bottom: 280.0),
+              child: SizedBox(
+                width: 260,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    bool shouldEditProfile = await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Confirmation'),
+                          content: Text('Are you sure you want'
+                              ' to edit your profile?'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(false); // User canceled
+                              },
+                              child: Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(true); // User confirmed
+                              },
+                              child: Text('Yes'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (shouldEditProfile ?? false) {
+
+
+                      // Call the function to update the specialist profile
+                      await _patients.editPatient(
+                        patientName: nameController.text.trim(),
+                        phone: phoneController.text.trim(),
+                        icNumber: icNumController.text.trim(),
+                        patientImage:_patients.patientImage,
+                        gender: _gender,
+                        birthDate: _birthDate
+                        ,
+
+                      );
+                      await _loadID();
+
+
+                      Fluttertoast.showToast(
+                        msg: 'You have successfully updated your profile',
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.TOP,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.blue,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+
+
+
+                    }
+
+
+
+                  },
+
+
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    backgroundColor: Color(hexColor('C73B3B')),
                   ),
-                  backgroundColor: Color(hexColor('C73B3B')),
-                ),
-                child: Text(
-                  'Edit Profile',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
+                  child: Text(
+                    'Edit Profile',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
               ),
@@ -313,10 +531,12 @@ class _EditProfile1State extends State<EditProfile1> {
         color: Colors.blue,
         fontWeight: FontWeight.bold,
       ),
+      maxDateTime: DateTime.now(), // Set the maximum date to today
+
       onChange: (selectedDate) {
         print(selectedDate);
         setState(() {
-          _selectedDate = selectedDate;
+          _birthDate = selectedDate;
           _dateController.text = _formatDate(selectedDate);
         });
       },
@@ -358,6 +578,79 @@ class _EditProfile1State extends State<EditProfile1> {
     );
   }
 
+
+  Widget _buildPhoneNumberTextField(
+      double leftside,
+      double righside,
+      String innerText,
+      TextEditingController controller,
+      TextInputType inputType,
+      ) {
+    return Container(
+      padding: EdgeInsets.only(left: leftside, right: righside, top: 5, bottom: 10),
+      child: Column(
+        children: [
+          TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: innerText,
+            ),
+            keyboardType: inputType,
+            onEditingComplete: () {
+              // Validate phone number length
+              String value = controller.text;
+              if (value.length <= 8 || value.length >= 12 ||
+                  !_containsNumber(value)) {
+                _showErrorPopup('Phone number must'
+                    ' between 9 and 11 digits');
+              }
+              else {
+                // If validation passes, move focus to the next focus node
+                FocusScope.of(context).requestFocus(FocusNode());
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  Widget _buildICNumberTextField(
+      double leftside,
+      double righside,
+      String innerText,
+      TextEditingController controller,
+      TextInputType inputType,
+      ) {
+    return Container(
+      padding: EdgeInsets.only(left: leftside, right: righside, top: 5, bottom: 10),
+      child: Column(
+        children: [
+          TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: innerText,
+            ),
+            keyboardType: inputType,
+            onEditingComplete: () {
+
+              String value = controller.text;
+              if (value.length !=12  || !_containsNumber(value)) {
+                _showErrorPopup('IC Number must have 12 digits');
+              }
+              else {
+                // If validation passes, move focus to the next focus node
+                FocusScope.of(context).requestFocus(FocusNode());
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+
   Widget _buildTextField(
       double leftside,
       double righside,
@@ -371,11 +664,22 @@ class _EditProfile1State extends State<EditProfile1> {
       child: Column(
         children: [
           TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              hintText: innerText,
-            ),
-            keyboardType: inputType,
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: innerText,
+              ),
+              keyboardType: inputType,
+              onEditingComplete: () {
+                // Validate phone number length
+                String value = controller.text;
+                if (_containsSpecialCharAndNumbers(value)) {
+                  _showErrorPopup('Invalid input: Special Characters or Numbers '
+                  ' are not allowed.');            }
+                else {
+                  // If validation passes, move focus to the next focus node
+                  FocusScope.of(context).requestFocus(FocusNode());
+                }
+              }
           ),
         ],
       ),
@@ -421,6 +725,28 @@ class _EditProfile1State extends State<EditProfile1> {
     );
   }
 
+
+
+  void _showErrorPopup(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Invalid Credentials'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   OutlineInputBorder inputBorder() {
     return OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -444,4 +770,27 @@ class _EditProfile1State extends State<EditProfile1> {
     int finalColor = int.parse(newColor);
     return finalColor;
   }
+
+
+  bool isPhoneNumberValid(String phoneNumber) {
+    return phoneNumber.length >= 8 && phoneNumber.length <= 11;
+  }
+
+
+  bool isICNumberValid(String icNumber){
+    return icNumber.length == 12;
+  }
+
+  bool _containsNumber(String value) {
+    return RegExp(r'[0-9]').hasMatch(value);
+  }
+
+  bool _containsSpecialCharAndNumbers(String value) {
+    return
+        RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(value) ||
+     RegExp(r'[0-9]').hasMatch(value)
+    ;
+  }
+
+
 }

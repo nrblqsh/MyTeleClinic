@@ -305,66 +305,72 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MapLocation()),
-                    );
-                  },
-                  child: Container(
-                    height: 380,
-                    width: 380,
-                    margin: EdgeInsets.symmetric(vertical: 16.0),
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: Stack(
-                      children: [
-                        GoogleMap(
-                          initialCameraPosition: CameraPosition(
-                            target: userLocation != null
-                                ? LatLng(userLocation!.latitude,
-                                    userLocation!.longitude)
-                                : const LatLng(
-                                    2.3232303497978815, 102.29396072202006),
-                            zoom: 14,
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => MapLocation()),
+                          );
+                        },
+                        child: Container(
+                          height: 380,
+                          width: 250,
+                          margin: EdgeInsets.symmetric(vertical: 16.0),
+                          padding: EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(20.0),
                           ),
-                        ),
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 5.0),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => MapLocation()),
-                                );
-                                print("Button tapped!");
-                              },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Color(hexColor('C73B3B'))),
-                                shape: MaterialStateProperty.all<
-                                    RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        10.0), // Adjust the radius as needed
+                          child: Stack(
+                            children: [
+                              GoogleMap(
+                                initialCameraPosition: CameraPosition(
+                                  target: userLocation != null
+                                      ? LatLng(userLocation!.latitude,
+                                          userLocation!.longitude)
+                                      : const LatLng(
+                                          2.3232303497978815, 102.29396072202006),
+                                  zoom: 14,
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.topRight,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 5.0),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => MapLocation()),
+                                      );
+                                      print("Button tapped!");
+                                    },
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Color(hexColor('C73B3B'))),
+                                      shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              10.0), // Adjust the radius as needed
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text("Navigate to Map Screen"),
                                   ),
                                 ),
                               ),
-                              child: Text("Navigate to Map Screen"),
-                            ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),

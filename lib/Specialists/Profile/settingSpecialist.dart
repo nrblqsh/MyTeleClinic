@@ -1,10 +1,12 @@
 import 'dart:core';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:my_teleclinic/Patients/Profile/patient_home_page.dart';
 import 'package:my_teleclinic/Main/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Main/changePassword1.dart';
+import '../../Model/specialist.dart';
 import '../../Patients/EMR/e_medical_record.dart';
 import '../../Patients/Telemedicine/view_appointment.dart';
 import '../../Patients/Telemedicine/view_specialist.dart';
@@ -15,10 +17,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../../Main/main.dart';
+import '../editProfileSpecialist.dart';
 
 
 class SettingsSpecialistScreen extends StatefulWidget {
-  final int specialistID;
+  late int specialistID;
 
   SettingsSpecialistScreen({required this.specialistID});
   @override
@@ -26,6 +29,63 @@ class SettingsSpecialistScreen extends StatefulWidget {
 }
 
 class _SettingsSpecialistScreenState extends State<SettingsSpecialistScreen> {
+late int specialistID;
+  String? specialistName;
+  String? phoneNumber;
+  String phone = '';
+  String name = '';
+  Uint8List? specialistImage;
+
+
+  final Specialist _specialist = Specialist(
+    specialistID: 0, // You may need to set the correct specialist ID
+    clinicID: 0, // You may need to set the correct clinic ID
+    specialistName: '', // You may need to set the correct specialist name
+    specialistTitle: '', // You may need to set the correct specialist title
+    phone: '', // You may need to set the correct phone number
+    password: '', // You may need to set the correct password
+    logStatus: '', // You may need to set the correct log status
+    clinicName: '',
+    specialistImagePath: Uint8List(0), // Empty Uint8List for no image
+  );
+
+  ImageProvider<Object>? _getImageProvider() {
+    if (_specialist.specialistImagePath != null && _specialist.specialistImagePath!.isNotEmpty) {
+      return MemoryImage(_specialist.specialistImagePath!); // Display the existing image
+    } else {
+      return AssetImage('asset/profile image default.jpg');
+    }
+  }
+
+
+  Future<void> _loadID() async {
+    try {
+      List<Specialist> specialists = await Specialist.loadAll();
+
+      if (specialists.isNotEmpty) {
+        Specialist firstSpecialist = specialists.first;
+
+        print("Raw JSON Data: ${firstSpecialist.toJson()}");
+
+        setState(() {
+          specialistName = firstSpecialist.specialistName ?? 'N/A';
+          phoneNumber = firstSpecialist.phone ?? 'N/A';
+
+        });
+
+        print("Patient Information:");
+        print("Name: $specialistName");
+       ;
+
+        print("\n");
+      } else {
+        print('No patient data available');
+      }
+    } catch (e) {
+      print('Error loading specialists: $e');
+    }
+  }
+
 
   void showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -40,20 +100,40 @@ class _SettingsSpecialistScreenState extends State<SettingsSpecialistScreen> {
 
   @override
   void initState() {
+    _loadID();
+    _loadSpecialistImage();
     _loadData();
   }
+
+
+Future<void> _loadSpecialistImage() async {
+  try {
+    Uint8List? imageBytes = await Specialist.getSpecialistImage();
+
+    if (imageBytes != null && imageBytes.isNotEmpty) {
+      setState(() {
+        _specialist.specialistImagePath = imageBytes;
+      });
+    } else {
+      print('Invalid or empty image data');
+    }
+  } catch (e) {
+    print('Error loading specialist image: $e');
+  }
+}
+
 
   Future<void> _loadData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
     String storedPhone = prefs.getString("phone") ?? "";
+    String storedName = prefs.getString("patientName") ?? "";
 
     setState(() {
-      print(storedSpecialistID);
+      specialistID = storedSpecialistID;
+      name = storedName;
+      phone = storedPhone;
     });
-
-
-
   }
 
   Future<void> _logout() async {
@@ -86,84 +166,82 @@ class _SettingsSpecialistScreenState extends State<SettingsSpecialistScreen> {
   }
 
   Widget settings(String label, VoidCallback onTap) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Container(
-          padding: EdgeInsets.only(left: 20, right: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 18,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.navigate_next_outlined),
+      child: Container(
+        height: 65,
+        padding: EdgeInsets.only(left: 15, right: 20, top: 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
                     color: Colors.grey,
-                    onPressed: onTap,
+                    fontSize: 18,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
                   ),
-                ],
-              ),
-              Divider(
-                color: Colors.grey,
-                thickness: 1,
-              ),
-            ],
-          ),
+                ),
+                // You can add your own custom icon here if needed
+                Icon(
+                  Icons.navigate_next_outlined,
+                  color: Colors.grey,
+                ),
+              ],
+            ),
+            Divider(
+              color: Colors.grey,
+              thickness: 1,
+            ),
+          ],
         ),
       ),
     );
   }
 
+
   Widget general(String label, VoidCallback onTap, List<GeneralItem> generalItems) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Container(
-          padding: EdgeInsets.only(left: 20, right: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 18,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.navigate_next_outlined),
+      child: Container(
+        height: 65,
+        padding: EdgeInsets.only(left: 15, right: 20, bottom: 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
                     color: Colors.grey,
-                    onPressed: onTap,
+                    fontSize: 18,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
                   ),
-                ],
-              ),
-              Divider(
-                color: Colors.grey,
-                thickness: 1,
-              ),
-            ],
-          ),
+                ),
+                // You can add your own custom icon here if needed
+                Icon(
+                  Icons.navigate_next_outlined,
+                  color: Colors.grey,
+                ),
+              ],
+            ),
+            Divider(
+              color: Colors.grey,
+              thickness: 1,
+            ),
+          ],
         ),
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -195,21 +273,51 @@ class _SettingsSpecialistScreenState extends State<SettingsSpecialistScreen> {
               alignment: Alignment.centerLeft,
               child: Container(
                 padding: EdgeInsets.only(left: 20),
-                child: Column(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CircleAvatar(
+                      key: UniqueKey(), // Add this line
                       radius: 45,
-                      backgroundImage: AssetImage("asset/logo.png"),
+                      backgroundImage: _getImageProvider(),
                     ),
                     SizedBox(height: 5),
-                    Text(
-                      "test",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                    Padding(
+                      padding: const EdgeInsets.only(top:25.0, left: 20),
+                      child: Container(
+                        child: Column(
+                          children: [
+                            Container(
+                              child: Text(
+                                specialistName?.isEmpty ?? true ? name
+                                    : specialistName!,
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+
+                            Padding(
+                              padding: const EdgeInsets.only(right:10.0),
+                              child: Container(
+
+
+                                child: Text(
+                                  phoneNumber?.isEmpty ?? true ? "+6$phone" :
+                                  "+6$phoneNumber"!,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    )
+
                   ],
                 ),
               ),
@@ -235,7 +343,7 @@ class _SettingsSpecialistScreenState extends State<SettingsSpecialistScreen> {
             settings('Edit Profile', () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EditProfile1()),
+                MaterialPageRoute(builder: (context) => EditProfileSpecialist()),
               );
             }),
             settings('Change Password', () {
