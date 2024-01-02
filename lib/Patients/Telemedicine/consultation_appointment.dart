@@ -1,4 +1,6 @@
 // consultation_appointment.dart
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -7,6 +9,7 @@ import 'package:my_teleclinic/Model/consultation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui';
 //import '/Model/booking.dart';
+import '../../Main/main.dart';
 import '../../Patients/Telemedicine/view_appointment.dart';
 
 
@@ -37,6 +40,86 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
   bool showConfirmation = false; // Track if confirmation container should be shown
+
+  Future<bool> checkAvailability(int specialistID, DateTime consultationDateTime) async {
+    try {
+      final response = await http.get(Uri.parse('http://${MyApp.ipAddress}/teleclinic/availabilityConsultation.php?specialistID=$specialistID&consultationDateTime=$consultationDateTime'));
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        return jsonData['available'];
+      } else {
+        print('Failed with status code: ${response.statusCode}');
+        throw Exception('Failed to check availability');
+      }
+    } catch (e) {
+      print('Error checking availability: $e');
+      throw Exception('Failed to check availability');
+    }
+  }
+  Future<void> _checkAndBookAppointment() async {
+    print('Checking availability...');
+    try {
+      bool isAvailable = await checkAvailability(specialistID, DateTime(
+        selectedDate.year,
+        selectedDate.month,
+        selectedDate.day,
+        selectedTime.hour,
+        selectedTime.minute,
+      ));
+
+      if (!isAvailable) {
+        print('Selected time slot is not available');
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Time Slot Not Available'),
+              content: Text('The selected time slot is not available. Please choose another time.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        print('Time slot is available. Proceeding to book appointment...');
+        Consultation consult = Consultation(
+          patientID: patientID,
+          specialistID: specialistID,
+          consultationDateTime: DateTime(
+            selectedDate.year,
+            selectedDate.month,
+            selectedDate.day,
+            selectedTime.hour,
+            selectedTime.minute,
+          ),
+          consultationStatus: 'Pending',
+          consultationTreatment: '',
+          consultationSymptom: '',
+        );
+
+        bool success = await consult.save();
+
+        if (success) {
+          print('Appointment booked successfully!');
+          setState(() {
+            showConfirmation = true;
+          });
+        } else {
+          print('Failed to book appointment. Please check the code or backend.');
+        }
+      }
+    } catch (e) {
+      print('Error occurred during appointment booking: $e');
+      // Handle error scenario (show error message, log, etc.)
+    }
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -186,32 +269,8 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
-                      print(specialistID);
-                      // Create a new Booking instance with the selected data
-                      Consultation consult = Consultation(
-                        patientID: patientID, // Replace with the actual patient ID
-                        specialistID: specialistID,
-                        consultationDateTime: DateTime(
-                          selectedDate.year,
-                          selectedDate.month,
-                          selectedDate.day,
-                          selectedTime.hour,
-                          selectedTime.minute,
-                        ), consultationStatus: 'Pending', consultationTreatment: '',
-                        consultationSymptom: '',
-                      );
-
-                      // Save the booking to the database
-                      bool success = await consult.save();
-
-                      // Show the confirmation container only if the booking is successful
-                      if (success) {
-                        setState(() {
-                          showConfirmation = true;
-                        });
-                      }
+                      await _checkAndBookAppointment();
                     },
-
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
                     ),
