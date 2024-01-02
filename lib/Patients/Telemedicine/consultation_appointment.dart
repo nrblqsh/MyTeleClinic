@@ -302,7 +302,8 @@ class SuccessPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => ViewAppointmentScreen(patientID: patientID,)));
+                        context, MaterialPageRoute(builder: (context) =>
+                        ViewAppointmentScreen(patientID: patientID,)));
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
