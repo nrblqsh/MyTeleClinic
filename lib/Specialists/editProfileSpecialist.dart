@@ -221,7 +221,8 @@ class _EditProfileSpecialistState extends State<EditProfileSpecialist> {
 
             if (shouldDiscardChanges ?? false) {
               // User confirmed to discard changes
-              Navigator.pop(context); // Go back
+              Navigator.pop(context);
+
             }
           },
           color: Colors.blue,
@@ -256,14 +257,21 @@ class _EditProfileSpecialistState extends State<EditProfileSpecialist> {
                       ),
 
                       Positioned(
-                        bottom: 20,
-                        right: 20,
-                        child: Icon(
-                          Icons.edit,
-                          color: Colors.grey,
-                          size: 28,
+                        top: 60,
+                        left: 60,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey, // Adjust the color and opacity
+                            borderRadius: BorderRadius.circular(30), // Adjust the radius
+                          ),
+                          padding: EdgeInsets.all(8), // Adjust the padding as needed
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.white, // Adjust the icon color
+                            size: 10,
+                          ),
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -278,7 +286,7 @@ class _EditProfileSpecialistState extends State<EditProfileSpecialist> {
               ),
               SizedBox(height: 15),
               Text(
-                _phone ?? ' ',
+                "+6$_phone" ?? ' ',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
@@ -479,6 +487,7 @@ class _EditProfileSpecialistState extends State<EditProfileSpecialist> {
                             await _loadID();
 
 
+
                             Fluttertoast.showToast(
                               msg: 'You have successfully updated your profile',
                               toastLength: Toast.LENGTH_SHORT,
@@ -586,9 +595,7 @@ class _EditProfileSpecialistState extends State<EditProfileSpecialist> {
     );
   }
 
-  static bool _containsNumber(String value) {
-    return RegExp(r'[0-9]').hasMatch(value);
-  }
+
 
 
   Widget _buildTextField(
@@ -743,6 +750,9 @@ class _EditProfileSpecialistState extends State<EditProfileSpecialist> {
     return phoneNumber.length >= 8 && phoneNumber.length <= 11;
   }
 
+   bool _containsNumber(String value) {
+    return RegExp(r'[0-9]').hasMatch(value);
+  }
 
 }
 

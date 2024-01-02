@@ -86,7 +86,7 @@ class Specialist {
 
     // Specify the full URI including the host
     String fullUri = "http://${MyApp.ipAddress}/teleclinic/"
-        "SPECIALISTPROFILEEDIT.php?specialistID=$storedID";
+        "editProfileSpecialist.php?specialistID=$storedID";
 
     try {
       // Create a `http.MultipartRequest` to send both text fields and the image file

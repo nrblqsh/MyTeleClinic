@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -52,7 +53,16 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
 
 
   Future<List<Consultation>> fetchBySpecialist() async {
+
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+      specialistID = pref.getInt("specialistID") ?? 0;
+    patientID = pref.getInt("patientID") ?? 0;
+
     print(specialistID);
+    print(patientID);
+
+
+
     var url =
         'http://${MyApp.ipAddress}/teleclinic/viewPatient.php?specialistID=$specialistID';
     final response = await http.get(Uri.parse(url));
@@ -118,6 +128,13 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
     }
   }
 
+  // Add this method to clear the suggestions when the query is empty
+  void clearSuggestions() {
+    setState(() {
+      suggestions.clear();
+    });
+  }
+
   String _formatDateTime(String dateTimeString) {
     DateTime dateTime = DateTime.parse(dateTimeString);
     return DateFormat('MMMM dd, yyyy').format(dateTime);
@@ -178,8 +195,10 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                   onPressed: () {
                     _searchController.clear();
                     suggestions.clear();
-                    // Optionally, you can also clear suggestions or perform any other action.
-                  },
+                    setState(() {
+
+                    });
+                    },
                 ),
               ),
             ),
@@ -196,18 +215,17 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                       ListTile(
                         title: Text(suggestion),
                         onTap: () async {
-                          // You can add logic to handle suggestion selection
+                          final currentContext = context;
                           _searchController.text = suggestion;
                           await searchPatients(suggestion);
                           setState(() {
-                             patientID = int.parse('${selectedPatient!.patientID}');
-                             print('sekarang dia pilih ${patientID}');
-
+                            patientID = int.parse('${selectedPatient!.patientID}');
+                            print('sekarang dia pilih ${patientID}');
                           });
                           final SharedPreferences pref = await SharedPreferences.getInstance();
                           await pref.setInt("patientID", patientID);
                           showDialog(
-                            context: context,
+                            context: currentContext,
                             builder: (BuildContext context) {
                               return Dialog(
                                 shape: RoundedRectangleBorder(
@@ -238,10 +256,66 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.only(bottom: 20.0),
-                                        child: Image.network(
-                                          'https://static.thenounproject.com/png/516749-200.png',
-                                          width: 90,
-                                          height: 90,
+                                        child: FutureBuilder(
+                                          future: Consultation.getPatientImage(selectedPatient!.patientID),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState == ConnectionState.waiting) {
+                                              return CircularProgressIndicator();
+                                            } else if (snapshot.hasError) {
+                                              return Text('Error: ${snapshot.error}');
+                                            } else if (snapshot.hasData) {
+                                              Uint8List? patientImage = snapshot.data as Uint8List?;
+                                              if (patientImage != null && patientImage.isNotEmpty) {
+                                                return Container(
+                                                  width: 90,
+                                                  height: 90,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.grey.withOpacity(0.5),
+                                                        spreadRadius: 2,
+                                                        blurRadius: 5,
+                                                        offset: Offset(0, 3),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Image.memory(
+                                                    patientImage,
+                                                    width: 90,
+                                                    height: 90,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                );
+                                              } else {
+                                                // Return an empty Container with an image asset as a placeholder
+                                                return Container(
+                                                  width: 90,
+                                                  height: 90,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10.0),
+                                                    image: DecorationImage(
+                                                      image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            } else {
+                                              // Return an empty Container with an image asset as a placeholder
+                                              return Container(
+                                                width: 90,
+                                                height: 90,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10.0),
+                                                  image: DecorationImage(
+                                                    image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
                                         ),
                                       ),
                                       Padding(
@@ -393,8 +467,9 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                     return CircularProgressIndicator();
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
-                  } else if (snapshot.hasData && snapshot.data != null) {
+                  } else if (snapshot.hasData) {
                     List<Consultation>? consultations = snapshot.data as List<Consultation>?;
+
                     if (consultations != null) {
                       return ListView.builder(
                         itemCount: consultations.length,
@@ -430,8 +505,9 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                         ],
                                       ),
                                       child: GestureDetector(
-                                        onTap: ()  async {
-                                          setState(()  {
+                                        onTap: () async {
+                                          final currentContext = context;
+                                          setState(() {
                                             int patientID = int.parse('${consult.patientID}');
                                           });
                                           final SharedPreferences pref = await SharedPreferences.getInstance();
@@ -439,7 +515,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                           print('Tapped on patient: ${consult.patientName}');
 
                                           showDialog(
-                                            context: context,
+                                            context: currentContext,  // Use the context from the build method
                                             builder: (BuildContext context) {
                                               return Dialog(
                                                 shape: RoundedRectangleBorder(
@@ -470,10 +546,66 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                                     children: [
                                                       Padding(
                                                         padding: const EdgeInsets.only(bottom: 20.0),
-                                                        child: Image.network(
-                                                          'https://static.thenounproject.com/png/516749-200.png',
-                                                          width: 90,
-                                                          height: 90,
+                                                        child: FutureBuilder(
+                                                          future: Consultation.getPatientImage(consult.patientID),
+                                                          builder: (context, snapshot) {
+                                                            if (snapshot.connectionState == ConnectionState.waiting) {
+                                                              return CircularProgressIndicator();
+                                                            } else if (snapshot.hasError) {
+                                                              return Text('Error: ${snapshot.error}');
+                                                            } else if (snapshot.hasData) {
+                                                              Uint8List? patientImage = snapshot.data as Uint8List?;
+                                                              if (patientImage != null && patientImage.isNotEmpty) {
+                                                                return Container(
+                                                                  width: 90,
+                                                                  height: 90,
+                                                                  decoration: BoxDecoration(
+                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                    boxShadow: [
+                                                                      BoxShadow(
+                                                                        color: Colors.grey.withOpacity(0.5),
+                                                                        spreadRadius: 2,
+                                                                        blurRadius: 5,
+                                                                        offset: Offset(0, 3),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  child: Image.memory(
+                                                                    patientImage,
+                                                                    width: 90,
+                                                                    height: 90,
+                                                                    fit: BoxFit.cover,
+                                                                  ),
+                                                                );
+                                                              } else {
+                                                                // Return an empty Container with an image asset as a placeholder
+                                                                return Container(
+                                                                  width: 90,
+                                                                  height: 90,
+                                                                  decoration: BoxDecoration(
+                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                    image: DecorationImage(
+                                                                      image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                                      fit: BoxFit.cover,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              }
+                                                            } else {
+                                                              // Return an empty Container with an image asset as a placeholder
+                                                              return Container(
+                                                                width: 90,
+                                                                height: 90,
+                                                                decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(10.0),
+                                                                  image: DecorationImage(
+                                                                    image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                                    fit: BoxFit.cover,
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            }
+                                                          },
                                                         ),
                                                       ),
                                                       Padding(
@@ -603,18 +735,96 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                               );
                                             },
                                           );
-                                        },
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(
-                                              '${consult.patientName}',
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                              ),
+                                        },child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                Flexible(
+                                                  child: FutureBuilder(
+                                                    future: Consultation.getPatientImage(consult.patientID),
+                                                    builder: (context, snapshot) {
+                                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                                        return CircularProgressIndicator();
+                                                      } else if (snapshot.hasError) {
+                                                        return Text('Error: ${snapshot.error}');
+                                                      } else if (snapshot.hasData) {
+                                                        Uint8List? patientImage = snapshot.data as Uint8List?;
+                                                        if (patientImage != null && patientImage.isNotEmpty) {
+                                                          return Column(
+                                                            children: [
+                                                              Container(
+                                                                width: 50,
+                                                                height: 50,
+                                                                decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(10.0),
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                      color: Colors.grey.withOpacity(0.5),
+                                                                      spreadRadius: 2,
+                                                                      blurRadius: 5,
+                                                                      offset: Offset(0, 3),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                child: Image.memory(
+                                                                  patientImage,
+                                                                  width: 90,
+                                                                  height: 90,
+                                                                  fit: BoxFit.fill,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          );
+                                                        } else {
+                                                          // Return an empty Container with an image asset as a placeholder
+                                                          return Container(
+                                                            width: 60,
+                                                            height: 50,
+                                                            decoration: BoxDecoration(
+                                                              borderRadius: BorderRadius.circular(10.0),
+                                                              image: DecorationImage(
+                                                                image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                                fit: BoxFit.fill,
+                                                              ),
+                                                            ),
+                                                          );
+                                                        }
+                                                      } else {
+                                                        // Return an empty Container with an image asset as a placeholder
+                                                        return Container(
+                                                          width: 60,
+                                                          height: 50,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(10.0),
+                                                            image: DecorationImage(
+                                                              image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                              fit: BoxFit.fill,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }
+                                                    },
+                                                  ),
+                                                ),
+                                                SizedBox(width: 10), // Add some spacing between the image and text
+                                                Container(
+                                                  width: 300, // Adjust the width based on your needs
+                                                  child: Text(
+                                                    '${consult.patientName}',
+                                                    style: TextStyle(
+                                                      fontSize: 20,
+                                                    ),
+                                                    softWrap: true,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
+                                          ),
+                                            // Add other details...
                                           ],
-                                        ),
+                                        )
                                       ),
                                     ),
                                   ),

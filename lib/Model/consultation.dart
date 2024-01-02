@@ -1,7 +1,9 @@
 // consultation.dart
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:my_teleclinic/Controller/request_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '';
 import '../Main/main.dart';
 
@@ -20,6 +22,8 @@ class Consultation {
   String? gender;
   DateTime? birthDate;
   String? phone;// Add specialist's name field
+  Uint8List? patientImage;
+
   //String? specialistTitle;
   //int procedureID;
 
@@ -37,6 +41,7 @@ class Consultation {
     this.gender,
     this.birthDate,
     this.phone,
+    this.patientImage
     // this.specialistTitle,
   });
 
@@ -56,8 +61,11 @@ class Consultation {
       birthDate : json['birthDate'] != null
           ? DateTime.tryParse(json['birthDate'])
           : DateTime.parse('0000-00-00'),
-      phone: json['phone'],// Add this field if it exists in the JSON response
+      phone: json['phone'],
+      patientImage: base64Decode(json["base64Image"] ?? ''),
+      // Add this field if it exists in the JSON response
       //specialistTitle: json['specialistTitle'], // Add this field if it exists in the JSON response
+
     );
   }
 
@@ -75,6 +83,8 @@ class Consultation {
     'gender': gender,
     'birthDate': birthDate.toString(),
     'phone': phone,
+    'patientImage' : patientImage
+
     //'specialistTitle':specialistTitle
 
   };
@@ -214,6 +224,43 @@ class Consultation {
     }
   }
 
+
+
+  static Future<Uint8List?> getPatientImage(int patientID) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int specialistID = prefs.getInt("specialistID") ?? 0;
+
+    RequestController req = RequestController(
+      path: "/teleclinic/getPatientImageConsultation.php",
+    );
+
+    // Add both specialistID and patientID as query parameters
+    req.path = "${req.path}?specialistID=$specialistID&patientID=$patientID";
+
+    print('Image URL: ${req.path}');
+
+    try {
+      // Make a GET request using RequestController
+      await req.get();
+
+      if (req.status() == 200) {
+        // Image data is available in the response body
+        return req.result();
+      } else if (req.status() == 404) {
+        // Image not found
+        print('Image not found for patientID: $patientID');
+        return null;
+      } else {
+        // Handle other status codes
+        print('Failed to retrieve image. Status: ${req.status()}');
+        return null;
+      }
+    } catch (error) {
+      // Handle any exceptions that might occur during the request
+      print('Error retrieving image: $error');
+      return null;
+    }
+  }
 
 
 }
