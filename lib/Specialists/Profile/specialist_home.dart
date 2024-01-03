@@ -5,6 +5,7 @@ import 'package:my_teleclinic/Specialists/Consultation/specialist_consultation_h
 import 'package:my_teleclinic/Specialists/Consultation/viewUpcomingAppointment.dart';
 import 'package:my_teleclinic/Specialists/PatientInfo/view_patient.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/consultation.dart';
 import '../../Patients/Telemedicine/view_appointment.dart';
@@ -191,6 +192,7 @@ class MenuScreen extends StatefulWidget {
    List<Consultation> todayConsultations;
   final Future<List<Consultation>> Function() fetchTodayConsultations;
   final Function(int) navigateToPage;
+
 
   MenuScreen({
     required this.specialistName,
@@ -558,15 +560,36 @@ class _MenuScreenState extends State<MenuScreen> {
                                                                                   child: Text('Cancel'),
                                                                                 ),
                                                                                 TextButton(
-                                                                                  onPressed: () {
-                                                                                    Navigator.push(
-                                                                                      context,
-                                                                                      MaterialPageRoute(
-                                                                                        builder: (context) =>
-                                                                                            CallPage(
-                                                                                            ),
-                                                                                      ),
-                                                                                    );
+                                                                                  onPressed: () async {
+                                                                                    // Check and request camera and microphone permissions
+                                                                                    var statusCamera = await Permission.camera.request();
+                                                                                    var statusMicrophone = await Permission.microphone.request();
+
+                                                                                    if (statusCamera.isGranted && statusMicrophone.isGranted) {
+                                                                                      print("dapat");
+                                                                                      // Both camera and microphone permissions are granted
+                                                                                      Navigator.of(context).pop(true); // Close the dialog and return true
+                                                                                    } else {
+                                                                                      // Permissions are not granted
+                                                                                      // Show a message to inform the user using a Dialog
+                                                                                      showDialog(
+                                                                                        context: context,
+                                                                                        builder: (BuildContext context) {
+                                                                                          return AlertDialog(
+                                                                                            title: Text('Permission Required'),
+                                                                                            content: Text('Camera and microphone permissions are required to make a call.'),
+                                                                                            actions: [
+                                                                                              TextButton(
+                                                                                                onPressed: () {
+                                                                                                  Navigator.of(context).pop(false);
+                                                                                                },
+                                                                                                child: Text('OK'),
+                                                                                              ),
+                                                                                            ],
+                                                                                          );
+                                                                                        },
+                                                                                      );
+                                                                                    }
                                                                                   },
                                                                                   child: Text('Confirm'),
                                                                                 ),
@@ -577,17 +600,25 @@ class _MenuScreenState extends State<MenuScreen> {
 
                                                                         if (confirmed == true) {
                                                                           try {
+                                                                            Navigator.push(
+                                                                              context,
+                                                                              MaterialPageRoute(
+                                                                                builder: (context) =>
+                                                                                    CallPage(
+                                                                                    ),
+                                                                              ),
+                                                                            );
                                                                             print("call");
                                                                           } catch (e) {
                                                                             print('Error updating status: $e');
                                                                           }
                                                                         }
                                                                       },
-                                                                    ),
-                                                                    Text('Call Now'),
-                                                                  ],
-                                                                ),
-                                                              ),
+                                          ),
+                                          Text('Call Now'),
+                                          ],
+                                        ),
+                                        ),
 
                                                             if (consult.consultationStatus != 'Accepted' &&
                                                                 consult.consultationStatus != 'Decline')
