@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 //import 'package:my_teleclinic/Chatbox/chatbox.dart';
 //import '../../Map/mapLocation.dart';
+import '../../VideoConsultation/videocall_page.dart';
 import '../Chatbox/chatbox.dart';
 import '../EMR/add_vital_info.dart';
 import '../EMR/current_vital.dart';
@@ -145,11 +147,39 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SizedBox(width: 8.0),
                     InkWell(
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        // Check and request camera and microphone permissions
+                        var statusCamera = await Permission.camera.request();
+                        var statusMicrophone = await Permission.microphone.request();
+
+                        if (statusCamera.isGranted && statusMicrophone.isGranted) {
+                          // Permissions granted, navigate to ChatboxScreen
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ChatboxScreen()));
+                              builder: (context) => CallPage(),
+                            ),
+                          );
+                        } else {
+                          // Permissions not granted, show an alert or handle accordingly
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Permission Required'),
+                                content: Text('Camera and microphone permissions are required for video calls.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
                       },
                       child: Stack(
                         children: [

@@ -3,33 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:my_teleclinic/Specialists/Profile/specialist_home.dart';
-
-//letak kat CallNow
-//SizedBox(height 30,),
-//InkWell(
-//onTap:() async{
-//await [Permission.camera, Permission.microphone].request().then((value){
-//Navigator.push(context, MaterialPageRoute(builder: (context)=>CallPage(channelName: _controller.text.trim())));
-//});
-//},
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CallPage extends StatefulWidget {
   @override
   State<CallPage> createState() => _CallPageState();
+  Function() get onInviteRemoteUser => _CallPageState().onInviteRemoteUser;
+
 }
 
 class _CallPageState extends State<CallPage> {
   late RtcEngine _engine;
   bool loading = false;
-  String appId = "9f2b77f5677646c89d25869fb5db3bcf";
+  String appId = "89bda870d0d34c01b3714365be3b9144";
   List<int> _remoteUids = [];
   double xPosition = 0;
   double yPosition = 0;
   bool muted = false;
   bool isMaximized = false;
   late String dynamicChannelName; // New dynamic channel name variable
+  void Function() onInviteRemoteUser = () {};
 
   @override
   void initState() {
@@ -50,34 +45,72 @@ class _CallPageState extends State<CallPage> {
     super.dispose();
   }
 
+
   Future<void> initializeAgora() async {
     setState(() {
       loading = true;
     });
-    _engine = await RtcEngine.createWithContext(RtcEngineContext(appId));
-    await _engine.enableVideo();
-    await _engine.setChannelProfile(ChannelProfile.Communication);
-    _engine.setEventHandler(RtcEngineEventHandler(
-      joinChannelSuccess: (channel, uid, elapsed) {
-        print("Channel joined: $channel");
-      },
-      userJoined: (uid, elapsed) {
-        print("User joined: $uid");
-        setState(() {
-          _remoteUids.add(uid);
-        });
-      },
-      userOffline: (uid, elapsed) {
-        print("User offline: $uid");
-        setState(() {
-          _remoteUids.remove(uid);
-        });
-      },
-    ));
-    await _engine.joinChannel(null, dynamicChannelName, null, 0);
-    setState(() {
-      loading = false;
-    });
+
+    var statusCamera = await Permission.camera.request();
+    var statusMicrophone = await Permission.microphone.request();
+
+    if (statusCamera.isGranted && statusMicrophone.isGranted) {
+      // Initialize the Agora RTC Engine
+      _engine = await RtcEngine.createWithContext(RtcEngineContext(appId));
+
+      await _engine.enableVideo();
+      print("Video Enabled");
+      await _engine.startPreview();
+      print("Preview Started");
+
+      // Set channel profile and join the channel
+      await _engine.setChannelProfile(ChannelProfile.Communication);
+      _engine.setEventHandler(RtcEngineEventHandler(
+        joinChannelSuccess: (channel, uid, elapsed) {
+          print("Channel joined: $channel");
+        },
+        userJoined: (uid, elapsed) {
+          print("User joined: $uid");
+          setState(() {
+            _remoteUids.add(uid);
+          });
+        },
+        userOffline: (uid, elapsed) {
+          print("User offline: $uid");
+          setState(() {
+            _remoteUids.remove(uid);
+          });
+        },
+      ));
+
+      await _engine.joinChannel(null, dynamicChannelName, null, 0);
+
+      setState(() {
+        loading = false;
+      });
+    } else {
+      // Handle permission not granted
+      setState(() {
+        loading = false;
+      });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Permission Required'),
+            content: Text('Camera and microphone permissions are required to make a call.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -96,6 +129,8 @@ class _CallPageState extends State<CallPage> {
       ),
       body: Stack(
         children: [
+
+
           Center(
             child: GestureDetector(
               onTap: () {
@@ -110,6 +145,7 @@ class _CallPageState extends State<CallPage> {
               ),
             ),
           ),
+
           Positioned(
             bottom: 0,
             left: 0,
@@ -148,57 +184,79 @@ class _CallPageState extends State<CallPage> {
   }
 
   Widget renderRemoteView(BuildContext context) {
-    if (_remoteUids.isNotEmpty) {
+    if (_remoteUids.isEmpty) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: RtcLocalView.SurfaceView(
+              channelId: dynamicChannelName,
+            ),
+          ),
+          Text(
+            'Waiting for others to join...',
+            style: TextStyle(fontSize: 16, color: Colors.grey),
+          ),
+        ],
+      );
+    } else {
       if (_remoteUids.length == 1) {
-        return RtcRemoteView.SurfaceView(
-          uid: _remoteUids[0],
-          channelId: dynamicChannelName,
+        return Expanded(
+          child: RtcRemoteView.SurfaceView(
+            uid: _remoteUids[0],
+            channelId: dynamicChannelName,
+          ),
         );
       } else if (_remoteUids.length == 2) {
         return Column(
           children: [
-            RtcRemoteView.SurfaceView(
-              uid: _remoteUids[0],
-              channelId: dynamicChannelName,
+            Expanded(
+              child: RtcRemoteView.SurfaceView(
+                uid: _remoteUids[0],
+                channelId: dynamicChannelName,
+              ),
             ),
-            RtcRemoteView.SurfaceView(
-              uid: _remoteUids[1],
-              channelId: dynamicChannelName,
+            Expanded(
+              child: RtcRemoteView.SurfaceView(
+                uid: _remoteUids[1],
+                channelId: dynamicChannelName,
+              ),
             ),
           ],
         );
       } else {
-        return SizedBox(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 200,
-              childAspectRatio: 11 / 20,
-              crossAxisSpacing: 5,
-              mainAxisSpacing: 10,
+        return Expanded(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 200,
+                childAspectRatio: 11 / 20,
+                crossAxisSpacing: 5,
+                mainAxisSpacing: 100,
+              ),
+              itemBuilder: (BuildContext context, index) {
+                return Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: RtcRemoteView.SurfaceView(
+                    uid: _remoteUids[index],
+                    channelId: dynamicChannelName,
+                  ),
+                );
+              },
+              itemCount: _remoteUids.length,
             ),
-            itemBuilder: (BuildContext context, index) {
-              return Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.amber,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: RtcRemoteView.SurfaceView(
-                  uid: _remoteUids[index],
-                  channelId: dynamicChannelName,
-                ),
-              );
-            },
-            itemCount: _remoteUids.length,
           ),
         );
       }
-    } else {
-      return const Text("Waiting for other users to join");
     }
   }
+
 
   Widget _toolbar() {
     return Container(
@@ -270,3 +328,4 @@ class _CallPageState extends State<CallPage> {
     _engine.switchCamera();
   }
 }
+
