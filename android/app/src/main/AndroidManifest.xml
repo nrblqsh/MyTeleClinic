@@ -9,7 +9,7 @@
 
 
     <application
-        android:label="my_teleclinic"
+        android:label="MyTeleClinic"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

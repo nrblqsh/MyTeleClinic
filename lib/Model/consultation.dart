@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:my_teleclinic/Controller/request_controller.dart';
+import 'package:my_teleclinic/Model/medication.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '';
 import '../Main/main.dart';
@@ -23,6 +24,10 @@ class Consultation {
   DateTime? birthDate;
   String? phone;// Add specialist's name field
   Uint8List? patientImage;
+  // int? medicationID;
+  // int? MedID;
+  // String? MedGeneral;
+  // String? MedForm;
 
   //String? specialistTitle;
   //int procedureID;
@@ -41,7 +46,12 @@ class Consultation {
     this.gender,
     this.birthDate,
     this.phone,
-    this.patientImage
+    this.patientImage,
+    // this.medicationID,
+    // this.MedID,
+    // this.MedGeneral,
+    // this.MedForm,
+
     // this.specialistTitle,
   });
 
@@ -63,6 +73,10 @@ class Consultation {
           : DateTime.parse('0000-00-00'),
       phone: json['phone'],
       patientImage: base64Decode(json["base64Image"] ?? ''),
+      // medicationID: json['medicationID'] as int?,
+      // MedID: json['MedID'] as int?,
+      // MedGeneral: json['MedGeneral'],
+      // MedForm: json['MedForm'],
       // Add this field if it exists in the JSON response
       //specialistTitle: json['specialistTitle'], // Add this field if it exists in the JSON response
 
@@ -83,7 +97,11 @@ class Consultation {
     'gender': gender,
     'birthDate': birthDate.toString(),
     'phone': phone,
-    'patientImage' : patientImage
+    'patientImage' : patientImage,
+    // 'medicationID': medicationID,
+    // 'MedID': MedID,
+    // 'MedForm': MedForm,
+    // 'MedGeneral': MedGeneral,
 
     //'specialistTitle':specialistTitle
 
@@ -100,6 +118,10 @@ class Consultation {
       consultationDateTime: this.consultationDateTime,
       patientID: this.patientID,
       patientName: this.patientName,
+      // medicationID: this.medicationID,
+      // MedID: this.MedID,
+      // MedGeneral: this.MedGeneral,
+      // MedForm:this.MedForm,
     );
   }
 
@@ -171,6 +193,8 @@ class Consultation {
       throw Exception('Failed to fetch consultations');
     }
   }
+
+
 
   Future<List<Consultation>> fetchUpcomingConsultations(int specialistID) async {
     final String url = 'http://${MyApp.ipAddress}/teleclinic/getUpcomingAppointment.php?specialistID=$specialistID';

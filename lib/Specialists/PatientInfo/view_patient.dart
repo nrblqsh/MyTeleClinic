@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:my_teleclinic/Specialists/Consultation/patient_consultation_history.dart';
+import 'package:my_teleclinic/Specialists/PatientInfo/patient_history.dart';
 import 'package:my_teleclinic/Specialists/PatientInfo/patient_info_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -437,7 +438,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => PatientConsultationHistory(
+                                                builder: (context) => PatientHistoryScreen(
                                                   patientID: selectedPatient!.patientID,
                                                   specialistID: selectedPatient!.specialistID,
                                                 ),
@@ -447,7 +448,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                           style: ButtonStyle(
                                             backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
                                           ),
-                                          child: Text("View Consultation History"),
+                                          child: Text("View Patient History"),
                                         ),
                                       ],
                                     ),
@@ -522,6 +523,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                             final SharedPreferences pref = await SharedPreferences.getInstance();
                                             await pref.setInt("patientID", consult.patientID);
                                             print('Tapped on patient: ${consult.patientName}');
+
 
                                             showDialog(
                                               context: currentContext,  // Use the context from the build method
@@ -726,7 +728,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                                             Navigator.push(
                                                               context,
                                                               MaterialPageRoute(
-                                                                builder: (context) => PatientConsultationHistory(
+                                                                builder: (context) => PatientHistoryScreen(
                                                                   patientID: consult.patientID,
                                                                   specialistID: consult.specialistID,
                                                                 ),
@@ -736,7 +738,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                                           style: ButtonStyle(
                                                             backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
                                                           ),
-                                                          child: Text("View Consultation History"),
+                                                          child: Text("View Patient History"),
                                                         ),
                                                       ],
                                                     ),

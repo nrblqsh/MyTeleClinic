@@ -5,20 +5,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/consultation.dart';
 import '../../Model/medication.dart';
 
-class PatientConsultationHistory extends StatefulWidget {
-  final int patientID;
-  final int specialistID;
+class PatientMedicationHistory extends StatefulWidget {
+  final int patientID ;
+  final int specialistID ;
 
-  PatientConsultationHistory(
-      {required this.patientID, required this.specialistID});
+  PatientMedicationHistory(
+      {required this.patientID,required this.specialistID});
 
   @override
-  _PatientConsultationHistoryState createState() =>
-      _PatientConsultationHistoryState();
+  _PatientMedicationHistoryState createState() =>
+      _PatientMedicationHistoryState();
 }
 
-class _PatientConsultationHistoryState
-    extends State<PatientConsultationHistory> {
+class _PatientMedicationHistoryState
+    extends State<PatientMedicationHistory> {
+  int consultationID=0;
   late int patientID = 0;
   late int specialistID = 0;
   late String specialistName;
@@ -29,8 +30,8 @@ class _PatientConsultationHistoryState
   String consultationStatus = '';
   String consultationSymptom = '';
   String consultationTreatment = '';
-  // String medGeneral = '';
-  // String medForm = '';
+  String medGeneral = '';
+  String medForm = '';
   late List<Consultation> todayConsultations = [];
 
   @override
@@ -38,21 +39,17 @@ class _PatientConsultationHistoryState
     super.initState();
     _loadDetails();
   }
-
-  Future<List<Consultation>> fetchConsultationByPatient(
-      int specialistID, int patientID) async {
-    Consultation consultation = Consultation(
-      patientID: patientID,
-      consultationTreatment: consultationTreatment,
-      consultationSymptom: consultationSymptom,
-      consultationStatus: consultationStatus,
+  Future<List<Medication>> fetchConsultationMedication(
+      int patientID, int specialistID) async {
+    Medication medication = Medication(
+      // medicationID: medicationID,
+      // medID: medID,
+      medGeneral: medGeneral,
+      medForm: medForm,
       consultationDateTime: consultationDateTime,
-      specialistID: specialistID,
-      specialistName: specialistName,
     );
-    print(consultation.fetchConsultationByPatient(specialistID, patientID));
-    return await consultation.fetchConsultationByPatient(
-        specialistID, patientID);
+    print(medication.fetchConsultationMedication(patientID, specialistID));
+    return await medication.fetchConsultationMedication(patientID, specialistID);
   }
 
 
@@ -64,6 +61,7 @@ class _PatientConsultationHistoryState
       specialistID = pref.getInt("specialistID") ?? 0;
       specialistName = pref.getString("specialistName") ?? '';
       logStatus = pref.getString("logStatus") ?? 'OFFLINE';
+
       print("testttt$specialistName");
       print(specialistID);
       print(patientID);
@@ -97,7 +95,7 @@ class _PatientConsultationHistoryState
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  'Consultation History', // Add your test text here
+                  'Medication History', // Add your test text here
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -107,22 +105,22 @@ class _PatientConsultationHistoryState
             ),
             Container(
               child: FutureBuilder(
-                future: fetchConsultationByPatient(specialistID, patientID),
+                future: fetchConsultationMedication(patientID, specialistID),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
-                    List<Consultation>? consultations =
-                        snapshot.data as List<Consultation>?;
+                    List<Medication>? medications =
+                    snapshot.data as List<Medication>?;
 
-                    if (consultations != null && consultations.isNotEmpty) {
+                    if (medications != null && medications.isNotEmpty) {
                       return ListView.builder(
-                        itemCount: consultations.length,
+                        itemCount: medications.length,
                         shrinkWrap: true,
                         itemBuilder: (BuildContext context, index) {
-                          Consultation consult = consultations[index];
+                          Medication med = medications[index];
                           return Card(
                             child: InkWell(
                               child: Container(
@@ -158,14 +156,13 @@ class _PatientConsultationHistoryState
                                         ),
                                         child: Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: <Widget>[
                                             Text(
-                                              'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
-                                              'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}\n'
-                                              'Status: ${consult.consultationStatus}\n'
-                                              'Consultation Symptom: ${consult.consultationSymptom}\n'
-                                              'Consultation Treatment: ${consult.consultationTreatment}\n',
+                                              'Date: ${DateFormat('dd/MM/yyyy').format(med.consultationDateTime)}\n'
+                                                  'Time: ${DateFormat('hh:mm a').format(med.consultationDateTime)}\n'
+                                                  'Medicine Name: ${med.medGeneral}\n'
+                                                  'Medicine Type: ${med.medForm}\n',
                                               style: TextStyle(
                                                 fontSize: 14,
                                               ),
