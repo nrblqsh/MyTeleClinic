@@ -5,6 +5,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 //import 'package:my_teleclinic/Chatbox/chatbox.dart';
 //import '../../Map/mapLocation.dart';
+import '../../Main/main.dart';
+import '../../Specialists/ZegoCloud/videocall_zegocloud.dart';
 import '../../VideoConsultation/videocall_page.dart';
 import '../Chatbox/chatbox.dart';
 import '../EMR/add_vital_info.dart';
@@ -15,6 +17,9 @@ import '../Map/mapLocation.dart';
 import '../Telemedicine/view_appointment.dart';
 import '../Telemedicine/view_specialist.dart';
 import 'settings.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 
 class HomePage extends StatefulWidget {
   final String phone;
@@ -39,6 +44,8 @@ class _HomePageState extends State<HomePage> {
   bool hasNewMessage = false;
   int newMessagesCount = 0;
   Position? userLocation;
+
+  int consultationID=33;
 
   void checkForNewMessages() {
     int newMessagesCount = /* Your logic to get the count of new messages */ 0;
@@ -65,6 +72,20 @@ class _HomePageState extends State<HomePage> {
     print(patientID);
 
 
+  }
+  Future<String?> getCallID(int consultationID) async {
+    final response = await http.get(
+      Uri.parse('http://${MyApp.ipAddress}/teleclinic/dynamicCallID.php?consultationID=$consultationID'),
+    );
+
+    if (response.statusCode == 200) {
+      // Parse the JSON response and return the channel name
+      Map<String, dynamic> data = jsonDecode(response.body);
+      return data['dynamicCallID'];
+    } else {
+      // Handle error (e.g., server error, network error)
+      throw Exception('Failed to get channel from backend');
+    }
   }
 
   Future<void> getUserLocation() async {
@@ -153,13 +174,25 @@ class _HomePageState extends State<HomePage> {
                         var statusMicrophone = await Permission.microphone.request();
 
                         if (statusCamera.isGranted && statusMicrophone.isGranted) {
-                          // Permissions granted, navigate to ChatboxScreen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CallPage(),
-                            ),
-                          );
+                          String? callID = await getCallID(consultationID);
+                          if (callID != null) {
+                            // Handle the case where the channel name is not null
+                            print('callID: $callID');
+                            print("tess$consultationID");
+                            print(patientName);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MyCall(callID: callID,id:
+                                patientID.toString(),
+                                  name: patientName, ),
+                              ),
+                            );
+                          } else {
+                            // Handle the case where the channel name is null
+                            print('Failed to get channel name from backend.');
+                          }
+
                         } else {
                           // Permissions not granted, show an alert or handle accordingly
                           showDialog(
@@ -466,6 +499,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
 
 int hexColor(String color) {
   String newColor = '0xff' + color;

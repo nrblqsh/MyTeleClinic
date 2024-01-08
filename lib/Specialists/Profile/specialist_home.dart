@@ -1,12 +1,17 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:my_teleclinic/Model/specialist.dart';
 import 'package:my_teleclinic/Specialists/Consultation/patient_consultation_history.dart';
 import 'package:my_teleclinic/Specialists/Profile/settingSpecialist.dart';
 import 'package:my_teleclinic/Specialists/Consultation/specialist_consultation_history.dart';
 import 'package:my_teleclinic/Specialists/Consultation/viewUpcomingAppointment.dart';
 import 'package:my_teleclinic/Specialists/PatientInfo/view_patient.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:my_teleclinic/Specialists/ZegoCloud/videocall_zegocloud.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import '../../Model/consultation.dart';
 import '../../Patients/Telemedicine/view_appointment.dart';
 import '../../Patients/Profile/settings.dart';
@@ -210,11 +215,33 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   late Future<List<Consultation>>? futureConsultations;
+  late int patientID ;
+  late int specialistID;
+  late String specialistName;
+  String dynamicCallID = ''; // Declare dynamicCallID here as a class variable
 
+
+
+
+  Future<void> _loadDetails() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      patientID = pref.getInt("patientID") ?? 0;
+      specialistID = pref.getInt("specialistID") ?? 0;
+      specialistName = pref.getString("specialistName") ?? '';
+      print("testttt$specialistName");
+      print(specialistID);
+      print(patientID);
+
+
+      // Add createMenuScreen() after loading specialist details
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    _loadDetails();
     futureConsultations =
     widget.fetchTodayConsultations() as Future<List<Consultation>>?;
   }
@@ -334,7 +361,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
                 ),
               ),
-          
+
 
     SizedBox(height: 30),
               Text(
@@ -561,6 +588,9 @@ class _MenuScreenState extends State<MenuScreen> {
                                                                                 ),
                                                                                 TextButton(
                                                                                   onPressed: () async {
+
+                                                                                    int? consultationID = consult.consultationID;
+                                                                                    print("consullttt$consultationID");
                                                                                     // Check and request camera and microphone permissions
                                                                                     var statusCamera = await Permission.camera.request();
                                                                                     var statusMicrophone = await Permission.microphone.request();
@@ -599,13 +629,54 @@ class _MenuScreenState extends State<MenuScreen> {
                                                                         );
 
                                                                         if (confirmed == true) {
+                                                                          ZegoSendCallInvitationButton(
+                                                                            isVideoCall: true,
+                                                                            resourceID: "zegouikit_call", // Replace with your resourceID
+                                                                            invitees: [
+                                                                              ZegoUIKitUser(
+                                                                                id: "1",
+                                                                                name: "aqish",
+                                                                              ),
+                                                                            ],
+                                                                          );
+
                                                                           try {
+                                                                             dynamicCallID = generateRandomString(15);
+                                                                            print("calllidddd$dynamicCallID");
+
+                                                                             try {
+                                                                               int consultationID = consult.consultationID ?? 0;
+
+
+                                                                               final response = await http.post(
+                                                                                 Uri.parse('http://${MyApp.ipAddress}/teleclinic/dynamicCallID.php'),
+                                                                                 body: {
+                                                                                   'consultationID': consultationID.toString(),
+                                                                                   'dynamicCallID': dynamicCallID,
+                                                                                 },
+                                                                               );
+
+
+                                                                               if (response.statusCode == 200) {
+                                                                                 print('Status updated successfully');
+                                                                                 // Fetch updated data and trigger a rebuild
+                                                                                 setState(() {});
+                                                                               } else {
+                                                                                 print('Failed to update status. Status Code: ${response.statusCode}');
+                                                                               }
+                                                                             } catch (e) {
+                                                                               print('Error updating status: $e');
+                                                                             }
+
+
                                                                             Navigator.push(
                                                                               context,
                                                                               MaterialPageRoute(
                                                                                 builder: (context) =>
-                                                                                    CallPage(
-                                                                                    ),
+                                                                                    MyCall(callID: dynamicCallID,
+                                                                                      id: specialistID.toString(),
+                                                                                      name: specialistName
+                                                                                    , ),
                                                                               ),
                                                                             );
                                                                             print("call");
@@ -744,6 +815,13 @@ class _MenuScreenState extends State<MenuScreen> {
       default:
         return Colors.transparent.value; // Default color
     }
+  }
+
+  String generateRandomString(int length) {
+    const charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    final random = Random();
+    print(random);
+    return List.generate(length, (index) => charset[random.nextInt(charset.length)]).join();
   }
 
   int hexColor(String color) {

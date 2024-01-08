@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_teleclinic/Patients/Profile/register.dart';
 import 'package:http/http.dart' as http;
+import 'package:my_teleclinic/Specialists/ZegoCloud/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 import 'dart:convert';
 import '../Patients/Profile/forgotPassword.dart';
 import '../Patients/Profile/patient_home_page.dart';
@@ -28,6 +31,11 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscureText= true;
   TextEditingController phoneController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+
+
+
+
 
   Future login() async {
     if (phoneController.text.isEmpty || passwordController.text.isEmpty) {
@@ -98,6 +106,14 @@ class _LoginScreenState extends State<LoginScreen> {
           await pref.setString("specialistName", specialistName);
           await pref.setInt("specialistID", specialistID);
           await pref.setString("logStatus", logStatus);
+
+          ZegoUIKitPrebuiltCallInvitationService().init(
+            appID: MyConstant.appId, // input your AppID
+            appSign: MyConstant.appSign, // input your AppSign
+            userID: specialistID.toString(),
+            userName: specialistName,
+            plugins: [ZegoUIKitSignalingPlugin()],
+          );
 
           Navigator.push(
               context, MaterialPageRoute(builder: (context) =>
