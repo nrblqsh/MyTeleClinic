@@ -7,12 +7,25 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:85837299824:android:6b5c6ccf29a079b01234b5",
+        "mobilesdk_app_id": "1:85837299824:android:1f4fa94b414cb55e1234b5",
         "android_client_info": {
           "package_name": "com.example.my_teleclinic"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "85837299824-vbav138rgc2avaclava3tjnjhn5bp81f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.my_teleclinic",
+            "certificate_hash": "f73aa41086ed9b9dccd72de600d96ffee95f3f1d"
+          }
+        },
+        {
+          "client_id": "85837299824-nfedqlkee08int2d9bki94pser8k3s3e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDmbSlOOAxDIBd3BWRBw0Ml3N3jS_pY2tA"
@@ -20,7 +33,63 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "85837299824-nfedqlkee08int2d9bki94pser8k3s3e.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "85837299824-aeihitrlpc79dhk75p9gj9rf0iihfsj6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.myTeleclinic"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:85837299824:android:6b5c6ccf29a079b01234b5",
+        "android_client_info": {
+          "package_name": "com.zegocloud.MyTeleClinic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "85837299824-v85767gdc10cuuqenh9h51sd1n9k4j8b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zegocloud.MyTeleClinic",
+            "certificate_hash": "f73aa41086ed9b9dccd72de600d96ffee95f3f1d"
+          }
+        },
+        {
+          "client_id": "85837299824-nfedqlkee08int2d9bki94pser8k3s3e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmbSlOOAxDIBd3BWRBw0Ml3N3jS_pY2tA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "85837299824-nfedqlkee08int2d9bki94pser8k3s3e.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "85837299824-aeihitrlpc79dhk75p9gj9rf0iihfsj6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.myTeleclinic"
+              }
+            }
+          ]
         }
       }
     }

@@ -103,12 +103,12 @@ class _MyCallState extends State<MyCall> {
                     userID: id,
                     userName: name,
                     config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall(
-                      // Other configurations...
+
                     ),
                   ),
                 ),
 
-                // Add a TextField if the user is a specialist
+
                 if (id == specialistID.toString())
                   Positioned(
                     bottom: 16.0,
