@@ -5,6 +5,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:my_teleclinic/Patients/Map/view_clinic_specialist.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../Main/main.dart';
@@ -191,129 +193,104 @@ class _MapLocationState extends State<MapLocation> {
   }
 
 
-  Widget buildDialog(dynamic item) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Stack(
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(36.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item['clinicName'],
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 30),
-                    Text(
-                      '· ${item['phone']}                 ',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                    SizedBox(height: 25),
-                    Text(
-                      '· ${item['clinicType']}',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-
-                    if (distance != null && duration != null)
-                      SizedBox(height: 30,),
-                    Row(
-                      children: [
-                        // Car icon next to distance
-                        Row(
-                          children: [
-                            Icon(Icons.directions_car, size: 20, color: Colors.blue),
-                            SizedBox(width: 7),
-                            Text(
-                              distance!,
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                          ],
+  Widget buildDialog(dynamic item) => Container(
+    height: 200,
+    child: Dialog(
+      insetPadding: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Stack(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item['clinicName'],
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
                         ),
-                        SizedBox(width:240), // Add some spacing between distance and duration
-                        // Clock icon next to duration
-                        Row(
-                          children: [
-                            SizedBox(width: 15),
-                            Icon(Icons.access_time, size: 20, color: Colors.green),
-                            SizedBox(width: 10), // Add some spacing
-                            Text(
-                              duration!,
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                          ],
+                      ),
+                      SizedBox(height: 30),
+                      Text(
+                        '· ${item['phone']}                 ',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.normal,
                         ),
-                      ],
-                    )
+                      ),
+                      SizedBox(height: 25),
+                      Text(
+                        '· ${item['clinicType']}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
 
-                  ],
-                ),
-              ),
-              Divider(),
-              ElevatedButton(
-                onPressed: () {
-                  handleNavigation(item);
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(13),
-                  ),
-                  backgroundColor: Color(hexColor('C73B3B')),
-                  fixedSize:
-                  Size.fromHeight(45), // Adjust the height as needed
-                ),
-                child: Text(
-                  'Navigate to this Clinic',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
+                      if (distance != null && duration != null)
+                        SizedBox(height: 30,),
+                      Row(
+                        children: [
+                          // Car icon next to distance
+                          Row(
+                            children: [
+                              Icon(Icons.directions_car, size: 20, color: Colors.blue),
+                              SizedBox(width: 7),
+                              Text(
+                                distance!,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+
+                            ],
+                          ),
+                          SizedBox(width:240), // Add some spacing between distance and duration
+                          // Clock icon next to duration
+                          Row(
+                            children: [
+                              SizedBox(width: 15),
+                              Icon(Icons.access_time, size: 20, color: Colors.green),
+                              SizedBox(width: 10), // Add some spacing
+                              Text(
+                                duration!,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+
+                            ],
+                          ),
+                        ],
+                      )
+
+                    ],
                   ),
                 ),
-              ),
-              SizedBox(height: 10,),
-              Container(
-                height: 45,
-                width: 145,
-                child: ElevatedButton(
+                Divider(),
+                ElevatedButton(
                   onPressed: () {
-                    openInMaps(item['latitude'], item['longitude']);
+                    handleNavigation(item);
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(13),
                     ),
-                    backgroundColor: Color(hexColor('7393B3')),
-                    fixedSize: Size.fromHeight(45),
-
-
+                    backgroundColor: Color(hexColor('C73B3B')),
+                    fixedSize:
+                    Size.fromHeight(45), // Adjust the height as needed
                   ),
                   child: Text(
-                    'Open in Maps',
+                    'Navigate to this Clinic',
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: 'Inter',
@@ -322,25 +299,84 @@ class _MapLocationState extends State<MapLocation> {
                     ),
                   ),
                 ),
-              ),
+                SizedBox(height: 10,),
+                Container(
+                  height: 45,
+                  width: 145,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      openInMaps(item['latitude'], item['longitude']);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                      backgroundColor: Color(hexColor('7393B3')),
+                      fixedSize: Size.fromHeight(45),
+                    ),
+                    child: Text(
+                      'Open in Maps',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  height: 45,
+                  width: 145,
+                  child: ElevatedButton(
+                    onPressed: () async{
+                      final SharedPreferences pref = await SharedPreferences.getInstance();
+                      await pref.setInt("clinicID", int.parse(item['clinicID']));
+                      print('Tapped on clinic: ${item['clinicID']}');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => viewClinicSpecialistScreen(patientID:0, clinicID: 0,
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                      backgroundColor: Color(hexColor('7393B3')),
+                      fixedSize: Size.fromHeight(35),
+                    ),
+                    child: Text(
+                      'Make Appointment',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
 
-            ],
-          ),
-
-          Positioned(
-            top: 8.0,
-            right: 8.0,
-            child: IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              ],
             ),
-          ),
-        ],
+
+            Positioned(
+              top: 30.0,
+              right: 8.0,
+              child: IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ],
+        ),
       ),
-    );
-  }
+  );
 
   Future<void> fetchDistanceAndDuration(LatLng destination) async {
     if (userLocation != null) {

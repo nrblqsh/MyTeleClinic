@@ -58,20 +58,20 @@ class Consultation {
   factory Consultation.fromJson(Map<String, dynamic> json) {
     return Consultation(
       consultationID: json['consultationID'] as int?,
-      patientID: json['patientID'] as int,
+      patientID: json['patientID'] as int ,
       consultationDateTime: DateTime.parse(json['consultationDateTime']),
       specialistID: json['specialistID'] as int,
       consultationTreatment: json['consultationTreatment'],
       consultationStatus: json['consultationStatus'],
       consultationSymptom: json['consultationSymptom'],
       specialistName: json['specialistName'],
-      patientName: json['patientName'],
-      icNum: json['icNumber'],
-      gender: json['gender'],
+      patientName: json['patientName']?? '',
+      icNum: json['icNumber'] ?? '' ,
+      gender: json['gender'] ?? '',
       birthDate : json['birthDate'] != null
           ? DateTime.tryParse(json['birthDate'])
           : DateTime.parse('0000-00-00'),
-      phone: json['phone'],
+      phone: json['phone'] ?? '',
       patientImage: base64Decode(json["base64Image"] ?? ''),
       // medicationID: json['medicationID'] as int?,
       // MedID: json['MedID'] as int?,
@@ -236,6 +236,71 @@ class Consultation {
           return consultations;
         } else {
           print('Unexpected response format. Body is not a JSON object.');
+          return [];
+        }
+      } catch (e) {
+        print('Error parsing response: $e');
+        throw Exception('Error parsing response: $e');
+      }
+    } else {
+      print('Failed to fetch consultation history. Status Code: ${response.statusCode}');
+      throw Exception('Failed to fetch consultation history. Status Code: ${response.statusCode}');
+    }
+  }
+
+  // Future<List<Consultation>> fetchPatientConsultation(int patientID) async {
+  //   final String url = 'http://${MyApp.ipAddress}/teleclinic/patientConsultationHistory.php?patientID=$patientID';
+  //   final response = await http.get(Uri.parse(url));
+  //
+  //   if (response.statusCode == 200) {
+  //     try {
+  //       List<dynamic> responseBody = json.decode(response.body);
+  //
+  //       print('Raw Response Body: $responseBody'); // Print the raw response body
+  //
+  //       List<Consultation> consultations = List<Consultation>.from(responseBody
+  //           .map((consultationData) {
+  //         print('Individual Consultation Data: $consultationData'); // Print individual consultation data
+  //         return Consultation.fromJson(consultationData);
+  //       }));
+  //
+  //       print('Consultations List: $consultations'); // Print the final list of consultations
+  //       return consultations;
+  //
+  //     } catch (e) {
+  //       print('Error parsing response: $e');
+  //       throw Exception('Error parsing response: $e');
+  //     }
+  //   } else {
+  //     print('Failed to fetch consultation history. Status Code: ${response.statusCode}');
+  //     throw Exception('Failed to fetch consultation history. Status Code: ${response.statusCode}');
+  //   }
+  // }
+
+
+
+  Future<List<Consultation>> fetchPatientConsultation(int patientID) async {
+    final String url = 'http://${MyApp.ipAddress}/teleclinic/patientConsultationHistory.php?patientID=$patientID';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      try {
+        dynamic responseBody = json.decode(response.body);
+        print ('response ${response}');
+        print ('url ${url}');
+        print ('result ${response.body}');
+
+        if (responseBody is Map<String, dynamic> && responseBody.containsKey('data')) {
+          List<Consultation> consultations = List<Consultation>.from(responseBody['data']
+              .map((consultationData) => Consultation.fromJson(consultationData)));
+          print ('consultations ${consultations}');
+          return consultations;
+        } else {
+          print('Unexpected response history format. Body is not a JSON object.');
+          print ('url ${url}');
+          print ('response ${response}');
+          print ('response body ${responseBody}');
+         // print('Length of data from API: ${responseBody['data'].length}');
           return [];
         }
       } catch (e) {

@@ -6,6 +6,7 @@ import '../Telemedicine/view_specialist.dart';
 import '../Profile/patient_home_page.dart';
 import '../Profile/settings.dart';
 import 'add_vital_info.dart';
+import 'consultation_history.dart';
 import 'current_vital.dart';
 
 // void main() {
@@ -71,7 +72,7 @@ class _MedicalRecordScreenState extends State<MedicalRecordScreen> {
               // Set the color for the selected label
               tabs: [
                 CustomTab(
-                  text: 'Current Vital Info',
+                  text: 'Medical Record',
                 ),
                 CustomTab(
                   text: 'Vital Info History',
@@ -81,7 +82,7 @@ class _MedicalRecordScreenState extends State<MedicalRecordScreen> {
           ),
           body: TabBarView(
             children: [
-              CurrentVitalInfoScreen(
+              ConsultationHistory(
                 patientID: 0,
               ),
               VitalInfoReportScreen(
