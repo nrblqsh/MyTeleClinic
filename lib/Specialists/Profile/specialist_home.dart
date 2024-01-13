@@ -193,6 +193,7 @@ class BottomNavigationBarWidget extends StatelessWidget {
   }
 }
 
+
 class MenuScreen extends StatefulWidget {
   final int specialistID;
   final String specialistName;
@@ -201,6 +202,7 @@ class MenuScreen extends StatefulWidget {
    List<Consultation> todayConsultations;
   final Future<List<Consultation>> Function() fetchTodayConsultations;
   final Function(int) navigateToPage;
+
 
 
   MenuScreen({
@@ -668,21 +670,41 @@ class _MenuScreenState extends State<MenuScreen> {
                                                                           },
                                                                         );
 
-                                                                        if (confirmed == true) {
+                                                                        if (confirmed!= null && confirmed) {
                                                                           try {
                                                                             print("masuk");
                                                                             String specialistIDtoString = specialistID.toString();
                                                                               dynamicCallID = generateRandomString(15);
                                                                             print("calllidddd$dynamicCallID");
-
+                                                                            print("specialistID here $specialistID");
                                                                             int consultationID = consult.consultationID ?? 0;
 
 
-                                                                            await saveCallIDtoDatabase(consultationID, dynamicCallID);  //save callid dulu dlm db
-                                                                            String? fcmToken = await getFCMTokenfromPatient(patientID);
+                                                                            await saveCallIDtoDatabase(consultationID, dynamicCallID);
+                                                                            print(patientID);
+                                                                            Navigator.push(
+                                                                              context,
+                                                                              MaterialPageRoute(
+                                                                                builder: (context) => MyCall(
+                                                                                  callID: dynamicCallID,
+                                                                                  id: specialistIDtoString,
+                                                                                  name: specialistName,
+                                                                                  roleId: 1,
+                                                                                ),
+                                                                              ),
+                                                                            );
+                                                                            //save callid dulu dlm db
+                                                                            String? fcmToken = await getFCMTokenfromPatient(consultationID);
                                                                             print("fcm token dalam specialist $fcmToken");
 
-                                                                            await sendFCMNotification(fcmToken!, dynamicCallID, specialistID, specialistName);
+
+                                                                            if (fcmToken != null) {
+
+
+                                                                              await sendFCMNotification(fcmToken, dynamicCallID, specialistID, specialistName);
+                                                                            } else {
+                                                                              print('FCM token is null. Cannot send notification.');
+                                                                            }
 
 
                                                                           } catch (e) {
@@ -811,8 +833,8 @@ class _MenuScreenState extends State<MenuScreen> {
       int specialistID,
       String specialistName) async {
     // Replace with your FCM server key
-    String serverKey = 'AAAAE_xNQHA:APA91bHGEwDCm7WqUrcG9hQ9czDxBS-g_v1SOJuYhLvlnS1rYuoHFeqa6ik_QiDeiprHTlri6ZFr7NZXsQVLAtvX7lMyrUo4DE0qCDGIfzwtXyaEi67ygGiEPeBaUJwLdBU4vactlTwT';
-print("masuk sini1");
+    String serverKey = 'AAAAE_xNQHA:APA91bG_NAiAbTSOMipmmFtjf4csexaWwCK35F9b6717eDzdvChCYfnsNeK85ruFDnAtF5P1CGOsuNAFm_35-8jzjhggd0cVhMIEvN2bNRdkxfPWGEdlWWakwP-65_c34CaIl3xKgz75';
+    print("masuk sini1");
     final Uri url = Uri.parse('https://fcm.googleapis.com/fcm/send');
 
     // Replace with your notification payload
@@ -824,22 +846,9 @@ print("masuk sini1");
         'sound': 'default', // Add sound if needed
       },
       'data': {
-      'call_id': callID,
-      // Include any other data needed to handle the call
-    }    };
-
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MyCall(
-          callID: dynamicCallID,
-          id: specialistID.toString(),
-          name: specialistName,
-        ),
-      ),
-    );
-    print("call");
+        'call_id': callID,
+        // Include any other data needed to handle the call
+      }};
 
 
     final http.Response response = await http.post(
@@ -851,16 +860,38 @@ print("masuk sini1");
       body: jsonEncode(payload),
     ).timeout(Duration(seconds: 30));
 
+
+    print('FCM Token: $fcmToken'); // Print the FCM token
+    print('FCM Response: ${response.body}'); // Print the response body
+
+
     if (response.statusCode == 200) {
-      print('Notification sent successfully');
-
-
+      final Map<String, dynamic> responseBody = json.decode(response.body);
+      if (responseBody['failure'] != 0) {
+        // Handle errors in the response
+        final Map<String, dynamic> result = responseBody['results'][0];
+        if (result.containsKey('error')) {
+          if (result['error'] == 'InvalidRegistration') {
+            // Handle invalid registration token
+            print('InvalidRegistration: Removing or updating the invalid token.');
+            // Your logic to handle or update the token on the server
+          } else {
+            print('Failed to send notification. Error: ${result['error']}');
+          }
+        }
+      } else {
+        print('Notification sent successfully');
+        // ... (remaining code)
+      }
     } else {
       print('Failed to send notification. Status Code: ${response.statusCode}');
     }
+
   }
 
-  int _getStatusColor(String status) {
+
+
+    int _getStatusColor(String status) {
     switch (status) {
       case 'Accepted':
         return Colors.green.value;
@@ -891,15 +922,18 @@ print("masuk sini1");
   }
 
 
-  Future<String?> getFCMTokenfromPatient(int patientID) async {
+  Future<String?> getFCMTokenfromPatient(int consultID) async {
+    String fcmToken = '';
+    print("consultID$consultID");
     final response = await http.get(
-      Uri.parse('http://${MyApp.ipAddress}/teleclinic/getFCMToken.php?patientID'
-          '=$patientID'),
+      Uri.parse('http://${MyApp.ipAddress}/teleclinic/getFCMToken.php?consultationID'
+          '=$consultID'),
     );
 
     if (response.statusCode == 200) {
       // Parse the JSON response and return the channel name
       Map<String, dynamic> data = jsonDecode(response.body);
+      print("fmcm$fcmToken");
       return data['fcmToken'];
     } else {
       // Handle error (e.g., server error, network error)
