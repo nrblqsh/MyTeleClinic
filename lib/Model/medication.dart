@@ -13,9 +13,9 @@ List<Medication> medicationFromJson(String str) => List<Medication>.from(json.de
 String medicationToJson(List<Medication> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Medication {
-  int medID;
-  int consultationID;
-  int medicationID;
+  int? medID;
+  int? consultationID;
+  int? medicationID;
   String? medGeneral;
   String? medForm;
   DateTime consultationDateTime;
@@ -23,9 +23,9 @@ class Medication {
   String? medInstruction;
 
   Medication({
-     required this.medID,
-     required this.consultationID,
-     required this.medicationID,
+    this.medID,
+    this.consultationID,
+    this.medicationID,
     required this.medGeneral,
     required this.medForm,
     required this.consultationDateTime,
@@ -34,9 +34,9 @@ class Medication {
   });
 
   factory Medication.fromJson(Map<String, dynamic> json) => Medication(
-     medID: json["MedID"],
-     consultationID: json["consultationID"],
-     medicationID: json["medicationID"],
+    medID: json["MedID"] ?? 0,
+    consultationID: json["consultationID"]??0,
+    medicationID: json["medicationID"] ??0,
     medGeneral: json["MedGeneral"],
     medForm: json["medForm"],
     consultationDateTime: DateTime.parse(json['consultationDateTime']),
@@ -47,9 +47,9 @@ class Medication {
   );
 
   Map<String, dynamic> toJson() => {
-     "MedID": medID,
-     "consultationID": consultationID,
-     "medicationID": medicationID,
+    "MedID": medID,
+    "consultationID": consultationID,
+    "medicationID": medicationID,
     "MedGeneral": medGeneral,
     "medForm": medForm,
     'consultationDateTime': consultationDateTime.toString(),

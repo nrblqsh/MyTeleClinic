@@ -44,16 +44,14 @@ class _PatientMedicationHistoryState
   Future<List<Medication>> fetchConsultationMedication(
       int patientID, int specialistID) async {
     Medication medication = Medication(
-      consultationID: consultationID,
-       medicationID: medicationID,
-       medID: medID,
-      medGeneral: medGeneral,
-      medForm: medForm,
-      consultationDateTime: consultationDateTime,
-      dosage: dosage,
-      medInstruction: medInstruction
-
-    );
+        consultationID: consultationID,
+        medicationID: medicationID,
+        medID: medID,
+        medGeneral: medGeneral,
+        medForm: medForm,
+        consultationDateTime: consultationDateTime,
+        dosage: dosage,
+        medInstruction: medInstruction);
     print(medication.fetchConsultationMedication(patientID, specialistID));
     return await medication.fetchConsultationMedication(patientID, specialistID);
   }
@@ -168,7 +166,9 @@ class _PatientMedicationHistoryState
                                               'Date: ${DateFormat('dd/MM/yyyy').format(med.consultationDateTime)}\n'
                                                   'Time: ${DateFormat('hh:mm a').format(med.consultationDateTime)}\n'
                                                   'Medicine Name: ${med.medGeneral}\n'
-                                                  'Medicine Type: ${med.medForm}\n',
+                                                  'Medicine Type: ${med.medForm}\n'
+                                                  'Medicine Dosage: ${med.dosage}\n'
+                                                  'Medicine Instruction: ${med.medInstruction}\n',
                                               style: TextStyle(
                                                 fontSize: 14,
                                               ),

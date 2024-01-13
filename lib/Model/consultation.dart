@@ -31,7 +31,6 @@ class Consultation {
 
   //String? specialistTitle;
   //int procedureID;
-  double? feesConsultation;
 
   Consultation({
     this.consultationID,
@@ -52,7 +51,6 @@ class Consultation {
     // this.MedID,
     // this.MedGeneral,
     // this.MedForm,
-    this.feesConsultation
 
     // this.specialistTitle,
   });
@@ -81,7 +79,6 @@ class Consultation {
       // MedForm: json['MedForm'],
       // Add this field if it exists in the JSON response
       //specialistTitle: json['specialistTitle'], // Add this field if it exists in the JSON response
-      feesConsultation: json['feesConsultation']
 
     );
   }
@@ -107,7 +104,6 @@ class Consultation {
     // 'MedGeneral': MedGeneral,
 
     //'specialistTitle':specialistTitle
-    'feesConsultation':feesConsultation
 
   };
 
@@ -161,6 +157,7 @@ class Consultation {
     }
   }
 
+<<<<<<< Updated upstream
 
   Future<List<Consultation>> fetchTodayConsultationsPatientSide(int patientID) async {
     final String url = 'http://${MyApp.ipAddress}/teleclinic/getTodayConsultationPatientSide.php?patientID=$patientID';
@@ -228,6 +225,8 @@ class Consultation {
   // }
 
 
+=======
+>>>>>>> Stashed changes
   //add save
   Future<bool> save() async {
     // API OPERATION
@@ -371,7 +370,7 @@ class Consultation {
           print ('url ${url}');
           print ('response ${response}');
           print ('response body ${responseBody}');
-         // print('Length of data from API: ${responseBody['data'].length}');
+          // print('Length of data from API: ${responseBody['data'].length}');
           return [];
         }
       } catch (e) {
