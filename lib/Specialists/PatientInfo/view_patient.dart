@@ -265,7 +265,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                         Padding(
                                           padding: const EdgeInsets.only(bottom: 20.0),
                                           child: FutureBuilder(
-                                            future: Consultation.getPatientImage(selectedPatient!.patientID),
+                                            future: Consultation.getPatientImage(selectedPatient!.patientID!),
                                             builder: (context, snapshot) {
                                               if (snapshot.connectionState == ConnectionState.waiting) {
                                                 return CircularProgressIndicator();
@@ -423,7 +423,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) => PatientInfoScreen(
-                                                  patientID: selectedPatient!.patientID,
+                                                  patientID: selectedPatient!.patientID!,
                                                 ),
                                               ),
                                             );
@@ -439,8 +439,8 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) => PatientHistoryScreen(
-                                                  patientID: selectedPatient!.patientID,
-                                                  specialistID: selectedPatient!.specialistID,
+                                                  patientID: selectedPatient!.patientID!,
+                                                  specialistID: selectedPatient!.specialistID!,
                                                 ),
                                               ),
                                             );
@@ -521,7 +521,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                               int patientID = int.parse('${consult.patientID}');
                                             });
                                             final SharedPreferences pref = await SharedPreferences.getInstance();
-                                            await pref.setInt("patientID", consult.patientID);
+                                            await pref.setInt("patientID", consult.patientID!);
                                             print('Tapped on patient: ${consult.patientName}');
 
 
@@ -558,7 +558,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                                         Padding(
                                                           padding: const EdgeInsets.only(bottom: 20.0),
                                                           child: FutureBuilder(
-                                                            future: Consultation.getPatientImage(consult.patientID),
+                                                            future: Consultation.getPatientImage(consult.patientID!),
                                                             builder: (context, snapshot) {
                                                               if (snapshot.connectionState == ConnectionState.waiting) {
                                                                 return CircularProgressIndicator();
@@ -713,7 +713,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                                               context,
                                                               MaterialPageRoute(
                                                                 builder: (context) => PatientInfoScreen(
-                                                                  patientID: consult.patientID,
+                                                                  patientID: consult.patientID!,
                                                                 ),
                                                               ),
                                                             );
@@ -729,8 +729,8 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                                               context,
                                                               MaterialPageRoute(
                                                                 builder: (context) => PatientHistoryScreen(
-                                                                  patientID: consult.patientID,
-                                                                  specialistID: consult.specialistID,
+                                                                  patientID: consult.patientID!,
+                                                                  specialistID: consult.specialistID!,
                                                                 ),
                                                               ),
                                                             );
@@ -753,7 +753,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                               children: [
                                                 Flexible(
                                                   child: FutureBuilder(
-                                                    future: Consultation.getPatientImage(consult.patientID),
+                                                    future: Consultation.getPatientImage(consult.patientID!),
                                                     builder: (context, snapshot) {
                                                       if (snapshot.connectionState == ConnectionState.waiting) {
                                                         return CircularProgressIndicator();
