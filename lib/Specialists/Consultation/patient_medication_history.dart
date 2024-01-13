@@ -32,6 +32,8 @@ class _PatientMedicationHistoryState
   String consultationTreatment = '';
   String medGeneral = '';
   String medForm = '';
+  String dosage = '';
+  String medInstruction = '';
   late List<Consultation> todayConsultations = [];
 
   @override
@@ -42,11 +44,15 @@ class _PatientMedicationHistoryState
   Future<List<Medication>> fetchConsultationMedication(
       int patientID, int specialistID) async {
     Medication medication = Medication(
-      // medicationID: medicationID,
-      // medID: medID,
+      consultationID: consultationID,
+       medicationID: medicationID,
+       medID: medID,
       medGeneral: medGeneral,
       medForm: medForm,
       consultationDateTime: consultationDateTime,
+      dosage: dosage,
+      medInstruction: medInstruction
+
     );
     print(medication.fetchConsultationMedication(patientID, specialistID));
     return await medication.fetchConsultationMedication(patientID, specialistID);

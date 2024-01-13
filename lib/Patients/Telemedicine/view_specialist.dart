@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +48,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
   late int specialistID;
   late String phone;
   late String patientName;
+
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
@@ -147,6 +150,11 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                     shrinkWrap: true,
                     itemBuilder: (BuildContext context, index) {
                       Specialist specialist = specialists[index];
+
+
+                        specialistID =
+                            int.parse('${specialist.specialistID}');
+
                       bool isSpecialistOnline =
                           specialist.logStatus == 'ONLINE';
                       return Card(
@@ -156,6 +164,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                             //  print('index-');
                             // print(index);
                             setState(() {
+
                               specialistID =
                                   int.parse('${specialist.specialistID}');
                             });
@@ -196,16 +205,69 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                     ),
                                     height: 400,
                                     child: Column(
-                                      // mainAxisAlignment:
-                                      //     MainAxisAlignment.spaceBetween,
                                       children: [
                                         Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 20.0),
-                                          child: Image.network(
-                                            'https://t4.ftcdn.net/jpg/02/29/53/11/360_F_229531197_jmFcViuzXaYOQdoOK1qyg7uIGdnuKhpt.jpg',
-                                            width: 90,
-                                            height: 90,
+                                          padding: const EdgeInsets.only(bottom: 20.0),
+                                          child: FutureBuilder(
+                                            future: Specialist.getSpecialistImage1(specialistID),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                                return CircularProgressIndicator();
+                                              } else if (snapshot.hasError) {
+                                                return Text('Error: ${snapshot.error}');
+                                              } else if (snapshot.hasData) {
+                                                Uint8List? specialistImage = snapshot.data as Uint8List?;
+                                                if (specialistImage != null && specialistImage.isNotEmpty) {
+                                                  return Container(
+                                                    width: 90,
+                                                    height: 90,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(10.0),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.grey.withOpacity(0.5),
+                                                          spreadRadius: 2,
+                                                          blurRadius: 5,
+                                                          offset: Offset(0, 3),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: Image.memory(
+                                                      specialistImage,
+                                                      width: 90,
+                                                      height: 90,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  );
+                                                } else {
+                                                  // Return an empty Container with an image asset as a placeholder
+                                                  return Container(
+                                                    width: 90,
+                                                    height: 90,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(10.0),
+                                                      image: DecorationImage(
+                                                        image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              } else {
+                                                // Return an empty Container with an image asset as a placeholder
+                                                return Container(
+                                                  width: 90,
+                                                  height: 90,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10.0),
+                                                    image: DecorationImage(
+                                                      image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            },
                                           ),
                                         ),
                                         Padding(
@@ -316,65 +378,141 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                               },
                             );
                           },
-                          child: Container(
-                            padding:
-                                EdgeInsets.only(left: 15, right: 15, top: 10),
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  width: 700,
-                                  height: 70,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                        left: 12, right: 12, top: 10),
-                                    decoration: BoxDecoration(
-                                      border:
-                                          Border.all(color: Colors.blueAccent),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(12.0)),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.blueGrey,
-                                          offset: const Offset(5.0, 5.0),
-                                          blurRadius: 10.0,
-                                          spreadRadius: 2.0,
-                                        ),
-                                        BoxShadow(
-                                          color: Colors.white,
-                                          offset: const Offset(0.0, 0.0),
-                                          blurRadius: 0.0,
-                                          spreadRadius: 0.0,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Row(
+
+
+                          child: Card(
+                            child: Container(
+                              padding:
+                                  EdgeInsets.only(left: 15, right: 15, top: 10),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    width: 700,
+                                    height: 70,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                          left: 12, right: 12, top: 10),
+                                      decoration: BoxDecoration(
+                                        border:
+                                            Border.all(color: Colors.blueAccent),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.blueGrey,
+                                            offset: const Offset(5.0, 5.0),
+                                            blurRadius: 10.0,
+                                            spreadRadius: 2.0,
+                                          ),
+                                          BoxShadow(
+                                            color: Colors.white,
+                                            offset: const Offset(0.0, 0.0),
+                                            blurRadius: 0.0,
+                                            spreadRadius: 0.0,
+                                          ),
+                                        ],
+                                      ),
+                                      child:  Row(
                                           children: [
-                                            Text(
-                                              '${specialist.specialistName}',
-                                              style: TextStyle(
-                                                fontSize: 20,
+                                      Flexible(
+                                      child: FutureBuilder(
+                                      future: Specialist.getSpecialistImage1(specialistID),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                          return CircularProgressIndicator();
+                                        } else if (snapshot.hasError) {
+                                          return Text('Error: ${snapshot.error}');
+                                        } else if (snapshot.hasData) {
+                                          Uint8List? specialistImage = snapshot.data as Uint8List?;
+                                          if (specialistImage != null && specialistImage.isNotEmpty) {
+                                            return Column(
+                                              children: [
+                                                Container(
+                                                  width: 50,
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.grey.withOpacity(0.5),
+                                                        spreadRadius: 2,
+                                                        blurRadius: 5,
+                                                        offset: Offset(0, 3),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Image.memory(
+                                                    specialistImage,
+                                                    width: 90,
+                                                    height: 90,
+                                                    fit: BoxFit.fill,
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          } else {
+                                            // Return an empty Container with an image asset as a placeholder
+                                            return Container(
+                                              width: 60,
+                                              height: 50,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(10.0),
+                                                image: DecorationImage(
+                                                  image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                  fit: BoxFit.fill,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        } else {
+                                          // Return an empty Container with an image asset as a placeholder
+                                          return Container(
+                                            width: 60,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10.0),
+                                              image: DecorationImage(
+                                                image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                fit: BoxFit.fill,
                                               ),
                                             ),
-                                            SizedBox(width: 5),
-                                            _buildOnlineIndicator(
-                                                isSpecialistOnline),
-                                          ],
-                                        ),
-                                        Text(
-                                          '${specialist.specialistTitle}',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ],
+                                          );
+                                        }
+                                      },
                                     ),
-                                  ),
-                                )
+                              ),
+                              SizedBox(width: 10,),
+                              Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Row(
+                                            children: [
+                                              Text(
+                                                '${specialist.specialistName}',
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+                                              SizedBox(width: 5),
+                                              _buildOnlineIndicator(
+                                                  isSpecialistOnline),
+                                            ],
+                                          ),
+                                          Text(
+                                            '${specialist.specialistTitle}',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                               ],
+                                    ),
+                                  )
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -464,6 +602,12 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
         unselectedItemColor: Colors.grey,
       ),
     );
+  }
+
+  buildListView(
+
+      ) {
+
   }
 
 // Future<void> _loadData() async {

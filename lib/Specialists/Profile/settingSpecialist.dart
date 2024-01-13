@@ -128,7 +128,7 @@ Future<void> _loadSpecialistImage() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
     String storedPhone = prefs.getString("phone") ?? "";
-    String storedName = prefs.getString("patientName") ?? "";
+    String storedName = prefs.getString("specialistName") ?? "";
 
     setState(() {
       specialistID = storedSpecialistID;
