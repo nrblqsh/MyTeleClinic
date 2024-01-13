@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -5,6 +6,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 //import 'package:my_teleclinic/Chatbox/chatbox.dart';
 //import '../../Map/mapLocation.dart';
+import '../../Main/main.dart';
+import '../../Specialists/ZegoCloud/videocall_zegocloud.dart';
 import '../../VideoConsultation/videocall_page.dart';
 import '../Chatbox/chatbox.dart';
 import '../EMR/add_vital_info.dart';
@@ -15,6 +18,9 @@ import '../Map/mapLocation.dart';
 import '../Telemedicine/view_appointment.dart';
 import '../Telemedicine/view_specialist.dart';
 import 'settings.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 
 class HomePage extends StatefulWidget {
   final String phone;
@@ -40,44 +46,30 @@ class _HomePageState extends State<HomePage> {
   int newMessagesCount = 0;
   Position? userLocation;
 
-  void checkForNewMessages() {
-    int newMessagesCount = /* Your logic to get the count of new messages */ 0;
+  int consultationID=33;
 
-    setState(() {
-      hasNewMessage = newMessagesCount > 0;
-    });
-  }
+
+
 
   @override
   void initState() {
     _loadData();
-    checkForNewMessages();
+    getFCMToken(patientID); // Add this line to retrieve the FCM token
     super.initState();
     getUserLocation();
-  }
 
-  Future<void> _loadData() async {
-    setState(() {
-      phone = widget.phone;
-      patientName = widget.patientName;
-      patientID = widget.patientID;
-    });
-    print(patientID);
-
-
-  }
-
-  Future<void> getUserLocation() async {
-    await Geolocator.requestPermission().then((value) {
-      if (value == LocationPermission.denied) {
-        print('Location permission denied');
-      }
-    }).onError((error, stackTrace) {
-      print('error $error');
+    // Handle incoming FCM messages
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      handleIncomingCall(message);
     });
 
-    userLocation = await Geolocator.getCurrentPosition();
+    // Handle when the app is opened by tapping on the notification
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      handleIncomingCall(message);
+    });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -153,13 +145,25 @@ class _HomePageState extends State<HomePage> {
                         var statusMicrophone = await Permission.microphone.request();
 
                         if (statusCamera.isGranted && statusMicrophone.isGranted) {
-                          // Permissions granted, navigate to ChatboxScreen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CallPage(),
-                            ),
-                          );
+                          String? callID = await getCallID(consultationID);
+                          if (callID != null) {
+                            // Handle the case where the channel name is not null
+                            print('callID: $callID');
+                            print("tess$consultationID");
+                            print(patientName);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MyCall(callID: callID,id:
+                                patientID.toString(),
+                                  name: patientName, ),
+                              ),
+                            );
+                          } else {
+                            // Handle the case where the channel name is null
+                            print('Failed to get channel name from backend.');
+                          }
+
                         } else {
                           // Permissions not granted, show an alert or handle accordingly
                           showDialog(
@@ -465,7 +469,123 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+  // Handle incoming call notification
+  void handleIncomingCall(RemoteMessage message) {
+    // Extract information from the FCM message
+    final Map<String, dynamic> data = message.data;
+    final String callId = data['call_id'];
+
+    // Show an incoming call dialog or navigate to the call screen
+    // For simplicity, let's assume you have a widget named IncomingCallScreen
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Incoming Video Call'),
+        content: Text('You have an incoming video call from the caller.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Reject the call
+              Navigator.pop(context);
+            },
+            child: Text('Reject'),
+          ),
+          TextButton(
+            onPressed: () {
+              // Accept the call and navigate to the call screen
+              Navigator.pop(context);
+              navigateToCallScreen(callId);
+            },
+            child: Text('Accept'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Navigate to the video call screen
+  void navigateToCallScreen(String callId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MyCall(
+        callID: callId,
+        id: patientID.toString(),
+        name: patientName,)),
+    );
+  }
+
+
+
+
+  Future<void> _loadData() async {
+    setState(() {
+      phone = widget.phone;
+      patientName = widget.patientName;
+      patientID = widget.patientID;
+    });
+    print(patientID);
+
+
+  }
+
+
+  Future<String?> getCallID(int consultationID) async {
+    final response = await http.get(
+      Uri.parse('http://${MyApp.ipAddress}/teleclinic/dynamicCallID.php?consultationID=$consultationID'),
+    );
+
+    if (response.statusCode == 200) {
+      // Parse the JSON response and return the channel name
+      Map<String, dynamic> data = jsonDecode(response.body);
+      return data['dynamicCallID'];
+    } else {
+      // Handle error (e.g., server error, network error)
+      throw Exception('Failed to get channel from backend');
+    }
+  }
+
+  Future<void> getUserLocation() async {
+    await Geolocator.requestPermission().then((value) {
+      if (value == LocationPermission.denied) {
+        print('Location permission denied');
+      }
+    }).onError((error, stackTrace) {
+      print('error $error');
+    });
+
+    userLocation = await Geolocator.getCurrentPosition();
+  }
+
+  Future<String?> getFCMToken(int patientID) async {
+    final FirebaseMessaging _firebaseMessaging =  FirebaseMessaging.instance;
+
+    String? fcmToken = await _firebaseMessaging.getToken();   //get token from firebase
+
+    print('FCM Token: $fcmToken');
+    try {
+
+      final response = await http.post(
+        Uri.parse('http://${MyApp.ipAddress}/teleclinic/getFCMToken.php'),
+        body: {
+          'patientID': patientID.toString(),
+          'fcmToken': fcmToken,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Status updated successfully');
+        setState(() {});
+      } else {
+        print('Failed to update status. Status Code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error updating status: $e');
+    }
+  }
+
+
 }
+
 
 int hexColor(String color) {
   String newColor = '0xff' + color;

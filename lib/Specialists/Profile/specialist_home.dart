@@ -1,18 +1,27 @@
+import 'dart:convert';
+import 'dart:math';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+//import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:my_teleclinic/Model/specialist.dart';
 import 'package:my_teleclinic/Specialists/Consultation/patient_consultation_history.dart';
 import 'package:my_teleclinic/Specialists/Profile/settingSpecialist.dart';
 import 'package:my_teleclinic/Specialists/Consultation/specialist_consultation_history.dart';
 import 'package:my_teleclinic/Specialists/Consultation/viewUpcomingAppointment.dart';
 import 'package:my_teleclinic/Specialists/PatientInfo/view_patient.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:my_teleclinic/Specialists/ZegoCloud/videocall_zegocloud.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import '../../Model/consultation.dart';
 import '../../Patients/Telemedicine/view_appointment.dart';
 import '../../Patients/Profile/settings.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 
 
 //import '../../VideoCall/videocall_page.dart';
@@ -210,11 +219,69 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   late Future<List<Consultation>>? futureConsultations;
+  late int patientID;
 
+  late int specialistID;
+  late String specialistName;
+  String dynamicCallID = ''; // Declare dynamicCallID here as a class variable
+
+
+
+
+  Future<void> _loadDetails() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      patientID = pref.getInt("patientID") ?? 0;
+      specialistID = pref.getInt("specialistID") ?? 0;
+      specialistName = pref.getString("specialistName") ?? '';
+      print("testttt$specialistName");
+      print(specialistID);
+      print(patientID);
+
+
+      // Add createMenuScreen() after loading specialist details
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    // FirebaseMessaging.onMessage.listen((RemoteMessage message){
+    //   String? title = message.notification!.title;
+    //   String? body = message.notification!.body;
+    //   AwesomeNotifications().createNotification(content: NotificationContent(id: 1,
+    //       channelKey: "call_channel",
+    //       title: title,
+    //       body: body,
+    //       category:NotificationCategory.Call,
+    //       wakeUpScreen: true,
+    //       fullScreenIntent: true,
+    //       autoDismissible: false,
+    //       backgroundColor: Colors.orangeAccent
+    //   ),
+    //
+    //       actionButtons:[ NotificationActionButton(key: "Accept", label: "Accept Call",
+    //           color:Colors.green,
+    //           autoDismissible: true),
+    //
+    //         NotificationActionButton(key: "Decline", label: "Decline Call",
+    //             color:Colors.green,
+    //             autoDismissible: true)
+    //
+    //       ]
+    //   );
+        // AwesomeNotifications().actionStream.listen((event){
+        //   if(event.buttonKeyPressed=="REJECT"){
+        //     print("call reject");
+        //   }
+        //   else if(event.buttonKeyPressed=="Accept"){
+        //     print("accept");
+        //   }
+    //     // });
+    // });
+
+
+    _loadDetails();
     futureConsultations =
     widget.fetchTodayConsultations() as Future<List<Consultation>>?;
   }
@@ -334,7 +401,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
                 ),
               ),
-          
+
 
     SizedBox(height: 30),
               Text(
@@ -561,6 +628,9 @@ class _MenuScreenState extends State<MenuScreen> {
                                                                                 ),
                                                                                 TextButton(
                                                                                   onPressed: () async {
+
+                                                                                    int? consultationID = consult.consultationID;
+                                                                                    print("consullttt$consultationID");
                                                                                     // Check and request camera and microphone permissions
                                                                                     var statusCamera = await Permission.camera.request();
                                                                                     var statusMicrophone = await Permission.microphone.request();
@@ -600,17 +670,23 @@ class _MenuScreenState extends State<MenuScreen> {
 
                                                                         if (confirmed == true) {
                                                                           try {
-                                                                            Navigator.push(
-                                                                              context,
-                                                                              MaterialPageRoute(
-                                                                                builder: (context) =>
-                                                                                    CallPage(
-                                                                                    ),
-                                                                              ),
-                                                                            );
-                                                                            print("call");
+                                                                            print("masuk");
+                                                                            String specialistIDtoString = specialistID.toString();
+                                                                              dynamicCallID = generateRandomString(15);
+                                                                            print("calllidddd$dynamicCallID");
+
+                                                                            int consultationID = consult.consultationID ?? 0;
+
+
+                                                                            await saveCallIDtoDatabase(consultationID, dynamicCallID);  //save callid dulu dlm db
+                                                                            String? fcmToken = await getFCMTokenfromPatient(patientID);
+                                                                            print("fcm token dalam specialist $fcmToken");
+
+                                                                            await sendFCMNotification(fcmToken!, dynamicCallID, specialistID, specialistName);
+
+
                                                                           } catch (e) {
-                                                                            print('Error updating status: $e');
+                                                                            print('Error during sen: $e');
                                                                           }
                                                                         }
                                                                       },
@@ -730,6 +806,60 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
+  Future<void> sendFCMNotification(String fcmToken,
+      String callID,
+      int specialistID,
+      String specialistName) async {
+    // Replace with your FCM server key
+    String serverKey = 'AAAAE_xNQHA:APA91bHGEwDCm7WqUrcG9hQ9czDxBS-g_v1SOJuYhLvlnS1rYuoHFeqa6ik_QiDeiprHTlri6ZFr7NZXsQVLAtvX7lMyrUo4DE0qCDGIfzwtXyaEi67ygGiEPeBaUJwLdBU4vactlTwT';
+print("masuk sini1");
+    final Uri url = Uri.parse('https://fcm.googleapis.com/fcm/send');
+
+    // Replace with your notification payload
+    final Map<String, dynamic> payload = {
+      'to': fcmToken,
+      'notification': {
+        'title': 'Incoming Call',
+        'body': 'You have an incoming call from the caller.',
+        'sound': 'default', // Add sound if needed
+      },
+      'data': {
+      'call_id': callID,
+      // Include any other data needed to handle the call
+    }    };
+
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MyCall(
+          callID: dynamicCallID,
+          id: specialistID.toString(),
+          name: specialistName,
+        ),
+      ),
+    );
+    print("call");
+
+
+    final http.Response response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'key=$serverKey',
+      },
+      body: jsonEncode(payload),
+    ).timeout(Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      print('Notification sent successfully');
+
+
+    } else {
+      print('Failed to send notification. Status Code: ${response.statusCode}');
+    }
+  }
+
   int _getStatusColor(String status) {
     switch (status) {
       case 'Accepted':
@@ -746,12 +876,54 @@ class _MenuScreenState extends State<MenuScreen> {
     }
   }
 
+  String generateRandomString(int length) {
+    const charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    final random = Random();
+    print(random);
+    return List.generate(length, (index) => charset[random.nextInt(charset.length)]).join();
+  }
+
   int hexColor(String color) {
     String newColor = '0xff' + color;
     newColor = newColor.replaceAll('#', '');
     int finalColor = int.parse(newColor);
     return finalColor;
   }
+
+
+  Future<String?> getFCMTokenfromPatient(int patientID) async {
+    final response = await http.get(
+      Uri.parse('http://${MyApp.ipAddress}/teleclinic/getFCMToken.php?patientID'
+          '=$patientID'),
+    );
+
+    if (response.statusCode == 200) {
+      // Parse the JSON response and return the channel name
+      Map<String, dynamic> data = jsonDecode(response.body);
+      return data['fcmToken'];
+    } else {
+      // Handle error (e.g., server error, network error)
+      throw Exception('Failed to get channel from backend');
+    }
+  }
+
+  Future<String?> saveCallIDtoDatabase(int consultationID,String callID) async {
+    final response = await http.post(
+      Uri.parse('http://${MyApp.ipAddress}/teleclinic/dynamicCallID.php'),
+      body: {
+        'consultationID': consultationID.toString(),
+        'dynamicCallID': dynamicCallID,
+      },
+    );
+    if (response.statusCode == 200) {
+      print('saveCallID successfully');
+      setState(() {});
+    } else {
+      print('Failed to update status. Status Code: ${response.statusCode}');
+    }
+  }
+
+
 
 
 }
