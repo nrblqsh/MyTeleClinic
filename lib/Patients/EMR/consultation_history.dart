@@ -32,7 +32,7 @@ class _ConsultationHistoryState
   String consultationTreatment = '';
   // String medGeneral = '';
   // String medForm = '';
- // late List<Consultation> todayConsultations = [];
+  // late List<Consultation> todayConsultations = [];
 
   @override
   void initState() {
@@ -60,7 +60,7 @@ class _ConsultationHistoryState
     print(" ni patient dia ${patientID}");
   }
   Future<List<Consultation>> fetchPatientConsultation(
-       int patientID) async {
+      int patientID) async {
     Consultation consultation = Consultation(
       consultationID: consultationID  ,
       patientID: patientID,
@@ -169,7 +169,7 @@ class _ConsultationHistoryState
                                             Text(
                                               'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
                                                   'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}\n'
-                                                 // 'Status: ${consult.consultationStatus}\n'
+                                              // 'Status: ${consult.consultationStatus}\n'
                                                   'Consultation Symptom: ${consult.consultationSymptom}\n'
                                                   'Consultation Treatment: ${consult.consultationTreatment}\n',
                                               style: TextStyle(
