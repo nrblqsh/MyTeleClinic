@@ -5,11 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:my_teleclinic/Model/vital_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../Main/main.dart';
 import '../Telemedicine/view_appointment.dart';
 import '../Telemedicine/view_specialist.dart';
-import '../Profile/patient_home_page.dart';
-import '../Profile/settings.dart';
 import 'add_vital_info.dart';
 import 'e_medical_record.dart';
 
@@ -49,7 +46,7 @@ class _CurrentVitalInfoScreenState extends State<CurrentVitalInfoScreen> {
   Future<VitalInfo?> generateVitalInfo() async {
     try {
       var url =
-          'http://${MyApp.ipAddress}/teleclinic/currentVitalInfo.php?patientID=$patientID';
+          'http://192.168.0.116/teleclinic/currentVitalInfo.php?patientID=$patientID';
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {

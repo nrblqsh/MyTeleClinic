@@ -3,9 +3,7 @@
 //     final welcome = welcomeFromJson(jsonString);
 
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../Controller/request_controller.dart';
 import '../Main/main.dart';
 import 'dart:io';
@@ -41,6 +39,7 @@ class Specialist {
     required this.clinicName,
       this.specialistImagePath
 
+
   });
 
   factory Specialist.fromJson(Map<String, dynamic> json) {
@@ -54,6 +53,7 @@ class Specialist {
       logStatus: json["logStatus"] ?? '',
       clinicName: json["clinicName"] ?? '',
       specialistImagePath: base64Decode(json["base64Image"] ?? ''),
+
 
     );
   }
@@ -248,5 +248,41 @@ class Specialist {
       return null;
     }
   }
+
+  static Future<Uint8List?> getSpecialistImage1(int specialistID) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    RequestController req = RequestController(
+      path: "/teleclinic/viewSpecialistImage.php",
+    );
+
+    // Add specialistID as a query parameter
+    req.path = "${req.path}?specialistID=$specialistID";
+
+    try {
+      // Make a GET request using RequestController
+      await req.get();
+
+      if (req.status() == 200) {
+        // Image data is available in the response body
+        //print(' result ${req.result}');
+        return req.result();
+      } else if (req.status() == 404) {
+        // Image not found
+        print('Image not found for specialistID: $specialistID');
+        return null;
+      } else {
+        // Handle other status codes
+        print('Failed to retrieve image. Status: ${req.status()}');
+        return null;
+      }
+    } catch (error) {
+      // Handle any exceptions that might occur during the request
+      print('Error retrieving image: $error');
+      return null;
+    }
+  }
+
+
 }
+
 

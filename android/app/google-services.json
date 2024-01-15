@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "175933602171",
+    "project_id": "myteleclinic-ef990",
+    "storage_bucket": "myteleclinic-ef990.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:175933602171:android:a5fecee749c988864125de",
+        "android_client_info": {
+          "package_name": "com.example.my_teleclinic"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4S8_Naic0JfLAKDTCgLld7eR6Mb4eNzo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

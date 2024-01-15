@@ -313,8 +313,6 @@ class Consultation {
     }
   }
 
-
-
   static Future<Uint8List?> getPatientImage(int patientID) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int specialistID = prefs.getInt("specialistID") ?? 0;

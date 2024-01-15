@@ -72,6 +72,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
     } else {
       throw Exception('Failed to fetch consultations');
     }
+
   }
 
   Future<Specialist?> fetchSpecialistByID(String specialistID) async {
