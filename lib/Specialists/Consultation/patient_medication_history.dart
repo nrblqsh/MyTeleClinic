@@ -163,8 +163,8 @@ class _PatientMedicationHistoryState
                                           CrossAxisAlignment.start,
                                           children: <Widget>[
                                             Text(
-                                              'Date: ${DateFormat('dd/MM/yyyy').format(med.consultationDateTime)}\n'
-                                                  'Time: ${DateFormat('hh:mm a').format(med.consultationDateTime)}\n'
+                                              'Date: ${DateFormat('dd/MM/yyyy').format(med.consultationDateTime!)}\n'
+                                                  'Time: ${DateFormat('hh:mm a').format(med.consultationDateTime!)}\n'
                                                   'Medicine Name: ${med.medGeneral}\n'
                                                   'Medicine Type: ${med.medForm}\n'
                                                   'Medicine Dosage: ${med.dosage}\n'

@@ -18,7 +18,7 @@ class Medication {
   int? medicationID;
   String? medGeneral;
   String? medForm;
-  DateTime consultationDateTime;
+  DateTime? consultationDateTime;
   String? dosage;
   String? medInstruction;
 
@@ -26,11 +26,11 @@ class Medication {
     this.medID,
     this.consultationID,
     this.medicationID,
-    required this.medGeneral,
-    required this.medForm,
-    required this.consultationDateTime,
-    required this.dosage,
-    required this.medInstruction
+    this.medGeneral,
+    this.medForm,
+    this.consultationDateTime,
+    this.dosage,
+    this.medInstruction
   });
 
   factory Medication.fromJson(Map<String, dynamic> json) => Medication(
@@ -39,11 +39,11 @@ class Medication {
     medicationID: json["medicationID"] ??0,
     medGeneral: json["MedGeneral"],
     medForm: json["medForm"],
-    consultationDateTime: DateTime.parse(json['consultationDateTime']),
+    consultationDateTime: json['consultationDateTime']!= null
+        ? DateTime.tryParse(json['consultationDateTime'])
+        : DateTime.parse('0000-00-00'),
     dosage: json["Dosage"],
     medInstruction: json["MedInstruction"],
-
-
   );
 
   Map<String, dynamic> toJson() => {
@@ -73,6 +73,39 @@ class Medication {
       throw Exception('Failed to fetch medications');
     }
   }
+
+  Future<List<Medication>> fetchPatientMedication(int consultationID) async {
+    final String url = 'http://${MyApp.ipAddress}/teleclinic/getPatientMedication.php?consultationID=$consultationID';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (responseData.containsKey('data')) {
+        final nestedData = responseData['data']['data'];
+
+        if (nestedData is List<dynamic>) {
+          // Handle the case when 'data' is a list of objects
+          List<Medication> meds = nestedData
+              .map((medicationData) => Medication.fromJson(medicationData as Map<String, dynamic>))
+              .toList();
+          print('responseData $responseData');
+          print('meds $meds');
+          return meds;
+        } else {
+          throw Exception('Unexpected format for "data" field');
+        }
+      } else {
+        throw Exception('No "data" field in the response');
+      }
+    } else {
+      throw Exception('Failed to fetch medications');
+    }
+  }
+
+
+
+
 
 
 
