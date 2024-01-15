@@ -289,6 +289,10 @@ var uuid = Uuid();
     _loadDetails();
     futureConsultations =
     widget.fetchTodayConsultations() as Future<List<Consultation>>?;
+
+
+
+
   }
 
   @override
@@ -323,6 +327,7 @@ var uuid = Uuid();
                       ),
                     ),
                   ),
+
                   Icon(
                     Icons.star,
                     size: 24,
@@ -390,6 +395,7 @@ var uuid = Uuid();
                               30,
                               Colors.white,
                               'Upcoming\nAppointment',
+
                             ),
                             onTap: () {
                               Navigator.push(
@@ -626,12 +632,14 @@ var uuid = Uuid();
                                                                               title: Text('Confirm Call Patient'),
                                                                               content: Text('Are you sure you want to call this patient?'),
                                                                               actions: [
+
                                                                                 TextButton(
                                                                                   onPressed: () {
                                                                                     Navigator.of(context).pop(false);
                                                                                   },
                                                                                   child: Text('Cancel'),
                                                                                 ),
+
                                                                                 TextButton(
                                                                                   onPressed: () async {
 
@@ -676,6 +684,7 @@ var uuid = Uuid();
 
                                                                         if (confirmed!= null && confirmed) {
                                                                           try {
+                                                                            actionButtion(true);
                                                                             print("masuk");
                                                                             String specialistIDtoString = specialistID.toString();
                                                                               dynamicCallID = generateRandomString(15);
@@ -692,19 +701,33 @@ var uuid = Uuid();
                                                                             print("kjskjdf$patientIDforSendingNotification");
                                                                             sendInAppMessage(pd.toString(), dynamicCallID);
 
-                                                                            // Navigator.push(
-                                                                            //   context,
-                                                                            //   MaterialPageRoute(
-                                                                            //     builder: (context) => MyCall(
-                                                                            //       callID: dynamicCallID,
-                                                                            //       id: specialistIDtoString,
-                                                                            //       name: specialistName,
-                                                                            //       roleId: 1,
-                                                                            //       consultationID: consultationID,
-                                                                            //     ),
-                                                                            //   ),
-                                                                            // );
+
+                                                                            // ZegoSendCallInvitationButton actionButton(bool isVideo)=>
+                                                                            //     ZegoSendCallInvitationButton(
+                                                                            //       isVideoCall:isVideo,
+                                                                            //       resourceID:"zegouikit_call",
+                                                                            //       invitees: [
+                                                                            //         ZegoUIKitUser(id: "1",
+                                                                            //             name: "test")
+                                                                            //       ],
+                                                                            //     );
+                                                                            //
+                                                                            //
+                                                                            // actionButton(true);
+                                                                            Navigator.push(
+                                                                              context,
+                                                                              MaterialPageRoute(
+                                                                                builder: (context) => MyCall(
+                                                                                  callID: dynamicCallID,
+                                                                                  id: specialistIDtoString,
+                                                                                  name: specialistName,
+                                                                                  roleId: 1,
+                                                                                  consultationID: consultationID,
+                                                                                ),
+                                                                              ),
+                                                                            );
                                                                            // _sendNotification( pd);
+
 
 
 
@@ -746,6 +769,7 @@ var uuid = Uuid();
                                           ],
                                         ),
                                         ),
+
 
                                                             if (consult.consultationStatus != 'Accepted' &&
                                                                 consult.consultationStatus != 'Decline' &&
@@ -820,7 +844,16 @@ var uuid = Uuid();
     );
   }
 
+  ZegoSendCallInvitationButton actionButtion(bool isVideo)=>
+      ZegoSendCallInvitationButton(
+        isVideoCall:isVideo,
+        resourceID:"zegouikit_call",
+        invitees: [
+          ZegoUIKitUser(id: "1",
+              name: "test")
+        ],
 
+      );
   Widget customIconWithLabel(
       IconData icon, double size, Color iconColor, String label) {
     int bgColor = hexColor('A34040');
@@ -939,6 +972,7 @@ var uuid = Uuid();
         return Colors.transparent.value; // Default color
     }
   }
+
 
   String generateRandomString(int length) {
     const charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -1062,7 +1096,7 @@ var uuid = Uuid();
       'priority': '10',
       'android_sound': 'hawaii_5_0',
       'vibration_pattern': [0, 300, 500, 300],
-      //'is_in_app': true,
+       'is_in_app': true,
       //'android_background_layout': {'headings_color': 'FFFF0000', 'contents_color': 'FF00FF00'},
       'buttons': [
         {'id': 'accept', 'text': 'Accept'},
@@ -1087,6 +1121,7 @@ var uuid = Uuid();
       print('Failed to send in-app message. Error: ${response.body}');
     }
   }
+
 
 
   Future<String?> saveCallIDtoDatabase(int consultationID,String callID) async {

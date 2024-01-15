@@ -295,21 +295,29 @@ class _MyCallState extends State<MyCall> {
                                //    ),
                                //  );
                                 if(widget.roleId==1){
-                                  Navigator.push(context, MaterialPageRoute(builder
-                                      : (context)=>SpecialistHomeScreen()));
+                                  // Navigator.push(context, MaterialPageRoute(builder
+                                  //     : (context)=>SpecialistHomeScreen()));
+                                   Navigator.of(context).pop(true);
 
                                 }
-                                else if(widget.roleId==0){
-                                  Navigator.push(context, MaterialPageRoute(builder
-                                      : (context)=>HomePage(phone:
-                                  "phone", patientName: "patientName",
-                                      patientID: patientID)));
-                                }
+                                // else if(widget.roleId==0){
+                                //   Navigator.push(context, MaterialPageRoute(builder
+                                //       : (context)=>HomePage(phone:
+                                //   "phone", patientName: "patientName",
+                                //       patientID: patientID)));
+                                // }
                                 }
 
-                              else{
+                              else if(widget.roleId==0){
                                 print("statusX");
-                                      }
+                                // Navigator.push(context, MaterialPageRoute(builder
+                                //           : (context)=>HomePage(phone:
+                                //       "phone", patientName: "patientName",
+                                //           patientID: patientID)));
+                                 Navigator.of(context).pop(true);
+
+
+                              }
 
                                     }
 
@@ -320,8 +328,13 @@ class _MyCallState extends State<MyCall> {
                               );
                             },
                           );
-                        } else {
-                          return null;
+                        } else if(widget.roleId==0) {
+                          // Navigator.push(context, MaterialPageRoute(builder
+                          //     : (context)=>HomePage(phone:
+                          // "phone", patientName: "patientName",
+                          //     patientID: patientID)));
+                           Navigator.of(context).pop(true);
+
                         }
                       },
                     ),
@@ -885,4 +898,74 @@ SizedBox(height: 10,),
       }
     }
   }
+
+  void onUserLogin() {
+    /// 4/5. initialized ZegoUIKitPrebuiltCallInvitationService when account is logged in or re-logged in
+    ZegoUIKitPrebuiltCallInvitationService().init(
+      appID: MyConstant.appId, /*input your AppID*/
+      appSign: MyConstant.appSign /*input your AppSign*/,
+      userID: widget.id,
+      userName: widget.name,
+      plugins: [
+        ZegoUIKitSignalingPlugin(),
+      ],
+      notificationConfig: ZegoCallInvitationNotificationConfig(
+        androidNotificationConfig: ZegoAndroidNotificationConfig(
+          channelID: "ZegoUIKit",
+          channelName: "Call Notifications",
+          sound: "call",
+          icon: "call",
+        ),
+        iOSNotificationConfig: ZegoIOSNotificationConfig(
+          systemCallingIconName: 'CallKitIcon',
+        ),
+      ),
+      requireConfig: (ZegoCallInvitationData data) {
+        final config = (data.invitees.length > 1)
+            ? ZegoCallType.videoCall == data.type
+            ? ZegoUIKitPrebuiltCallConfig.groupVideoCall()
+            : ZegoUIKitPrebuiltCallConfig.groupVoiceCall()
+            : ZegoCallType.videoCall == data.type
+            ? ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
+            : ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall();
+
+       // config.avatarBuilder = customAvatarBuilder;
+
+        /// support minimizing, show minimizing button
+        config.topMenuBarConfig.isVisible = true;
+        config.topMenuBarConfig.buttons
+            .insert(0, ZegoMenuBarButtonName.minimizingButton);
+
+        return config;
+      },
+    );
+  }
 }
+
+
+
+//
+// class CallInvitationPage extends StatelessWidget {
+//   const CallInvitationPage({super.key,
+//   required this.child,
+//   required this.username});
+//
+//
+//   final Widget child;
+//   final String username;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//
+//     );
+//   }
+//   ZegoSendCallInvitationButton actionButton(bool isVideo) =>
+//       ZegoSendCallInvitationButton(
+//         isVideoCall: isVideo,
+//         resourceID: "zegouikit_call", invitees: [
+//           id:
+//       ],
+//
+//       )
+// }

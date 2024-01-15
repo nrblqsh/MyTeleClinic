@@ -1446,21 +1446,21 @@ packages:
     source: hosted
     version: "4.0.1"
   zego_uikit_signaling_plugin:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: zego_uikit_signaling_plugin
-      sha256: e042aa5c28434f0799582b3f321db6084f822c985c83bc8260d6b654f5fa5d06
+      sha256: "01d911157326535eb8948c469d56e9ccde160e6bcded6458934e9a546cedc73d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.7.3"
+    version: "2.7.4"
   zego_zim:
     dependency: transitive
     description:
       name: zego_zim
-      sha256: "85f61176c5806fd33d14fca15b02307af31dfc8e99a84ba96e369f84346fba39"
+      sha256: "37a0480b42e12b2e23ab839adba9084295ab4c407f6f4adb342a923c123ff607"
       url: "https://pub.dev"
     source: hosted
-    version: "2.12.1"
+    version: "2.13.1"
   zego_zpns:
     dependency: transitive
     description:
