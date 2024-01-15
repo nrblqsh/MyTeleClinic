@@ -691,7 +691,7 @@ var uuid = Uuid();
                                                                             print("calllidddd$dynamicCallID");
                                                                             print("specialistID here $specialistID");
                                                                             int consultationID = consult.consultationID ?? 0;
-                                                                            int pd = consult.patientID;
+                                                                            int pd = consult.patientID!;
                                                                             print("Patient ID for sending notification: $pd");
 
 
