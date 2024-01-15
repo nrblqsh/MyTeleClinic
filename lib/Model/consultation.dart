@@ -302,37 +302,37 @@ class Consultation {
   //   }
   // }
 
-  Future<List<Consultation>> fetchTodayConsultationsPatientSide(int patientID) async {
-    final String url = 'http://${MyApp.ipAddress}/teleclinic/getTodayConsultationPatientSide.php?patientID=$patientID';
-    final response = await http.get(Uri.parse(url));
-    print(specialistID);
-    print('Response Status Code: ${response.statusCode}');
-    print('Content-Type: ${response.headers['content-type']}');
-    print('Response Body: ${response.body}');
-
-    if (response.statusCode == 200) {
-      try {
-        dynamic responseBody = json.decode(response.body);
-
-        // Check if the response is a JSON object
-        if (responseBody is Map<String, dynamic> && responseBody.containsKey('data')) {
-          List<Consultation> consultations = List<Consultation>.from(responseBody['data']
-              .map((consultationData) => Consultation.fromJson(consultationData)));
-          return consultations;
-        } else {
-          print('Unexpected response format. Body is not a JSON object.');
-          return [];
-        }
-
-      } catch (e) {
-        print('Error parsing response: $e');
-        throw Exception('Error parsing response: $e');
-      }
-    } else {
-      print('Failed to fetch today\'s consultations. Status Code: ${response.statusCode}');
-      throw Exception('Failed to fetch today\'s consultations. Status Code: ${response.statusCode}');
-    }
-  }
+  // Future<List<Consultation>> fetchTodayConsultationsPatientSide(int patientID) async {
+  //   final String url = 'http://${MyApp.ipAddress}/teleclinic/getTodayConsultationPatientSide.php?patientID=$patientID';
+  //   final response = await http.get(Uri.parse(url));
+  //   print(specialistID);
+  //   print('Response Status Code: ${response.statusCode}');
+  //   print('Content-Type: ${response.headers['content-type']}');
+  //   print('Response Body: ${response.body}');
+  //
+  //   if (response.statusCode == 200) {
+  //     try {
+  //       dynamic responseBody = json.decode(response.body);
+  //
+  //       // Check if the response is a JSON object
+  //       if (responseBody is Map<String, dynamic> && responseBody.containsKey('data')) {
+  //         List<Consultation> consultations = List<Consultation>.from(responseBody['data']
+  //             .map((consultationData) => Consultation.fromJson(consultationData)));
+  //         return consultations;
+  //       } else {
+  //         print('Unexpected response format. Body is not a JSON object.');
+  //         return [];
+  //       }
+  //
+  //     } catch (e) {
+  //       print('Error parsing response: $e');
+  //       throw Exception('Error parsing response: $e');
+  //     }
+  //   } else {
+  //     print('Failed to fetch today\'s consultations. Status Code: ${response.statusCode}');
+  //     throw Exception('Failed to fetch today\'s consultations. Status Code: ${response.statusCode}');
+  //   }
+  // }
 
 
 
@@ -345,12 +345,11 @@ class Consultation {
     if (response.statusCode == 200) {
       try {
         dynamic responseBody = json.decode(response.body);
-<<<<<<< Updated upstream
-=======
+
         print ('response ${response}');
 
         print ('result ${response.body}');
->>>>>>> Stashed changes
+
 
         // Check for a specific condition (404) and handle it gracefully
         if (responseBody is Map<String, dynamic> && responseBody.containsKey('error')) {
