@@ -79,31 +79,66 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     getUserLocation();
 
+    OneSignal.Notifications.addPermissionObserver((state) {
+      print("Has permission " + state.toString());
+    });
+
+    OneSignal.Notifications.addClickListener((event) {
+      print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
+
+      _debugLabelString =
+      "Clicked notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MyCall(callID: "callID",id:
+          patientID.toString(),
+              name: patientName,
+              roleId:0,
+              consultationID: consultationID),
+        ),
+      );
+
+
+    });
+
+    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+      print(
+          'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
+
+      /// Display Notification, preventDefault to not display
+      event.preventDefault();
+
+      /// Do async work
+
+      /// notification.display() to display after preventing default
+      event.notification.display();
+
+
+      _debugLabelString =
+      "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+
+      // navigatorKey.currentState?.push(MaterialPageRoute(
+      //   builder: (context) => SpecialistHomeScreen(),
+      // ));
+    });
     OneSignal.InAppMessages.addClickListener((event) {
-      this.setState(() {
-        _debugLabelString =
-        "In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}";
-      });
+      print("In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}");
     });
 
     OneSignal.InAppMessages.addWillDisplayListener((event) {
       print("ON WILL DISPLAY IN APP MESSAGE ${event.message.messageId}");
-      // Handle the in-app message will display event
     });
-
     OneSignal.InAppMessages.addDidDisplayListener((event) {
       print("ON DID DISPLAY IN APP MESSAGE ${event.message.messageId}");
-      // Handle the in-app message did display event
     });
-
     OneSignal.InAppMessages.addWillDismissListener((event) {
       print("ON WILL DISMISS IN APP MESSAGE ${event.message.messageId}");
-      // Handle the in-app message will dismiss event
     });
-
     OneSignal.InAppMessages.addDidDismissListener((event) {
       print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
-      // Handle the in-app message did dismiss event
     });
 
 
@@ -888,6 +923,8 @@ class _HomePageState extends State<HomePage> {
       throw Exception('Failed to get channel from backend');
     }
   }
+
+
 
   Future<void> getUserLocation() async {
     await Geolocator.requestPermission().then((value) {

@@ -1,3 +1,5 @@
+
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:my_teleclinic/Patients/Profile/CountDown.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import '../Specialists/Profile/specialist_home.dart';
 import '../firebase_options.dart';
 import 'login.dart';
 
@@ -75,6 +78,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  String _debugLabelString = "";
+  bool _requireConsent = false;
+  bool _enableConsentButton = false;
+
 
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
   OneSignal.Debug.setAlertLevel(OSLogLevel.none);
@@ -84,6 +91,83 @@ void main() async {
     print("has permission" + state.toString());
   });
   // Set up Firebase Cloud Messaging
+
+
+
+  // OneSignal.Notifications.addPermissionObserver((state) {
+  //   print("Has permission " + state.toString());
+  // });
+  //
+  // OneSignal.Notifications.addClickListener((event) {
+  //   print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
+  //
+  //     _debugLabelString =
+  //     "Clicked notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+  //
+  // });
+  //
+  // OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+  //   print(
+  //       'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
+  //
+  //   /// Display Notification, preventDefault to not display
+  //   event.preventDefault();
+  //
+  //   /// Do async work
+  //
+  //   /// notification.display() to display after preventing default
+  //   event.notification.display();
+  //
+  //
+  //     _debugLabelString =
+  //     "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+  //
+  //   // navigatorKey.currentState?.push(MaterialPageRoute(
+  //   //   builder: (context) => SpecialistHomeScreen(),
+  //   // ));
+  // });
+  // OneSignal.InAppMessages.addClickListener((event) {
+  //   print("In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}");
+  // });
+  //
+  // OneSignal.InAppMessages.addWillDisplayListener((event) {
+  //   print("ON WILL DISPLAY IN APP MESSAGE ${event.message.messageId}");
+  // });
+  // OneSignal.InAppMessages.addDidDisplayListener((event) {
+  //   print("ON DID DISPLAY IN APP MESSAGE ${event.message.messageId}");
+  // });
+  // OneSignal.InAppMessages.addWillDismissListener((event) {
+  //   print("ON WILL DISMISS IN APP MESSAGE ${event.message.messageId}");
+  // });
+  // OneSignal.InAppMessages.addDidDismissListener((event) {
+  //   print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
+  // });
+
+
+   // _enableConsentButton = _requireConsent;
+
+
+  // OneSignal.InAppMessages.addClickListener((actionResult) {
+  //   // Check if the action result has buttons
+  //   if (actionResult.message?.buttons?.isNotEmpty ?? false) {
+  //     // Handle button clicks
+  //     for (var button in actionResult.message!.buttons!) {
+  //       if (button.id == 'accept') {
+  //         // Handle the 'Accept' button click
+  //         handleAcceptAction();
+  //       } else if (button.id == 'reject') {
+  //         // Handle the 'Reject' button click
+  //         handleRejectAction();
+  //       }
+  //     }
+  //   }
+  // });
+
+
+  OneSignal.InAppMessages.addWillDisplayListener((event) {
+    // Handle the in-app message will display event
+  });
+
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
 
 

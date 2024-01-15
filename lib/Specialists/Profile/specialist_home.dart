@@ -1057,8 +1057,13 @@ var uuid = Uuid();
       'data': {
         'type': 'call',
         'callId': dynamicCallID,
+
       },
-      'is_in_app': true,
+      'priority': '10',
+      'android_sound': 'hawaii_5_0',
+      'vibration_pattern': [0, 300, 500, 300],
+      //'is_in_app': true,
+      //'android_background_layout': {'headings_color': 'FFFF0000', 'contents_color': 'FF00FF00'},
       'buttons': [
         {'id': 'accept', 'text': 'Accept'},
         {'id': 'reject', 'text': 'Reject'},
