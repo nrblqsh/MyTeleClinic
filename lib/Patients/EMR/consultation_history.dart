@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Model/consultation.dart';
 import '../../Model/medication.dart';
+import '../Map/view_clinic_specialist.dart';
+import 'medication_details.dart';
 
 class ConsultationHistory extends StatefulWidget {
   final int patientID;
@@ -32,7 +34,7 @@ class _ConsultationHistoryState
   String consultationTreatment = '';
   // String medGeneral = '';
   // String medForm = '';
- // late List<Consultation> todayConsultations = [];
+  // late List<Consultation> todayConsultations = [];
 
   @override
   void initState() {
@@ -46,11 +48,6 @@ class _ConsultationHistoryState
     print(" ni patient dia ${patientID}");
     setState(() {
       patientID = pref.getInt("patientID") ?? 0;
-      //specialistID = pref.getInt("specialistID") ?? 0;
-      //specialistName = pref.getString("specialistName") ?? '';
-      //logStatus = pref.getString("logStatus") ?? 'OFFLINE';
-      //print("testttt$specialistName");
-      //print(specialistID);
 
       //print(logStatus);
       print(" ni patient dia ${patientID}");
@@ -60,7 +57,7 @@ class _ConsultationHistoryState
     print(" ni patient dia ${patientID}");
   }
   Future<List<Consultation>> fetchPatientConsultation(
-       int patientID) async {
+      int patientID) async {
     Consultation consultation = Consultation(
       consultationID: consultationID  ,
       patientID: patientID,
@@ -82,28 +79,16 @@ class _ConsultationHistoryState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   toolbarHeight: 68,
-      //   backgroundColor: Colors.white,
-      //   title: Center(
-      //     child: Image.asset(
-      //       "asset/MYTeleClinic.png",
-      //       width: 594,
-      //       height: 258,
-      //     ),
-      //   ),
-      // ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          // Align content to the left
           children: [
             Align(
               alignment: Alignment.centerLeft,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  'Consultation History', // Add your test text here
+                  'Consultation History',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -112,7 +97,7 @@ class _ConsultationHistoryState
               ),
             ),
             Container(
-              child: FutureBuilder(
+              child: FutureBuilder<List<Consultation>>(
                 future: fetchPatientConsultation(patientID),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -120,67 +105,83 @@ class _ConsultationHistoryState
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
-                    List<Consultation>? consultations =
-                    snapshot.data as List<Consultation>?;
-                    print ("data ${snapshot.data}");
-                    if (consultations != null && consultations.isNotEmpty) {
+                    List<Consultation> consultations = snapshot.data!;
+
+                    if (consultations.isNotEmpty) {
                       return ListView.builder(
                         itemCount: consultations.length,
                         shrinkWrap: true,
                         itemBuilder: (BuildContext context, index) {
                           Consultation consult = consultations[index];
                           return Card(
-                            child: InkWell(
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 15, right: 15, top: 10),
-                                child: Column(
-                                  children: [
-                                    SizedBox(
-                                      width: 700,
-                                      height: 130,
-                                      child: Container(
-                                        padding: EdgeInsets.only(
-                                            left: 12, right: 12, top: 10),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: Colors.blueAccent),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(12.0)),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.blueGrey,
-                                              offset: const Offset(5.0, 5.0),
-                                              blurRadius: 10.0,
-                                              spreadRadius: 2.0,
-                                            ),
-                                            BoxShadow(
-                                              color: Colors.white,
-                                              offset: const Offset(0.0, 0.0),
-                                              blurRadius: 0.0,
-                                              spreadRadius: 0.0,
-                                            ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(
-                                              'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
-                                                  'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}\n'
-                                                 // 'Status: ${consult.consultationStatus}\n'
-                                                  'Consultation Symptom: ${consult.consultationSymptom}\n'
-                                                  'Consultation Treatment: ${consult.consultationTreatment}\n',
-                                              style: TextStyle(
-                                                fontSize: 14,
+                            child: GestureDetector(
+                              onTap: () async {
+                                Consultation consult = consultations[index];
+                                final int selectedConsultationID = int.parse('${consult.consultationID}');
+                                print('consult id tapped - $selectedConsultationID');
+
+                                final SharedPreferences pref = await SharedPreferences.getInstance();
+                                await pref.setInt("consultationID", selectedConsultationID);
+                                print('consult id dalam shared pref - $selectedConsultationID');
+                                // setState(() {
+                                //   // If you have any synchronous state updates, you can put them here
+                                //   // For example: someSynchronousVariable = newValue;
+                                // });
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MedicationDetails(consultationID: selectedConsultationID),
+                                  ),
+                                );
+                              },
+
+                              child: InkWell(
+                                child: Container(
+                                  padding: EdgeInsets.only(left: 15, right: 15, top: 10),
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        width: 700,
+                                        height: 90,
+                                        child: Container(
+                                          padding: EdgeInsets.only(left: 12, right: 12, top: 10),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(color: Colors.blueAccent),
+                                            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.blueGrey,
+                                                offset: const Offset(5.0, 5.0),
+                                                blurRadius: 10.0,
+                                                spreadRadius: 2.0,
                                               ),
-                                            ),
-                                          ],
+                                              BoxShadow(
+                                                color: Colors.white,
+                                                offset: const Offset(0.0, 0.0),
+                                                blurRadius: 0.0,
+                                                spreadRadius: 0.0,
+                                              ),
+                                            ],
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Text(
+                                                'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
+                                                    'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}\n'
+                                                    'Specialist: ${consult.specialistName}\n',
+                                                    //'Consultation Treatment: ${consult.consultationTreatment}\n',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    )
-                                  ],
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -201,6 +202,7 @@ class _ConsultationHistoryState
       ),
     );
   }
+
 
 // void _showConsultationMedicationDialog(BuildContext context, Medication medication) {
 //   showDialog(
