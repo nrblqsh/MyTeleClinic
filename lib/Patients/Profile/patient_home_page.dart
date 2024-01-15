@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:my_teleclinic/Patients/Profile/CountDown.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:timer_count_down/timer_count_down.dart';
@@ -52,6 +53,9 @@ class _HomePageState extends State<HomePage> {
   String consultationSymptom='';
   String consultationTreatment = '';
   String specialistName = '';
+  //late String callId;
+  String _debugLabelString = ""; // Add this line
+
 
 
 
@@ -75,15 +79,45 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     getUserLocation();
 
-    // Handle incoming FCM messages
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      handleIncomingCall(message);
+    OneSignal.InAppMessages.addClickListener((event) {
+      this.setState(() {
+        _debugLabelString =
+        "In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
     });
 
-    // Handle when the app is opened by tapping on the notification
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      handleIncomingCall(message);
+    OneSignal.InAppMessages.addWillDisplayListener((event) {
+      print("ON WILL DISPLAY IN APP MESSAGE ${event.message.messageId}");
+      // Handle the in-app message will display event
     });
+
+    OneSignal.InAppMessages.addDidDisplayListener((event) {
+      print("ON DID DISPLAY IN APP MESSAGE ${event.message.messageId}");
+      // Handle the in-app message did display event
+    });
+
+    OneSignal.InAppMessages.addWillDismissListener((event) {
+      print("ON WILL DISMISS IN APP MESSAGE ${event.message.messageId}");
+      // Handle the in-app message will dismiss event
+    });
+
+    OneSignal.InAppMessages.addDidDismissListener((event) {
+      print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
+      // Handle the in-app message did dismiss event
+    });
+
+
+    //  handleNotification(context, 'accept', callId);
+
+    // Handle incoming FCM messages
+    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    //   handleIncomingCall(message);
+    // });
+    //
+    // // Handle when the app is opened by tapping on the notification
+    // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    //   handleIncomingCall(message);
+    // });
   }
 
 
@@ -176,7 +210,8 @@ class _HomePageState extends State<HomePage> {
                                   builder: (context) => MyCall(callID: callID,id:
                                   patientID.toString(),
                                     name: patientName,
-                                  roleId:0),
+                                  roleId:0,
+                                      consultationID: consultationID),
                                 ),
                               );
                             } else {
@@ -547,44 +582,45 @@ class _HomePageState extends State<HomePage> {
     );
   }
   // Handle incoming call notification
-  void handleIncomingCall(RemoteMessage message) {
-    // Extract information from the FCM message
-    final Map<String, dynamic> data = message.data;
-    final String callId = data['call_id'];
-
-    // Show an incoming call dialog or navigate to the call screen
-    // For simplicity, let's assume you have a widget named IncomingCallScreen
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Incoming Video Call'),
-        content: Text('You have an incoming video call from the caller.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Reject the call
-              Navigator.pop(context);
-            },
-            child: Text('Reject'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Accept the call and navigate to the call screen
-              Navigator.pop(context);
-              navigateToCallScreen(callId);
-            },
-            child: Text('Accept'),
-          ),
-        ],
-      ),
-    );
-  }
+  // void handleIncomingCall(RemoteMessage message) {
+  //   // Extract information from the FCM message
+  //   final Map<String, dynamic> data = message.data;
+  //   final String callId = data['call_id'];
+  //
+  //   // Show an incoming call dialog or navigate to the call screen
+  //   // For simplicity, let's assume you have a widget named IncomingCallScreen
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: Text('Incoming Video Call'),
+  //       content: Text('You have an incoming video call from the caller.'),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () {
+  //             // Reject the call
+  //             Navigator.pop(context);
+  //           },
+  //           child: Text('Reject'),
+  //         ),
+  //         TextButton(
+  //           onPressed: () {
+  //             // Accept the call and navigate to the call screen
+  //             Navigator.pop(context);
+  //             navigateToCallScreen(callId);
+  //           },
+  //           child: Text('Accept'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   // Navigate to the video call screen
   void navigateToCallScreen(String callId) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => MyCall(
+          consultationID: consultationID,
         callID: callId,
         id: patientID.toString(),
         name: patientName,
@@ -740,6 +776,7 @@ class _HomePageState extends State<HomePage> {
                                                     context,
                                                     MaterialPageRoute(
                                                       builder: (context) => MyCall(
+                                                        consultationID: consultationID,
                                                         callID: callID,
                                                         id: patientID.toString(),
                                                         name: patientName,
@@ -907,6 +944,44 @@ class _HomePageState extends State<HomePage> {
         return Colors.transparent.value; // Default color
     }
   }
+
+  // Future<void> initOneSignal() async {
+  //   OneSignal.setInAppMessageClickedHandler((OSInAppMessageAction action) {
+  //     // Handle in-app message click
+  //     print("In-App Message clicked: ${action.clickName}");
+  //     // You can navigate to a specific page or perform any action based on the clickName
+  //   });
+  //   OneSignalInAppMessages
+  //
+  //   // Other OneSignal initialization code goes here
+  //   // ...
+  //
+  //   // Example: Setting up notification handling
+  //   OneSignal.shared.setNotificationReceivedHandler((OSNotification notification) {
+  //     // Handle notification received
+  //     print("Notification received: ${notification.payload}");
+  //   });
+  // }
+  //   // Add a subscription listener to handle incoming notifications
+  //
+  // }
+
+  // Future<void> handleNotification(BuildContext context, String action, String callId) async {
+  //   // You can implement the logic here based on the action received
+  //   if (action == 'accept') {
+  //     // Navigate to the MyCall page with the callId
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => MyCall(callID: callId,
+  //           id: patientID.toString(),
+  //           name: patientName.toString(),consultationID: consultationID,
+  //           roleId: 0,
+  //       )),
+  //     );
+  //   } else if (action == 'reject') {
+  //     // Handle rejection logic
+  //   }
+  // }
 
   Widget buildCountdownWidget() {
     return Consumer<CountdownProvider>(

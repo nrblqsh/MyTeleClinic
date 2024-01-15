@@ -31,7 +31,7 @@ class Consultation {
 
   //String? specialistTitle;
   //int procedureID;
-  double? feesConsultation;
+  String? feesConsultation;
 
   Consultation({
     this.consultationID,

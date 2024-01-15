@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:my_teleclinic/Patients/Profile/CountDown.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
-
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import '../firebase_options.dart';
 import 'login.dart';
 
@@ -51,6 +51,8 @@ Future<void> backgroundHandler(RemoteMessage message) async {
 }
 
 
+
+
 void main() async {
   // // Initialize Awesome Notifications
   // await AwesomeNotifications().initialize(
@@ -74,8 +76,16 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+  OneSignal.Debug.setAlertLevel(OSLogLevel.none);
+  OneSignal.initialize("59bae8a4-4acb-4435-9edf-c5e794ac1f37");
+  OneSignal.Notifications.requestPermission(true);
+  OneSignal.Notifications.addPermissionObserver((state) {
+    print("has permission" + state.toString());
+  });
   // Set up Firebase Cloud Messaging
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+
 
   // Initialize ZegoUIKit
   ZegoUIKit().initLog().then((value) {
@@ -86,7 +96,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  static final String ipAddress = "172.20.10.7";
+  static final String ipAddress = "192.168.8.186";
   static final String clinicPath = "/teleclinic/clinic.php";
 
   @override

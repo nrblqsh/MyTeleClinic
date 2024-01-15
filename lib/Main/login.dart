@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_teleclinic/Patients/Profile/register.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_teleclinic/Specialists/ZegoCloud/constants.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
@@ -80,6 +81,8 @@ class _LoginScreenState extends State<LoginScreen> {
           await pref.setString("patientName", patientName);
           await pref.setInt("patientID", patientID);
           // Save patient name in SharedPreferences
+          int? patientId = int.tryParse(patientID.toString());
+          OneSignal.login(patientId.toString());
 
           Navigator.push(
             context,
