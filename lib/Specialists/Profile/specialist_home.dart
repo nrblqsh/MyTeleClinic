@@ -14,6 +14,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:my_teleclinic/Specialists/ZegoCloud/videocall_zegocloud.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import '../../Model/consultation.dart';
 import '../../Patients/Telemedicine/view_appointment.dart';
@@ -135,6 +136,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
     );
   }
 
+  var uuid = Uuid();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -227,6 +229,7 @@ class _MenuScreenState extends State<MenuScreen> {
   late String specialistName;
   String dynamicCallID = ''; // Declare dynamicCallID here as a class variable
 
+var uuid = Uuid();
 
 
 
@@ -535,7 +538,8 @@ class _MenuScreenState extends State<MenuScreen> {
                                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                           children: [
                                                             if (consult.consultationStatus != 'Accepted' &&
-                                                                consult.consultationStatus != 'Decline')
+                                                                consult.consultationStatus != 'Decline'&&
+                                                                consult.consultationStatus != 'Done')
                                                               Column(
                                                                 children: [
                                                                   IconButton(
@@ -678,22 +682,47 @@ class _MenuScreenState extends State<MenuScreen> {
                                                                             print("calllidddd$dynamicCallID");
                                                                             print("specialistID here $specialistID");
                                                                             int consultationID = consult.consultationID ?? 0;
+                                                                            int pd = consult.patientID;
+                                                                            print("Patient ID for sending notification: $pd");
 
 
                                                                             await saveCallIDtoDatabase(consultationID, dynamicCallID);
-                                                                            print(patientID);
-                                                                            Navigator.push(
-                                                                              context,
-                                                                              MaterialPageRoute(
-                                                                                builder: (context) => MyCall(
-                                                                                  callID: dynamicCallID,
-                                                                                  id: specialistIDtoString,
-                                                                                  name: specialistName,
-                                                                                  roleId: 1,
-                                                                                ),
-                                                                              ),
-                                                                            );
-                                                                            //save callid dulu dlm db
+                                                                            var patientIDforSendingNotification = uuid.v4(); // Use the original patient ID
+                                                                            //
+                                                                            print("kjskjdf$patientIDforSendingNotification");
+                                                                            sendInAppMessage(pd.toString(), dynamicCallID);
+
+                                                                            // Navigator.push(
+                                                                            //   context,
+                                                                            //   MaterialPageRoute(
+                                                                            //     builder: (context) => MyCall(
+                                                                            //       callID: dynamicCallID,
+                                                                            //       id: specialistIDtoString,
+                                                                            //       name: specialistName,
+                                                                            //       roleId: 1,
+                                                                            //       consultationID: consultationID,
+                                                                            //     ),
+                                                                            //   ),
+                                                                            // );
+                                                                           // _sendNotification( pd);
+
+
+
+
+                                                                            //await sendCallNotificationWithInAppActions(patientIDforSendingNotification, dynamicCallID);
+
+                                                                            // Navigator.push(
+                                                                            //   context,
+                                                                            //   MaterialPageRoute(
+                                                                            //     builder: (context) => MyCall(
+                                                                            //       callID: dynamicCallID,
+                                                                            //       id: specialistIDtoString,
+                                                                            //       name: specialistName,
+                                                                            //       roleId: 1,
+                                                                            //     ),
+                                                                            //   ),
+                                                                            // );
+                                                                            // //save callid dulu dlm db
                                                                             String? fcmToken = await getFCMTokenfromPatient(consultationID);
                                                                             print("fcm token dalam specialist $fcmToken");
 
@@ -701,7 +730,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                                                             if (fcmToken != null) {
 
 
-                                                                              await sendFCMNotification(fcmToken, dynamicCallID, specialistID, specialistName);
+                                                                            //  await sendFCMNotification(fcmToken, dynamicCallID, specialistID, specialistName);
                                                                             } else {
                                                                               print('FCM token is null. Cannot send notification.');
                                                                             }
@@ -719,7 +748,8 @@ class _MenuScreenState extends State<MenuScreen> {
                                         ),
 
                                                             if (consult.consultationStatus != 'Accepted' &&
-                                                                consult.consultationStatus != 'Decline')
+                                                                consult.consultationStatus != 'Decline' &&
+                                                                consult.consultationStatus != 'Done')
                                                               Column(
                                                                 children: [
                                                                   IconButton(
@@ -900,6 +930,9 @@ class _MenuScreenState extends State<MenuScreen> {
       case 'Pending':
       // Use your hexColor function here for the desired color
         return hexColor('FFC000');
+      case 'Done':
+      // Use your hexColor function here for the desired color
+        return hexColor('024362');
       case 'CustomColor': // Add a case for a custom color
         return hexColor('1A2B3C'); // Replace with your custom hexadecimal color
       default:
@@ -940,6 +973,121 @@ class _MenuScreenState extends State<MenuScreen> {
       throw Exception('Failed to get channel from backend');
     }
   }
+
+  // Future<void> sendCallNotificationWithInAppActions(String patientIDforSendingNotification, String dynamicCallID) async {
+  //   final String apiKey = "Y2E0YjA1YjEtOTVmYy00ZGRmLWI3YmQtNWNmYTExY2ZjNTlj";
+  //   final String appId = "59bae8a4-4acb-4435-9edf-c5e794ac1f37";
+  //
+  //   print("ha tatau la$patientIDforSendingNotification");
+  //   try {
+  //     final response = await http.post(
+  //       Uri.parse('https://onesignal.com/api/v1/notifications'),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': 'Basic $apiKey',
+  //       },
+  //       body: jsonEncode({
+  //         'app_id': appId,
+  //         'include_player_ids': [patientIDforSendingNotification],
+  //         'contents': {'en': 'You have a call'},
+  //         'data': {
+  //           'type': 'call',
+  //           'callId': dynamicCallID,
+  //         },
+  //         'buttons': [
+  //           {'id': 'accept', 'text': 'Accept'},
+  //           {'id': 'reject', 'text': 'Reject'},
+  //         ],
+  //         //'in_app_url': 'YOUR_IN_APP_MESSAGE_URL', // Provide the URL to your in-app message
+  //       }),
+  //     );
+  //
+  //     print("sicces");
+  //     print(response.body);
+  //   } catch(e){
+  //     print('Error sending notification: $e');
+  //
+  //   }
+  // }
+
+
+
+  Future<void> _sendNotification(int patientID) async {
+    final response = await http.post(
+      Uri.parse('https://onesignal.com/api/v1/notifications'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Basic NzVmMDZkOTktNmYzZS00NzgyLWIxOWItYTM1MTlkMDBiZjA0',
+      },
+      body: jsonEncode({
+        "app_id": "59bae8a4-4acb-4435-9edf-c5e794ac1f37",
+        "include_external_user_ids": [patientID.toString()],
+        "contents": {"en": "Test notification"},
+        'data': {
+                  'type': 'call',
+                  'callId': dynamicCallID,
+                },
+        'buttons': [
+                  {'id': 'accept', 'text': 'Accept'},
+                  {'id': 'reject', 'text': 'Reject'},
+                ],
+
+
+      }),
+    );
+
+
+
+    if (response.statusCode == 200) {
+      print('Notification sent successfully');
+    } else {
+      print('Failed to send notification. Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+    }
+  }
+
+
+  Future<void> sendInAppMessage(String playerId, String dynamicCallID) async {
+    final String oneSignalApiUrl = 'https://onesignal.com/api/v1/notifications';
+
+    final Map<String, dynamic> inAppMessage = {
+      'app_id': "59bae8a4-4acb-4435-9edf-c5e794ac1f37",
+      "include_external_user_ids": [playerId],
+      'contents': {'en': 'Hello, this is a test in-app message!'},
+      'data': {
+        'type': 'call',
+        'callId': dynamicCallID,
+
+      },
+      'priority': '10',
+      'android_sound': 'hawaii_5_0',
+      'vibration_pattern': [0, 300, 500, 300],
+      //'is_in_app': true,
+      //'android_background_layout': {'headings_color': 'FFFF0000', 'contents_color': 'FF00FF00'},
+      'buttons': [
+        {'id': 'accept', 'text': 'Accept'},
+        {'id': 'reject', 'text': 'Reject'},
+      ],
+    };
+
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Basic NzVmMDZkOTktNmYzZS00NzgyLWIxOWItYTM1MTlkMDBiZjA0',
+    };
+
+    final http.Response response = await http.post(
+      Uri.parse(oneSignalApiUrl),
+      headers: headers,
+      body: json.encode(inAppMessage),
+    );
+
+    if (response.statusCode == 200) {
+      print('In-app message sent successfully');
+    } else {
+      print('Failed to send in-app message. Error: ${response.body}');
+    }
+  }
+
 
   Future<String?> saveCallIDtoDatabase(int consultationID,String callID) async {
     final response = await http.post(

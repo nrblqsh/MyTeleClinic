@@ -31,7 +31,9 @@ class Consultation {
   // String? MedForm;
 
   //String? specialistTitle;
-  //int procedureID;
+  //int pro
+  String? feesConsultation;
+
 
   Consultation({
     this.consultationID,
