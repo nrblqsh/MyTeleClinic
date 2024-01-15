@@ -126,9 +126,9 @@ class _MyCallState extends State<MyCall> {
     if (meds.isNotEmpty) {
       for (Medication med in meds) {
         setState(() {
-          _medID = med.medID;
-          _consultationID = med.consultationID;
-          _medicationID = med.medicationID;
+          _medID = med.medID!;
+          _consultationID = med.consultationID!;
+          _medicationID = med.medicationID!;
           _medGeneral = med.medGeneral;
           _medForm = med.medForm;
           _dosage = med.dosage;
