@@ -12,6 +12,8 @@ buildscript {
         classpath ("com.google.gms:google-services:4.4.0")
         //classpath 'com.google.firebase:firebase-messaging-gradle:23.0.0'
         classpath 'com.google.firebase:firebase-messaging:21.1.0'
+        //implementation 'com.onesignal:OneSignal:[5.0.0-beta, 5.99.99]'
+
         //classpath 'com.android.support:multidex:2.0.1' // Use version 1.0.3 or a different version if needed
 
 
