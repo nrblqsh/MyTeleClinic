@@ -156,11 +156,11 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
   Future<void> _loadData()  async{
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     int storedID = prefs.getInt("patientID") ?? 0;
-    //int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
+    int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
 
     setState(() {
       patientID = storedID;
-      specialistID = widget.specialistID;
+      specialistID = storedSpecialistID;
       patientIDController.text = patientID.toString();
       specialistIDController.text = specialistID.toString();
     });

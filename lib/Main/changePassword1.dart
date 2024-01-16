@@ -57,7 +57,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
        await _getPatientID();
 
       final response = await http.post(
-        Uri.http("192.168.0.116", '/teleclinic/changePassword1.php', {'q': '{http}'}),
+        Uri.http("192.168.229.150", '/teleclinic/changePassword1.php', {'q': '{http}'}),
         body: {
           'patientID': patientID.toString(),
           'oldPassword': oldPasswordController.text,

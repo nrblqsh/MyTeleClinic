@@ -62,17 +62,25 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
     if (response.statusCode == 200) {
       final List<dynamic> responseData = json.decode(response.body);
 
-      // Filter consultations based on patientID
-      List<Consultation> patientConsultations = responseData
+      // Convert response data to a list of Consultation objects
+      List<Consultation> allConsultations = responseData
           .map((data) => Consultation.fromJson(data))
+          .toList();
+
+      // Filter consultations based on patientID
+      List<Consultation> patientConsultations = allConsultations
           .where((consultation) => consultation.patientID == patientID)
           .toList();
+
+      // Sort patientConsultations based on appointment date in descending order
+      patientConsultations.sort((a, b) => b.consultationDateTime.compareTo(a.consultationDateTime));
 
       return patientConsultations;
     } else {
       throw Exception('Failed to fetch consultations');
     }
   }
+
 
   Future<Specialist?> fetchSpecialistByID(String specialistID) async {
     final String url = 'http://${MyApp.ipAddress}/teleclinic/viewSpecialist.php';
@@ -102,6 +110,28 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
       // Handle error as needed
     }
   }
+
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Accepted':
+        return Colors.green;
+      case 'Decline':
+        return Colors.red;
+      case 'Pending':
+      // Use your hexColor function here for the desired color
+        return hexColor('FFC000');
+      default:
+        return Colors.transparent; // Default color
+    }
+  }
+
+  Color hexColor(String color) {
+    String newColor = '0xff' + color.replaceAll('#', '');
+    int finalColor = int.parse(newColor);
+    return Color(finalColor);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -256,7 +286,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
                             decoration: BoxDecoration(
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
+                                  color: Colors.blueAccent.withOpacity(0.5),
                                   spreadRadius: 3,
                                   blurRadius: 7,
                                   offset: Offset(0, 3),
@@ -275,8 +305,26 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
                                     Text(
                                       'Specialist Name: ${consultation.specialistName}',
                                     ),
-                                    Text(
-                                      'Status: ${consultation.consultationStatus}',
+                                    Padding(
+                                      padding: const EdgeInsets.only(top:5.0),
+                                      child: Container(
+                                        height: 23,
+                                        width: 75,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(20),
+                                          color: _getStatusColor(consultation.consultationStatus),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '${consultation.consultationStatus}',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.white
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),

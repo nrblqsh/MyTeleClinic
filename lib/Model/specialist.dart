@@ -3,9 +3,7 @@
 //     final welcome = welcomeFromJson(jsonString);
 
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../Controller/request_controller.dart';
 import '../Main/main.dart';
 import 'dart:io';
@@ -41,6 +39,7 @@ class Specialist {
     required this.clinicName,
       this.specialistImagePath
 
+
   });
 
   factory Specialist.fromJson(Map<String, dynamic> json) {
@@ -54,6 +53,7 @@ class Specialist {
       logStatus: json["logStatus"] ?? '',
       clinicName: json["clinicName"] ?? '',
       specialistImagePath: base64Decode(json["base64Image"] ?? ''),
+
 
     );
   }
@@ -250,6 +250,7 @@ class Specialist {
   }
 
 
+
   static Future<Uint8List?> getSpecialistImageforCall(int consultationID) async {
 
     RequestController req = RequestController(
@@ -317,4 +318,5 @@ class Specialist {
     }
   }
 }
+
 

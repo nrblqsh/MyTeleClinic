@@ -374,7 +374,7 @@ class _VitalInfoReportScreenState extends State<VitalInfoReportScreen> {
             ),
 
             Padding(
-              padding: const EdgeInsets.only(top: 25, right: 100),
+              padding: const EdgeInsets.only(top: 25, right: 100, bottom: 10),
               child: Text(
                 "Vital Info Report ",
                 style: TextStyle(
@@ -391,16 +391,7 @@ class _VitalInfoReportScreenState extends State<VitalInfoReportScreen> {
             //   },
             //   child: Text("Add Vital Info "),
             // ),
-            ListTile(
-              title: Padding(
-                padding: EdgeInsets.only(top: 30, bottom: 30),
-                child: Image.asset(
-                  "asset/news.png",
-                  width: 294,
-                  height: 88,
-                ),
-              ),
-            ),
+
             FutureBuilder<List<VitalInfo>>(
               future: generateVitalInfoList(),
               builder: (context, snapshot) {
@@ -509,4 +500,3 @@ class VitalInfoDataSource extends DataGridSource {
     notifyListeners();
   }
 }
-
