@@ -83,7 +83,7 @@ class _PatientInfoScreenState  extends State<PatientInfoScreen> {
                 patientID: patientID,
               ),
               PatientVitalReportScreen(
-                patientID: patientID,
+                //patientID: patientID,
               ),
             ],
           ),

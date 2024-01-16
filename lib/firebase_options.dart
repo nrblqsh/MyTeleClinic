@@ -47,30 +47,30 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyD_WP1ZdGOH5f7wpzmRyNxpDekJN17qtF4',
-    appId: '1:85837299824:web:f80e67344a7abf8e1234b5',
-    messagingSenderId: '85837299824',
-    projectId: 'myteleclinic-e56d6',
-    authDomain: 'myteleclinic-e56d6.firebaseapp.com',
-    storageBucket: 'myteleclinic-e56d6.appspot.com',
+    apiKey: 'AIzaSyCmtT1rs9a3zqkuIFUyf5CKf-iW4jIreZw',
+    appId: '1:175933602171:web:324c826075a51d6d4125de',
+    messagingSenderId: '175933602171',
+    projectId: 'myteleclinic-ef990',
+    authDomain: 'myteleclinic-ef990.firebaseapp.com',
+    storageBucket: 'myteleclinic-ef990.appspot.com',
+    measurementId: 'G-LT8H1CN3SX',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDmbSlOOAxDIBd3BWRBw0Ml3N3jS_pY2tA',
-    appId: '1:85837299824:android:1f4fa94b414cb55e1234b5',
-    messagingSenderId: '85837299824',
-    projectId: 'myteleclinic-e56d6',
-    storageBucket: 'myteleclinic-e56d6.appspot.com',
+    apiKey: 'AIzaSyB4S8_Naic0JfLAKDTCgLld7eR6Mb4eNzo',
+    appId: '1:175933602171:android:a5fecee749c988864125de',
+    messagingSenderId: '175933602171',
+    projectId: 'myteleclinic-ef990',
+    storageBucket: 'myteleclinic-ef990.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBO7E-u9wNJP-9fYtahqkdfii_-AGKnlYY',
-    appId: '1:85837299824:ios:8d9644ae7ec3da641234b5',
-    messagingSenderId: '85837299824',
-    projectId: 'myteleclinic-e56d6',
-    storageBucket: 'myteleclinic-e56d6.appspot.com',
-    androidClientId: '85837299824-v85767gdc10cuuqenh9h51sd1n9k4j8b.apps.googleusercontent.com',
-    iosClientId: '85837299824-aeihitrlpc79dhk75p9gj9rf0iihfsj6.apps.googleusercontent.com',
+    apiKey: 'AIzaSyBqtsPZykt1LQ7wetwjKfYRl6CPvBAQEbI',
+    appId: '1:175933602171:ios:7d78bd37899bd7eb4125de',
+    messagingSenderId: '175933602171',
+    projectId: 'myteleclinic-ef990',
+    storageBucket: 'myteleclinic-ef990.appspot.com',
     iosBundleId: 'com.example.myTeleclinic',
   );
 }
+

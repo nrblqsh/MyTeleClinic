@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:my_teleclinic/Patients/EMR/vital_info_report.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../Telemedicine/view_specialist.dart';
 import '../Profile/patient_home_page.dart';
 import '../Profile/settings.dart';
+import '../Telemedicine/view_specialist.dart';
 import 'add_vital_info.dart';
 import 'consultation_history.dart';
 import 'current_vital.dart';
@@ -23,7 +23,7 @@ class MedicalRecordScreen extends StatefulWidget {
 }
 
 class _MedicalRecordScreenState extends State<MedicalRecordScreen> {
-  late int patientID;
+  late int patientID=0;
   late String patientName;
 
   @override
