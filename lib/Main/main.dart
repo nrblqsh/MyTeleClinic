@@ -93,10 +93,10 @@ void main() async {
 
 
 
-  // OneSignal.Notifications.addPermissionObserver((state) {
-  //   print("Has permission " + state.toString());
-  // });
-  //
+  OneSignal.Notifications.addPermissionObserver((state) {
+    print("Has permission " + state.toString());
+  });
+
   // OneSignal.Notifications.addClickListener((event) {
   //   print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
   //
@@ -180,7 +180,8 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
 
-  static final String ipAddress = "10.131.76.44";
+
+  static final String ipAddress = "192.168.0.117";
   static final String clinicPath = "/teleclinic/clinic.php";
 
   @override

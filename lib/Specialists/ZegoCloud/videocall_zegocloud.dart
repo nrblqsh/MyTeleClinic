@@ -189,45 +189,63 @@ class _MyCallState extends State<MyCall> {
                     events: ZegoUIKitPrebuiltCallEvents(
 
                       onHangUpConfirmation: (BuildContext context) async {
-                        if (widget.roleId == 1) {
-                          return await showDialog(
-                            context: context,
+                        bool shouldHangUp = false;
 
+                        if (widget.roleId == 1) {
+                          await showDialog(
+                            context: context,
                             barrierDismissible: false,
                             builder: (BuildContext context) {
                               return AlertDialog(
                                 backgroundColor: Colors.white.withOpacity(0.9),
-                                title: const Text("Consultation Information",
-                                    style: TextStyle(color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                    fontSize: 25)),
+                                title: const Text(
+                                  "Consultation Information",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25,
+                                  ),
+                                ),
 
                                 content: Container(
-                                  height: MediaQuery.of(context).size.height * 0.2 , // Set your desired height here
+                                  height: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .height * 0.2,
+                                  // Set your desired height here
 
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .start,
                                     children: [
                                       customText1("Symptom"),
                                       Text('${symptomEditingContoller.text}'),
 
                                       SizedBox(height: 8,),
                                       customText1("Treatement"),
-                                      Text('${treatmentEditingController.text}'),
+                                      Text(
+                                          '${treatmentEditingController.text}'),
 
                                       SizedBox(height: 8,),
                                       customText1("Medication and Instruction"),
-                                      for (int index = 0; index < selectedMedications.length; index++)
+                                      for (int index = 0; index <
+                                          selectedMedications.length; index++)
                                         Column(
 
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment
+                                              .start,
                                           children: [
 
                                             Text(
-                                              '${index+1} ${selectedMedications[index]['MedGeneral'] ?? ''}(${selectedMedications[index]['Dosage'] ?? ''}) - ${selectedMedications[index]['MedForm'] ?? ''} ',
+                                              '${index +
+                                                  1} ${selectedMedications[index]['MedGeneral'] ??
+                                                  ''}(${selectedMedications[index]['Dosage'] ??
+                                                  ''}) - ${selectedMedications[index]['MedForm'] ??
+                                                  ''} ',
                                             ),
                                             Text(
-                                              'Instruction: ${medInstructionControllers[index].text}',
+                                              'Instruction: ${medInstructionControllers[index]
+                                                  .text}',
                                             ),
 
                                           ],
@@ -243,84 +261,94 @@ class _MyCallState extends State<MyCall> {
                                 ),
                                 actions: [
                                   ElevatedButton(
-                                    child: const Text("Cancel", style: TextStyle(color: Colors.white70)),
-                                    onPressed: () => Navigator.of(context).pop(false),
+                                      child: const Text("Cancel",
+                                          style: TextStyle(
+                                              color: Colors.white70)),
+                                      onPressed: () {
+                                        shouldHangUp = false;
+
+                                        Navigator.of(context).pop(false);
+                                      }
+
                                   ),
                                   ElevatedButton(
-                                    child: const Text("Exit"),
-                                    onPressed: ()async{
+                                      child: const Text("Exit"),
+                                      onPressed: () async {
+                                        String combinedFees = '${rmEditingController
+                                            .text}.'
+                                            '${centsEditingController.text}';
+                                        print(combinedFees);
+                                        await insertConsultationInformation
+                                          (consultationID,
+                                            symptomEditingContoller.text,
+                                            treatmentEditingController.text,
+                                            combinedFees);
 
-                                      String combinedFees = '${rmEditingController.text}.'
-                                          '${centsEditingController.text}';
-                                      print(combinedFees);
-                                      await insertConsultationInformation
-                                        (consultationID,
-                                        symptomEditingContoller.text,
-                                        treatmentEditingController.text,
-                                      combinedFees);
+                                        // print('MedID: ${selectedMedications[index]['MedID']}');
 
-                                      // print('MedID: ${selectedMedications[index]['MedID']}');
-
-                                        print('consultationID: $consultationID');
-                                        await insertMedicationDetails(consultationID, selectedMedications);
-
-
-                              final newStatus = 'Done';
-
-                              final response = await http.get(Uri.parse(
-                              'http://${MyApp.ipAddress}/teleclinic/'
-                              'updateConsultationStatus.php?consultationID='
-                              '$consultationID&updateConsultationStatus=$newStatus',
-                              ));
-
-                              if (response.statusCode == 200) {
-                                print('Status updated successfully');
-
-                                // Update the UI with the new status
-
-                                // Close the existing dialog and show the updated one
-                               // Navigator.of(context).pop(true);
-                               //  Navigator.push(
-                               //    context,
-                               //    MaterialPageRoute(
-                               //      builder: (context) => MenuScreen
-                               //        (specialistName: specialistName,
-                               //        logStatus: 'Done',
-                               //        specialistID: specialistID,
-                               //        todayConsultations: [],
-                               //        fetchTodayConsultations: () {  },
-                               //        navigateToPage: (int ) {  },
-                               //
-                               //      ), // Replace YourSpecificPage with the actual widget/page you want to navigate to
-                               //    ),
-                               //  );
-                                if(widget.roleId==1){
-                                  // Navigator.push(context, MaterialPageRoute(builder
-                                  //     : (context)=>SpecialistHomeScreen()));
-                                   Navigator.of(context).pop(true);
-
-                                }
-                                // else if(widget.roleId==0){
-                                //   Navigator.push(context, MaterialPageRoute(builder
-                                //       : (context)=>HomePage(phone:
-                                //   "phone", patientName: "patientName",
-                                //       patientID: patientID)));
-                                // }
-                                }
-
-                              else if(widget.roleId==0){
-                                print("statusX");
-                                // Navigator.push(context, MaterialPageRoute(builder
-                                //           : (context)=>HomePage(phone:
-                                //       "phone", patientName: "patientName",
-                                //           patientID: patientID)));
-                                 Navigator.of(context).pop(true);
+                                        print(
+                                            'consultationID: $consultationID');
+                                        await insertMedicationDetails(
+                                            consultationID,
+                                            selectedMedications);
 
 
-                              }
+                                        final newStatus = 'Done';
 
-                                    }
+                                        final response = await http.get(
+                                            Uri.parse(
+                                              'http://${MyApp
+                                                  .ipAddress}/teleclinic/'
+                                                  'updateConsultationStatus.php?consultationID='
+                                                  '$consultationID&updateConsultationStatus=$newStatus',
+                                            ));
 
+                                        if (response.statusCode == 200) {
+                                          print('Status updated successfully');
+
+                                          // Update the UI with the new status
+
+                                          // Close the existing dialog and show the updated one
+                                          // Navigator.of(context).pop(true);
+                                          //  Navigator.push(
+                                          //    context,
+                                          //    MaterialPageRoute(
+                                          //      builder: (context) => MenuScreen
+                                          //        (specialistName: specialistName,
+                                          //        logStatus: 'Done',
+                                          //        specialistID: specialistID,
+                                          //        todayConsultations: [],
+                                          //        fetchTodayConsultations: () {  },
+                                          //        navigateToPage: (int ) {  },
+                                          //
+                                          //      ), // Replace YourSpecificPage with the actual widget/page you want to navigate to
+                                          //    ),
+                                          //  );
+                                          shouldHangUp = true;
+                                          Navigator.of(context).pop(true);
+                                          Navigator.push(context, MaterialPageRoute(builder
+                                                          : (context)=>SpecialistHomeScreen()));
+
+                                          // else if(widget.roleId==0){
+                                          //   Navigator.push(context, MaterialPageRoute(builder
+                                          //       : (context)=>HomePage(phone:
+                                          //   "phone", patientName: "patientName",
+                                          //       patientID: patientID)));
+                                          // }
+                                        }
+
+                                        // else if(shouldHangUp || widget.roleId==0){
+                                        //   print("statusX");
+                                        //   Navigator.push(context, MaterialPageRoute(builder
+                                        //             : (context)=>HomePage(phone:
+                                        //         "phone", patientName: "patientName",
+                                        //             patientID: patientID)));
+                                        //    //Navigator.of(context).pop(true);
+                                        //
+                                        //
+                                        // }
+
+                                      }
 
 
                                   ),
@@ -328,14 +356,39 @@ class _MyCallState extends State<MyCall> {
                               );
                             },
                           );
-                        } else if(widget.roleId==0) {
-                          // Navigator.push(context, MaterialPageRoute(builder
-                          //     : (context)=>HomePage(phone:
-                          // "phone", patientName: "patientName",
-                          //     patientID: patientID)));
-                           Navigator.of(context).pop(true);
-
                         }
+                        if(widget.roleId==0){
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //       builder: (context) => HomePage(
+                          //         phone: "phone",
+                          //         patientName: "patientName",
+                          //         patientID: patientID, // Replace with actual patientID
+                          //       ),
+                          //     )
+                          // );
+                        }
+
+                        // }   if (shouldHangUp || widget.roleId == 0) {
+                        //   print("Hang up or navigate based on shouldHangUp or roleId");
+                        //
+                        //   // If roleId is 0, directly navigate to the appropriate screen
+                        //   if (widget.roleId == 0) {
+                        //     Navigator.push(
+                        //       context,
+                        //       MaterialPageRoute(
+                        //         builder: (context) => HomePage(
+                        //           phone: "phone",
+                        //           patientName: "patientName",
+                        //           patientID: patientID, // Replace with actual patientID
+                        //         ),
+                        //       ),
+                        //     );
+                        //   }
+                        // }
                       },
                     ),
                   ),
