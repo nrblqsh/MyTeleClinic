@@ -72,28 +72,29 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
     //   });
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setInt("specialistID", specialistID);
+    patientID = prefs.getInt("patientID") ?? 0;
    // prefs.setInt("patientID", patientID);
 
     print ("specialistID ${specialistID}");
-    //print ("patientID ${patientID}");
+    print ("patientID ${patientID}");
   }
 
-  Future<void> _getData() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    specialistID = prefs.getInt("specialistID") ?? 0;
-    patientID = prefs.getInt("patientID") ?? 0; // Correct variable name
-    print("specialistID nak req $specialistID");
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      RequestController req = RequestController(
-          path: "/api/timezone/Asia/Kuala_Lumpur",
-          server: "http://worldtimeapi.org");
-      req.get().then((value) {
-        dynamic res = req.result();
-        selectedDate = DateTime.parse(res["datetime"].toString().substring(0, 19).replaceAll('T', ''));
-      });
-    });
-  }
+  // Future<void> _getData() async {
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   specialistID = prefs.getInt("specialistID") ?? 0;
+  //   patientID = prefs.getInt("patientID") ?? 0; // Correct variable name
+  //   print("specialistID nak req $specialistID");
+  //
+  //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+  //     RequestController req = RequestController(
+  //         path: "/api/timezone/Asia/Kuala_Lumpur",
+  //         server: "http://worldtimeapi.org");
+  //     req.get().then((value) {
+  //       dynamic res = req.result();
+  //       selectedDate = DateTime.parse(res["datetime"].toString().substring(0, 19).replaceAll('T', ''));
+  //     });
+  //   });
+  // }
 
 
   static Future<Uint8List?> getSpecialistImage1(int specialistID) async {
@@ -365,14 +366,14 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                                         ElevatedButton(
                                                           onPressed: isSpecialistOnline
                                                               ? () async {
-                                                            _getData();
-                                                            print('SPECIALIST REQUEST >> ${specialistID}');
+                                                            //_getData();
+                                                            //print('SPECIALIST REQUEST >> ${specialistID}');
                                                             // Create a new Booking instance with the selected data
                                                             Consultation consult =
                                                             Consultation(
                                                               patientID: patientID,
                                                               specialistID:
-                                                              specialistID,
+                                                              int.parse(specialist.specialistID),
                                                               consultationDateTime:
                                                               selectedDate,
                                                               consultationStatus:
