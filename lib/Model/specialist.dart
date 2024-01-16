@@ -3,9 +3,7 @@
 //     final welcome = welcomeFromJson(jsonString);
 
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../Controller/request_controller.dart';
 import '../Main/main.dart';
 import 'dart:io';
@@ -41,6 +39,7 @@ class Specialist {
     required this.clinicName,
       this.specialistImagePath
 
+
   });
 
   factory Specialist.fromJson(Map<String, dynamic> json) {
@@ -54,6 +53,7 @@ class Specialist {
       logStatus: json["logStatus"] ?? '',
       clinicName: json["clinicName"] ?? '',
       specialistImagePath: base64Decode(json["base64Image"] ?? ''),
+
 
     );
   }
@@ -250,11 +250,13 @@ class Specialist {
   }
 
 
+
   static Future<Uint8List?> getSpecialistImage1(int specialistID) async {
 
     RequestController req = RequestController(
 
       path: "/teleclinic/getSpecialistImagePatientSide.php",
+
     );
 
     // Add specialistID as a query parameter
@@ -266,6 +268,8 @@ class Specialist {
 
       if (req.status() == 200) {
         // Image data is available in the response body
+
+
         return req.result();
       } else if (req.status() == 404) {
         // Image not found
@@ -282,5 +286,7 @@ class Specialist {
       return null;
     }
   }
+
 }
+
 

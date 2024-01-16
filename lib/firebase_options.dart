@@ -47,30 +47,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyD_WP1ZdGOH5f7wpzmRyNxpDekJN17qtF4',
-    appId: '1:85837299824:web:f80e67344a7abf8e1234b5',
-    messagingSenderId: '85837299824',
-    projectId: 'myteleclinic-e56d6',
-    authDomain: 'myteleclinic-e56d6.firebaseapp.com',
-    storageBucket: 'myteleclinic-e56d6.appspot.com',
-  );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDmbSlOOAxDIBd3BWRBw0Ml3N3jS_pY2tA',
-    appId: '1:85837299824:android:1f4fa94b414cb55e1234b5',
-    messagingSenderId: '85837299824',
-    projectId: 'myteleclinic-e56d6',
-    storageBucket: 'myteleclinic-e56d6.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBO7E-u9wNJP-9fYtahqkdfii_-AGKnlYY',
-    appId: '1:85837299824:ios:8d9644ae7ec3da641234b5',
-    messagingSenderId: '85837299824',
-    projectId: 'myteleclinic-e56d6',
-    storageBucket: 'myteleclinic-e56d6.appspot.com',
-    androidClientId: '85837299824-v85767gdc10cuuqenh9h51sd1n9k4j8b.apps.googleusercontent.com',
-    iosClientId: '85837299824-aeihitrlpc79dhk75p9gj9rf0iihfsj6.apps.googleusercontent.com',
     iosBundleId: 'com.example.myTeleclinic',
   );
 }
