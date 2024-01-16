@@ -1180,7 +1180,7 @@ var uuid = Uuid();
     final Map<String, dynamic> inAppMessage = {
       'app_id': "59bae8a4-4acb-4435-9edf-c5e794ac1f37",
       "include_external_user_ids": [playerId],
-      'contents': {'en': 'Hello, this is a test in-app message!'},
+      'contents': {'en': 'Specialist is calling you...'},
       'data': {
         'type': 'call',
         'callId': dynamicCallID,

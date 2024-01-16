@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:my_teleclinic/Patients/Profile/patient_home_page.dart';
 import 'package:my_teleclinic/Specialists/ZegoCloud/videocall_zegocloud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
@@ -101,7 +102,7 @@ class _NotificationPageState extends State<NotificationPage>
       await player.play(UrlSource(url));
 
       // Adjust the duration based on your sound file
-
+      await Future.delayed(Duration(seconds: 2));
 
       // Check _shouldPlaySound before playing the sound again
       if (!_shouldPlaySound) {
@@ -219,24 +220,27 @@ class _NotificationPageState extends State<NotificationPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Notification'),
-      ),
+
       backgroundColor: Colors.blueGrey, // Set the background color of the page
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+
             Text(
-              'Notification from: ${widget.senderName}',
-              style: TextStyle(fontSize: 40, color: Colors.white),
+              'Video Call',
+              style: TextStyle(fontSize: 35, color: Colors.white),
+            ),
+            Text(
+              ' ${widget.senderName} is calling you..',
+              style: TextStyle(fontSize: 20, color: Colors.white),
             ),
             CircleAvatar(
               key: UniqueKey(), // Add this line
-              radius: 100,
+              radius: 50,
               backgroundImage: _getImageProvider(),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 100),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -271,7 +275,8 @@ class _NotificationPageState extends State<NotificationPage>
                     // Add more actions if needed
                   },
                 ),
-                SizedBox(width: 30),
+
+                SizedBox(width: 70),
                 _buildAnimatedButton(
                   Icons.call_end,
                   Colors.red,
@@ -280,7 +285,21 @@ class _NotificationPageState extends State<NotificationPage>
                       () {
                     // Add the action for the decline button here
                     _stopVibrationAndSound();
+                    _stopVibrationAndSound();
+                    _stopVibrationAndSound();
                     Navigator.pop(context);
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                HomePage(phone: "phone",
+                                patientID: patientID,
+                                patientName: patientName,)
+                          //****
+                        ));
 
                         // Add more actions if needed
                   },
