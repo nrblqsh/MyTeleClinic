@@ -23,7 +23,7 @@ class MedicalRecordScreen extends StatefulWidget {
 }
 
 class _MedicalRecordScreenState extends State<MedicalRecordScreen> {
-  late int patientID;
+  late int patientID=0;
   late String patientName;
 
   @override

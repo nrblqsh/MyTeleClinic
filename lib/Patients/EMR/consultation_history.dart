@@ -171,7 +171,7 @@ class _ConsultationHistoryState
                                                 'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
                                                     'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}\n'
                                                     'Specialist: ${consult.specialistName}\n',
-                                                    //'Consultation Treatment: ${consult.consultationTreatment}\n',
+                                                //'Consultation Treatment: ${consult.consultationTreatment}\n',
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                 ),

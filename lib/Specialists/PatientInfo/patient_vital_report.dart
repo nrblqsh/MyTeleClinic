@@ -14,8 +14,9 @@ import '../../Main/main.dart';
 // }
 
 class PatientVitalReportScreen extends StatefulWidget {
-  late final int patientID;
-  PatientVitalReportScreen({required this.patientID});
+  late final int patientID=0;
+
+  PatientVitalReportScreen();
 
   @override
   _PatientVitalReportScreenState createState() => _PatientVitalReportScreenState();

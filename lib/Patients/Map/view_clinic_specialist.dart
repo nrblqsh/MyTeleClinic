@@ -39,9 +39,9 @@ class viewClinicSpecialistScreen extends StatefulWidget {
 
 
 class _viewClinicSpecialistScreenState extends State<viewClinicSpecialistScreen> {
-  late int clinicID;
+  late int clinicID=0;
   late int patientID;
-  late int specialistID;
+  late int specialistID=0;
   late String phone;
   late String patientName;
 
@@ -66,9 +66,10 @@ class _viewClinicSpecialistScreenState extends State<viewClinicSpecialistScreen>
     //         DateTime.parse(res["datetime"].toString().substring(0,19).replaceAll('T',''));
     //   });
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt("specialistID", specialistID);
     int storedID = prefs.getInt("patientID") ?? 0;
     int storedClinicID = prefs.getInt("clinicID") ?? 0;
-    // int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
+    //int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
     String storedPhone = prefs.getString("phone") ?? "";
     String storedName = prefs.getString("patientName") ?? "";
 
