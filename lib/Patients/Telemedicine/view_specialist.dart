@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +60,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
   late int specialistID;
   late String phone;
   late String patientName;
+
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
@@ -183,12 +186,14 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(20))),
 
+
                                       child: Container(
                                         padding: EdgeInsets.only(
                                             left: 12, right: 12, top: 10),
                                         decoration: BoxDecoration(
                                           border:
                                           Border.all(color: Colors.blueAccent),
+
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(12.0)),
                                           boxShadow: [
@@ -197,6 +202,93 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                               offset: const Offset(5.0, 5.0),
                                               blurRadius: 10.0,
                                               spreadRadius: 2.0,
+                                        ),
+                                      ],
+                                    ),
+                                    height: 400,
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(bottom: 20.0),
+                                          child: FutureBuilder(
+                                            future: Specialist.getSpecialistImage1(specialistID),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                                return CircularProgressIndicator();
+                                              } else if (snapshot.hasError) {
+                                                return Text('Error: ${snapshot.error}');
+                                              } else if (snapshot.hasData) {
+                                                Uint8List? specialistImage = snapshot.data as Uint8List?;
+                                                if (specialistImage != null && specialistImage.isNotEmpty) {
+                                                  return Container(
+                                                    width: 90,
+                                                    height: 90,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(10.0),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.grey.withOpacity(0.5),
+                                                          spreadRadius: 2,
+                                                          blurRadius: 5,
+                                                          offset: Offset(0, 3),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: Image.memory(
+                                                      specialistImage,
+                                                      width: 90,
+                                                      height: 90,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  );
+                                                } else {
+                                                  // Return an empty Container with an image asset as a placeholder
+                                                  return Container(
+                                                    width: 90,
+                                                    height: 90,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(10.0),
+                                                      image: DecorationImage(
+                                                        image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              } else {
+                                                // Return an empty Container with an image asset as a placeholder
+                                                return Container(
+                                                  width: 90,
+                                                  height: 90,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10.0),
+                                                    image: DecorationImage(
+                                                      image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 5.0),
+                                          child: Text(
+                                            '${specialist.specialistName}',
+                                            style: TextStyle(fontSize: 20),
+                                          ),
+                                          //
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 15.0),
+                                          child: Text(
+                                            '${specialist.specialistTitle}',
+                                            style: TextStyle(
+                                              fontSize: 14,
+
                                             ),
                                             BoxShadow(
                                               color: Colors.white,
@@ -330,6 +422,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                   },
                                 );
                               },
+
                               child: Container(
                                 padding:
                                 EdgeInsets.only(left: 15, right: 15, top: 10),
@@ -455,12 +548,17 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                                       '${specialist.specialistTitle}',
                                                       style: TextStyle(
                                                         fontSize: 14,
+
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
+                              ],
                                     ),
+
                                   ]),
                               ]),
+
                             ),
                                     ))])
                           )));
@@ -549,6 +647,12 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
         unselectedItemColor: Colors.grey,
       ),
     );
+  }
+
+  buildListView(
+
+      ) {
+
   }
 
 // Future<void> _loadData() async {

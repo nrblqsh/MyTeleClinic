@@ -249,10 +249,14 @@ class Specialist {
     }
   }
 
+
+
   static Future<Uint8List?> getSpecialistImage1(int specialistID) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+
     RequestController req = RequestController(
-      path: "/teleclinic/viewSpecialistImage.php",
+
+      path: "/teleclinic/getSpecialistImagePatientSide.php",
+
     );
 
     // Add specialistID as a query parameter
@@ -264,7 +268,8 @@ class Specialist {
 
       if (req.status() == 200) {
         // Image data is available in the response body
-        //print(' result ${req.result}');
+
+
         return req.result();
       } else if (req.status() == 404) {
         // Image not found
@@ -281,7 +286,6 @@ class Specialist {
       return null;
     }
   }
-
 
 }
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:my_teleclinic/Patients/Profile/patient_home_page.dart';
 import 'package:my_teleclinic/Main/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 import '../../Main/changePassword1.dart';
 import '../../Model/specialist.dart';
@@ -127,7 +128,7 @@ Future<void> _loadSpecialistImage() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     int storedSpecialistID = prefs.getInt("specialistID") ?? 0;
     String storedPhone = prefs.getString("phone") ?? "";
-    String storedName = prefs.getString("patientName") ?? "";
+    String storedName = prefs.getString("specialistName") ?? "";
 
     setState(() {
       specialistID = storedSpecialistID;
@@ -150,6 +151,11 @@ Future<void> _loadSpecialistImage() async {
 
         if (data['status'] == 'success') {
           showSnackBar(data['message']);
+          /// on User logout
+          void onUserLogout() {
+            ZegoUIKitPrebuiltCallInvitationService().uninit();
+          }
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => LoginScreen()),
