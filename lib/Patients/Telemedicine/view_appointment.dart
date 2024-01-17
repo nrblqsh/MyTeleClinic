@@ -45,7 +45,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
 
   String _formatDateTime(String dateTimeString) {
     DateTime dateTime = DateTime.parse(dateTimeString); // Parse the string into a DateTime object
-    return DateFormat('MMMM dd, yyyy - hh:mm a').format(dateTime); // Format the DateTime object
+    return DateFormat('dd MMMM yyyy - hh:mm a').format(dateTime); // Format the DateTime object
   }
 
   @override
@@ -73,7 +73,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
           .toList();
 
       // Sort patientConsultations based on appointment date in descending order
-      patientConsultations.sort((a, b) => b.consultationDateTime.compareTo(a.consultationDateTime));
+     // patientConsultations.sort((a, b) => b.consultationDateTime.compareTo(a.consultationDateTime));
 
       return patientConsultations;
     } else {
@@ -88,6 +88,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
+      print ('response data ${response.body}');
       return Specialist.fromJson(responseData);
     } else {
       throw Exception('Failed to fetch specialist details');
