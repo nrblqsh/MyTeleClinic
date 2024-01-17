@@ -237,7 +237,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
                                                 consultation
                                                     .consultationID!,
                                                 consultation
-                                                    .patientID,
+                                                    .patientID!,
                                               );
                                               Navigator.pop(
                                                   context);

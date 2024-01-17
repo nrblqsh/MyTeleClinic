@@ -33,36 +33,39 @@ class Medication {
     this.medInstruction
   });
 
-  factory Medication.fromJson(Map<String, dynamic> json) => Medication(
-    medID: json["MedID"] ?? 0,
-    consultationID: json["consultationID"]??0,
-    medicationID: json["medicationID"] ??0,
-    medGeneral: json["MedGeneral"],
-    medForm: json["medForm"],
-    consultationDateTime: json['consultationDateTime']!= null
-        ? DateTime.tryParse(json['consultationDateTime'])
-        : DateTime.parse('0000-00-00'),
-    dosage: json["Dosage"],
-    medInstruction: json["MedInstruction"],
-  );
+  factory Medication.fromJson(Map<String, dynamic> json) =>
+      Medication(
+        medID: json["MedID"] ?? 0,
+        consultationID: json["consultationID"] ?? 0,
+        medicationID: json["medicationID"] ?? 0,
+        medGeneral: json["MedGeneral"],
+        medForm: json["medForm"],
+        consultationDateTime: json['consultationDateTime'] != null
+            ? DateTime.tryParse(json['consultationDateTime'])
+            : DateTime.parse('0000-00-00'),
+        dosage: json["Dosage"],
+        medInstruction: json["MedInstruction"],
+      );
 
-  Map<String, dynamic> toJson() => {
-    "MedID": medID,
-    "consultationID": consultationID,
-    "medicationID": medicationID,
-    "MedGeneral": medGeneral,
-    "medForm": medForm,
-    'consultationDateTime': consultationDateTime.toString(),
-    "Dosage": dosage,
-    "MedInstruction": medInstruction,
-
-
-
-  };
+  Map<String, dynamic> toJson() =>
+      {
+        "MedID": medID,
+        "consultationID": consultationID,
+        "medicationID": medicationID,
+        "MedGeneral": medGeneral,
+        "medForm": medForm,
+        'consultationDateTime': consultationDateTime.toString(),
+        "Dosage": dosage,
+        "MedInstruction": medInstruction,
 
 
-  Future<List<Medication>> fetchConsultationMedication(int patientID, int specialistID) async {
-    final String url = 'http://${MyApp.ipAddress}/teleclinic/patientMedication.php?patientID=$patientID&&specialistID=$specialistID'; // Modify the path accordingly
+      };
+
+
+  Future<List<Medication>> fetchConsultationMedication(int patientID,
+      int specialistID) async {
+    final String url = 'http://${MyApp
+        .ipAddress}/teleclinic/patientMedication.php?patientID=$patientID&&specialistID=$specialistID'; // Modify the path accordingly
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -75,7 +78,8 @@ class Medication {
   }
 
   Future<List<Medication>> fetchPatientMedication(int consultationID) async {
-    final String url = 'http://${MyApp.ipAddress}/teleclinic/getPatientMedication.php?consultationID=$consultationID';
+    final String url = 'http://${MyApp
+        .ipAddress}/teleclinic/getPatientMedication.php?consultationID=$consultationID';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -87,7 +91,8 @@ class Medication {
         if (nestedData is List<dynamic>) {
           // Handle the case when 'data' is a list of objects
           List<Medication> meds = nestedData
-              .map((medicationData) => Medication.fromJson(medicationData as Map<String, dynamic>))
+              .map((medicationData) =>
+              Medication.fromJson(medicationData as Map<String, dynamic>))
               .toList();
           print('responseData $responseData');
           print('meds $meds');
@@ -104,14 +109,7 @@ class Medication {
   }
 
 
-
-
-
-
-
-
   static Future<List<Medication>> loadAll() async {
-
     // Instantiate RequestController
     RequestController req = RequestController(
       path: "/teleclinic/getMedicineforVideoConsultation.php",
@@ -130,7 +128,8 @@ class Medication {
       print("Raw JSON Data: $resultData");
 
       try {
-        if (resultData is Map<String, dynamic> && resultData.containsKey('data')) {
+        if (resultData is Map<String, dynamic> &&
+            resultData.containsKey('data')) {
           // Handle the case when the result is an array or a single object
           print("1");
           var dataList = resultData['data'] as List<dynamic>;
@@ -151,8 +150,10 @@ class Medication {
   }
 
 
-  static Future<List<Map<String, dynamic>>> getMedicationSuggestions(String value) async {
-    final String url = 'http://${MyApp.ipAddress}/teleclinic/getMedicineforVideoConsultation.php?searchTerm=$value'; // Modify the path accordingly
+  static Future<List<Map<String, dynamic>>> getMedicationSuggestions(
+      String value) async {
+    final String url = 'http://${MyApp
+        .ipAddress}/teleclinic/getMedicineforVideoConsultation.php?searchTerm=$value'; // Modify the path accordingly
     final response = await http.get(Uri.parse(url));
 
     print('Raw Response: ${response.body}');
@@ -162,7 +163,8 @@ class Medication {
       try {
         dynamic responseBody = json.decode(response.body);
 
-        if (responseBody is Map<String, dynamic> && responseBody.containsKey('data')) {
+        if (responseBody is Map<String, dynamic> &&
+            responseBody.containsKey('data')) {
           if (responseBody['data'] is List<dynamic>) {
             // Handle the case when the result is a list
             return List<Map<String, dynamic>>.from(responseBody['data']);
@@ -179,9 +181,11 @@ class Medication {
         return [];
       }
     } else {
-      print('Failed to fetch medication suggestions. Status Code: ${response.statusCode}');
-      throw Exception('Failed to fetch medication suggestions. Status Code: ${response.statusCode}');
+      print('Failed to fetch medication suggestions. Status Code: ${response
+          .statusCode}');
+      throw Exception(
+          'Failed to fetch medication suggestions. Status Code: ${response
+              .statusCode}');
     }
   }
-
 }

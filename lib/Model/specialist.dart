@@ -70,8 +70,6 @@ class Specialist {
         "logStatus": logStatus,
         "clinicName": clinicName,
         "specialistImagePath": specialistImagePath
-
-
       };
 
 
@@ -196,7 +194,8 @@ class Specialist {
       dynamic resultData = req.result();
 
       try {
-        if (resultData is Map<String, dynamic> && resultData.containsKey('data')) {
+        if (resultData is Map<String, dynamic> &&
+            resultData.containsKey('data')) {
           // The data field contains a single Specialist object
           Specialist specialist = Specialist.fromJson(resultData['data']);
           return [specialist];
@@ -250,9 +249,8 @@ class Specialist {
   }
 
 
-
-  static Future<Uint8List?> getSpecialistImageforCall(int consultationID) async {
-
+  static Future<Uint8List?> getSpecialistImageforCall(
+      int consultationID) async {
     RequestController req = RequestController(
 
       path: "/teleclinic/getSpecialistImageforVideoNotification.php",
@@ -286,10 +284,11 @@ class Specialist {
 
 
   static Future<Uint8List?> getSpecialistImage1(int specialistID) async {
-
     RequestController req = RequestController(
 
       path: "/teleclinic/getSpecialistImagePatientSide.php",
+
+
     );
 
     // Add specialistID as a query parameter
@@ -301,6 +300,7 @@ class Specialist {
 
       if (req.status() == 200) {
         // Image data is available in the response body
+
         return req.result();
       } else if (req.status() == 404) {
         // Image not found
@@ -318,4 +318,3 @@ class Specialist {
     }
   }
 }
-
