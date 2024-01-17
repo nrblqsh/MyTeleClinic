@@ -990,51 +990,51 @@ int? consultid;
     });
 
 
-    OneSignal.InAppMessages.addDidDisplayListener((event) {
-      print("disdisplay");
-
-
-
-    });
-
     OneSignal.Notifications.addClickListener((event) async {
-      getCallID(consultationID).then((Map<String, String>? callInfo) {
-        if (callInfo != null) {
-          String callId = callInfo['dynamicCallID']!;
-          String specialistName = callInfo['specialistName']!;
-          print("callId: $callId");
-          print("specialistName: $specialistName");
-          print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
+      String callId;
+      int consultationID;
 
-          _debugLabelString =
+      print("hello");
+      String _debugLabelString =
           "Clicked notification: \n${event.notification.jsonRepresentation()
-              .replaceAll("\\n", "\n")}";
+          .replaceAll("\\n", "\n")}";
 
-          // getCallID(consultationID).then((String? callId) {cc
-          //   print("callll $callId");
-          //   print(consultationID);
-          //
-          //   if (callId != null) {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => MyCall(
-          //           callID: callId.toString(),
-          //           id: patientID.toString(),
-          //           name: patientName,
-          //           roleId: 0,
-          //           consultationID: consultationID,
-          //         ),
-          //       ),
-          //     );
-          //   } else {
-          //     // Handle the case when callId is null
-          //     print('Failed to get call ID');
-          //   }
-          // });
+      try {
+        Map<String, dynamic>? additionalData = event.notification
+            .additionalData;
+        if (additionalData != null) {
+          // Extract specific data fields
+          String type = additionalData['type'] ?? '';
+          callId = additionalData['callId'] ?? '';
+          consultationID = additionalData['consultationID'] ?? 0;
+
+          Map<String, String>? callInfo = await getCallID(consultationID);
+          if (callInfo != null) {
+            String callID = callInfo['dynamicCallID'] ?? '';
+            String specialistName = callInfo['specialistName'] ?? '';
+            print("callId: $callID");
+            print("specialistName: $specialistName");
+
+            _debugLabelString =
+            "Clicked notification: \n${event.notification.jsonRepresentation()
+                .replaceAll("\\n", "\n")}";
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    NotificationPage(
+                      senderName: specialistName,
+                      consultationID: consultationID,
+                      callID: callId,
+                    ),
+              ),
+            );
+          }
         }
+      } catch (e) {
+        print("Error handling notification: $e");
       }
-      );
     });
 
     // OneSignal.Notifications.addClickListener((event) async {
@@ -1193,15 +1193,7 @@ int? consultid;
       });
     });
 
-    OneSignal.InAppMessages.addDidDisplayListener((event) {
-      print("ON DID DISPLAY IN APP MESSAGE ${event.message.messageId}");
-    });
-    OneSignal.InAppMessages.addWillDismissListener((event) {
-      print("ON WILL DISMISS IN APP MESSAGE ${event.message.messageId}");
-    });
-    OneSignal.InAppMessages.addDidDismissListener((event) {
-      print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
-    });
+
 
 
     OneSignal.Notifications.addForegroundWillDisplayListener((event) async {
