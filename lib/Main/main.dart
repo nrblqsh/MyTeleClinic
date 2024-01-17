@@ -1,4 +1,5 @@
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -16,39 +17,39 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   final String? title = data?['title'];
   final String? body = data?['body'];
 
-  // // You can also extract other data from the message if needed
+  // You can also extract other data from the message if needed
+
+  // Use Awesome Notifications or another notification package to show a notification
+  AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      id: 1,
+      channelKey: "call channel",
+      title: title,
+      body: body,
+      category: NotificationCategory.Call,
+      wakeUpScreen: true,
+      fullScreenIntent: true,
+      autoDismissible: false,
+      backgroundColor: Colors.orangeAccent,
+    ),
+    actionButtons: [
+      NotificationActionButton(
+        key: "Accept",
+        label: "Accept Call",
+        color: Colors.green,
+        autoDismissible: true,
+      ),
+      NotificationActionButton(
+        key: "Decline",
+        label: "Decline Call",
+        color: Colors.red,
+        autoDismissible: true,
+      ),
+    ],
+  );
   //
-  // // Use Awesome Notifications or another notification package to show a notification
-  // AwesomeNotifications().createNotification(
-  //   content: NotificationContent(
-  //     id: 1,
-  //     channelKey: "call channel",
-  //     title: title,
-  //     body: body,
-  //     category: NotificationCategory.Call,
-  //     wakeUpScreen: true,
-  //     fullScreenIntent: true,
-  //     autoDismissible: false,
-  //     backgroundColor: Colors.orangeAccent,
-  //   ),
-  //   actionButtons: [
-  //     NotificationActionButton(
-  //       key: "Accept",
-  //       label: "Accept Call",
-  //       color: Colors.green,
-  //       autoDismissible: true,
-  //     ),
-  //     NotificationActionButton(
-  //       key: "Decline",
-  //       label: "Decline Call",
-  //       color: Colors.red,
-  //       autoDismissible: true,
-  //     ),
-  //   ],
-  // );
-
   // Perform any other background tasks or actions based on the message
-
+  //
   // Note: This function should be lightweight, as the system may terminate it after a short time.
 }
 
@@ -56,21 +57,21 @@ Future<void> backgroundHandler(RemoteMessage message) async {
 
 
 void main() async {
-  // // Initialize Awesome Notifications
-  // await AwesomeNotifications().initialize(
-  //   null,
-  //   [
-  //     NotificationChannel(
-  //       channelKey: "call channel",
-  //       channelName: "Call",
-  //       channelDescription: "Channel for calls",
-  //       importance: NotificationImportance.Max,
-  //       channelShowBadge: true,
-  //       locked: true,
-  //       defaultRingtoneType: DefaultRingtoneType.Ringtone,
-  //     ),
-  //   ],
-  // );
+  // Initialize Awesome Notifications
+  await AwesomeNotifications().initialize(
+    null,
+    [
+      NotificationChannel(
+        channelKey: "call channel",
+        channelName: "Call",
+        channelDescription: "Channel for calls",
+        importance: NotificationImportance.Max,
+        channelShowBadge: true,
+        locked: true,
+        defaultRingtoneType: DefaultRingtoneType.Ringtone,
+      ),
+    ],
+  );
 
   // Initialize Firebase
   WidgetsFlutterBinding.ensureInitialized();
@@ -97,70 +98,70 @@ void main() async {
     print("Has permission " + state.toString());
   });
 
-  // OneSignal.Notifications.addClickListener((event) {
-  //   print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
-  //
-  //     _debugLabelString =
-  //     "Clicked notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
-  //
-  // });
-  //
-  // OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-  //   print(
-  //       'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
-  //
-  //   /// Display Notification, preventDefault to not display
-  //   event.preventDefault();
-  //
-  //   /// Do async work
-  //
-  //   /// notification.display() to display after preventing default
-  //   event.notification.display();
-  //
-  //
-  //     _debugLabelString =
-  //     "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
-  //
-  //   // navigatorKey.currentState?.push(MaterialPageRoute(
-  //   //   builder: (context) => SpecialistHomeScreen(),
-  //   // ));
-  // });
-  // OneSignal.InAppMessages.addClickListener((event) {
-  //   print("In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}");
-  // });
-  //
-  // OneSignal.InAppMessages.addWillDisplayListener((event) {
-  //   print("ON WILL DISPLAY IN APP MESSAGE ${event.message.messageId}");
-  // });
-  // OneSignal.InAppMessages.addDidDisplayListener((event) {
-  //   print("ON DID DISPLAY IN APP MESSAGE ${event.message.messageId}");
-  // });
-  // OneSignal.InAppMessages.addWillDismissListener((event) {
-  //   print("ON WILL DISMISS IN APP MESSAGE ${event.message.messageId}");
-  // });
-  // OneSignal.InAppMessages.addDidDismissListener((event) {
-  //   print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
-  // });
+  OneSignal.Notifications.addClickListener((event) {
+    print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
+
+      _debugLabelString =
+      "Clicked notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+
+  });
+
+  OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+    print(
+        'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
+
+    /// Display Notification, preventDefault to not display
+    event.preventDefault();
+
+    /// Do async work
+
+    /// notification.display() to display after preventing default
+    event.notification.display();
 
 
-   // _enableConsentButton = _requireConsent;
+      _debugLabelString =
+      "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+
+    // navigatorKey.currentState?.push(MaterialPageRoute(
+    //   builder: (context) => SpecialistHomeScreen(),
+    // ));
+  });
+  OneSignal.InAppMessages.addClickListener((event) {
+    print("In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}");
+  });
+
+  OneSignal.InAppMessages.addWillDisplayListener((event) {
+    print("ON WILL DISPLAY IN APP MESSAGE ${event.message.messageId}");
+  });
+  OneSignal.InAppMessages.addDidDisplayListener((event) {
+    print("ON DID DISPLAY IN APP MESSAGE ${event.message.messageId}");
+  });
+  OneSignal.InAppMessages.addWillDismissListener((event) {
+    print("ON WILL DISMISS IN APP MESSAGE ${event.message.messageId}");
+  });
+  OneSignal.InAppMessages.addDidDismissListener((event) {
+    print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
+  });
 
 
-  // OneSignal.InAppMessages.addClickListener((actionResult) {
-  //   // Check if the action result has buttons
-  //   if (actionResult.message?.buttons?.isNotEmpty ?? false) {
-  //     // Handle button clicks
-  //     for (var button in actionResult.message!.buttons!) {
-  //       if (button.id == 'accept') {
-  //         // Handle the 'Accept' button click
-  //         handleAcceptAction();
-  //       } else if (button.id == 'reject') {
-  //         // Handle the 'Reject' button click
-  //         handleRejectAction();
-  //       }
-  //     }
-  //   }
-  // });
+   _enableConsentButton = _requireConsent;
+
+
+  OneSignal.InAppMessages.addClickListener((actionResult) {
+    // Check if the action result has buttons
+    // if (actionResult.message?.buttons?.isNotEmpty ?? false) {
+    //   // Handle button clicks
+    //   for (var button in actionResult.message!.buttons!) {
+    //     if (button.id == 'accept') {
+    //       // Handle the 'Accept' button click
+    //       handleAcceptAction();
+    //     } else if (button.id == 'reject') {
+    //       // Handle the 'Reject' button click
+    //       handleRejectAction();
+    //     }
+    //   }
+    // }
+  });
 
 
   OneSignal.InAppMessages.addWillDisplayListener((event) {
@@ -181,15 +182,15 @@ class MyApp extends StatelessWidget {
 
 
 
-  static final String ipAddress = "192.168.0.117";
+  static final String ipAddress = "10.131.76.44";
   static final String clinicPath = "/teleclinic/clinic.php";
 
   @override
   Widget build(BuildContext context) {
     final navigatorKey = GlobalKey<NavigatorState>();
-    //
-    // ZegoUIKitPrebuiltCallInvitationService().setNavigatorKey(navigatorKey);
-    // ZegoUIKitPrebuiltCallInvitationService().useSystemCallingUI([ZegoUIKitSignalingPlugin()]);
+
+    ZegoUIKitPrebuiltCallInvitationService().setNavigatorKey(navigatorKey);
+    ZegoUIKitPrebuiltCallInvitationService().useSystemCallingUI([ZegoUIKitSignalingPlugin()]);
 
     return MaterialApp(
       navigatorKey: navigatorKey,
