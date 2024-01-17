@@ -37,7 +37,7 @@ class Specialist {
     required this.password,
     required this.logStatus,
     required this.clinicName,
-      this.specialistImagePath
+    this.specialistImagePath
 
 
   });
@@ -249,10 +249,47 @@ class Specialist {
     }
   }
 
-  static Future<Uint8List?> getSpecialistImage1(int specialistID) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+  static Future<Uint8List?> getSpecialistImageforCall(int consultationID) async {
+
     RequestController req = RequestController(
-      path: "/teleclinic/viewSpecialistImage.php",
+
+      path: "/teleclinic/getSpecialistImageforVideoNotification.php",
+    );
+
+    // Add specialistID as a query parameter
+    req.path = "${req.path}?consultationID=$consultationID";
+
+    try {
+      // Make a GET request using RequestController
+      await req.get();
+
+      if (req.status() == 200) {
+        // Image data is available in the response body
+        return req.result();
+      } else if (req.status() == 404) {
+        // Image not found
+        print('Image not found for specialistID: $consultationID');
+        return null;
+      } else {
+        // Handle other status codes
+        print('Failed to retrieve image. Status: ${req.status()}');
+        return null;
+      }
+    } catch (error) {
+      // Handle any exceptions that might occur during the request
+      print('Error retrieving image: $error');
+      return null;
+    }
+  }
+
+
+  static Future<Uint8List?> getSpecialistImage1(int specialistID) async {
+
+    RequestController req = RequestController(
+
+      path: "/teleclinic/getSpecialistImagePatientSide.php",
     );
 
     // Add specialistID as a query parameter
@@ -264,7 +301,6 @@ class Specialist {
 
       if (req.status() == 200) {
         // Image data is available in the response body
-        //print(' result ${req.result}');
         return req.result();
       } else if (req.status() == 404) {
         // Image not found
@@ -281,8 +317,5 @@ class Specialist {
       return null;
     }
   }
-
-
 }
-
 
