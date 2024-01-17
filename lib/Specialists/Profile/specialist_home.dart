@@ -435,7 +435,7 @@ var uuid = Uuid();
                   child: Column(
                     children: [
                       Container(
-                        height: 407,
+                        height: 700,
                         width: double.infinity, // Set width to take available space
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
@@ -443,156 +443,361 @@ var uuid = Uuid();
                         ),
                         padding: EdgeInsets.only(left: 15, right: 15, top: 2),
                         child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              SizedBox(height: 10),
-                              SizedBox(
-                                width: 550,
-                                height: 500,
-                                child: FutureBuilder<List<Consultation>>(
-                                  future: widget.fetchTodayConsultations(),
-                                  builder: (BuildContext context, AsyncSnapshot<List<Consultation>> snapshot) {
-                                    if (snapshot.connectionState == ConnectionState.waiting) {
-                                      return Center(child: CircularProgressIndicator());
-                                    } else if (snapshot.hasError) {
-                                      return Center(child: Text('Error: ${snapshot.error}'));
-                                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                      return Center(child: Text('No Data for Appointment Today'));
-                                    } else if (snapshot.hasData) {
-                                      List<Consultation>? consultations = snapshot.data;
+                          child: Expanded(
+                            child: Column(
+                              children: [
+                                SizedBox(height: 10),
+                                SizedBox(
+                                  width: 550,
+                                  height: 600,
+                                  child: FutureBuilder<List<Consultation>>(
+                                    future: widget.fetchTodayConsultations(),
+                                    builder: (BuildContext context, AsyncSnapshot<List<Consultation>> snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return Center(child: CircularProgressIndicator());
+                                      } else if (snapshot.hasError) {
+                                        return Center(child: Text('Error: ${snapshot.error}'));
+                                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                        return Center(child: Text('No Data for Appointment Today'));
+                                      } else if (snapshot.hasData) {
+                                        List<Consultation>? consultations = snapshot.data;
 
-                                      return ListView.builder(
-                                        itemCount: consultations?.length ?? 0,
-                                        itemBuilder: (BuildContext context, index) {
-                                          Consultation consult = consultations![index];
-                                          print("patienname ${consult.patientName}");
-                                          String? patientName = consult.patientName;
-                                          return Card(
-                                            elevation: 4,
-                                            margin: EdgeInsets.all(8.0),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12.0),
-                                              side: BorderSide(color: Colors.blueAccent),
-                                            ),
-                                            child: SizedBox(
-                                              height: 123,
-                                              child: Flexible(
-                                                child: Container(
-                                                  padding: EdgeInsets.only(left: 12, right: 12, top: 10),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.blueGrey,
-                                                        offset: const Offset(5.0, 5.0),
-                                                        blurRadius: 10.0,
-                                                        spreadRadius: 2.0,
-                                                      ),
-                                                      BoxShadow(
-                                                        color: Colors.white,
-                                                        offset: const Offset(0.0, 0.0),
-                                                        blurRadius: 0.0,
-                                                        spreadRadius: 0.0,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Flexible(
-                                                        child: Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            Text(
-                                                              '${consult.patientName}',
-                                                              style: TextStyle(
-                                                                fontWeight: FontWeight.bold,
-                                                                fontSize: 18,
+                                        return ListView.builder(
+                                          itemCount: consultations?.length ?? 0,
+                                          itemBuilder: (BuildContext context, index) {
+                                            Consultation consult = consultations![index];
+                                            print("patienname ${consult.patientName}");
+                                            String? patientName = consult.patientName;
+                                            return Card(
+                                              elevation: 4,
+                                              margin: EdgeInsets.all(8.0),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(12.0),
+                                                side: BorderSide(color: Colors.blueAccent),
+                                              ),
+                                              child: SizedBox(
+                                                height: 123,
+                                                child: Flexible(
+                                                  child: Container(
+                                                    padding: EdgeInsets.only(left: 12, right: 12, top: 10),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.blueGrey,
+                                                          offset: const Offset(5.0, 5.0),
+                                                          blurRadius: 10.0,
+                                                          spreadRadius: 2.0,
+                                                        ),
+                                                        BoxShadow(
+                                                          color: Colors.white,
+                                                          offset: const Offset(0.0, 0.0),
+                                                          blurRadius: 0.0,
+                                                          spreadRadius: 0.0,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Flexible(
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                '${consult.patientName}',
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontSize: 18,
+                                                                ),
                                                               ),
-                                                            ),
-                                                            SizedBox(height: 3,),
-                                                            Text(
-                                                              'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}',
-                                                            ),
-                                                            SizedBox(height: 3,),
-                                                            Text(
-                                                              'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}',
-                                                            ),
-                                                            SizedBox(
-                                                              height: 5,
-                                                            ),
-                                                            Container(
-                                                              height: 23,
-                                                              width: 75,
-                                                              decoration: BoxDecoration(
-                                                                borderRadius: BorderRadius.circular(20),
-                                                                color: Color(_getStatusColor(consult.consultationStatus)),
+                                                              SizedBox(height: 3,),
+                                                              Text(
+                                                                'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}',
                                                               ),
-                                                              child: Center(
-                                                                child: Text(
-                                                                  '${consult.consultationStatus}',
-                                                                  style: TextStyle(
-                                                                    fontSize: 14,
-                                                                    fontWeight: FontWeight.normal,
-                                                                    color: Colors.white,
+                                                              SizedBox(height: 3,),
+                                                              Text(
+                                                                'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}',
+                                                              ),
+                                                              SizedBox(
+                                                                height: 5,
+                                                              ),
+                                                              Container(
+                                                                height: 23,
+                                                                width: 75,
+                                                                decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(20),
+                                                                  color: Color(_getStatusColor(consult.consultationStatus)),
+                                                                ),
+                                                                child: Center(
+                                                                  child: Text(
+                                                                    '${consult.consultationStatus}',
+                                                                    style: TextStyle(
+                                                                      fontSize: 14,
+                                                                      fontWeight: FontWeight.normal,
+                                                                      color: Colors.white,
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                          ],
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                      Container(
-                                                        width: 150,
-                                                        height: 200,// Adjust the width as needed
-                                                        child: Align(
-                                                          alignment: Alignment.bottomRight,
-                                                          child: Row(
-                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                            children: [
-                                                              if (consult.consultationStatus != 'Accepted' &&
-                                                                  consult.consultationStatus != 'Decline'&&
-                                                                  consult.consultationStatus != 'Done')
-                                                                Column(
-                                                                  children: [
-                                                                    IconButton(
-                                                                      icon: Icon(Icons.cancel,
-                                                                      size: 30,
-                                                                          color: Colors.red,),
-                                                                      onPressed: () async {
-                                                                        bool confirmed = await showDialog(
-                                                                          context: context,
-                                                                          builder: (BuildContext context) {
-                                                                            return AlertDialog(
-                                                                              shape: RoundedRectangleBorder(
-                                                                                borderRadius: BorderRadius.circular(10.0),
-                                                                              ),
-                                                                              title: Text('Confirm Decline'),
-                                                                              content: Text('Are you sure you want to decline this consultation?'),
-                                                                              actions: [
-                                                                                TextButton(
-                                                                                  onPressed: () {
-                                                                                    Navigator.of(context).pop(false);
-                                                                                  },
-                                                                                  child: Text('Cancel'),
+                                                        Container(
+                                                          width: 150,
+                                                          height: 200,// Adjust the width as needed
+                                                          child: Align(
+                                                            alignment: Alignment.bottomRight,
+                                                            child: Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                if (consult.consultationStatus != 'Accepted' &&
+                                                                    consult.consultationStatus != 'Decline'&&
+                                                                    consult.consultationStatus != 'Done')
+                                                                  Column(
+                                                                    children: [
+                                                                      IconButton(
+                                                                        icon: Icon(Icons.cancel,
+                                                                        size: 30,
+                                                                            color: Colors.red,),
+                                                                        onPressed: () async {
+                                                                          bool confirmed = await showDialog(
+                                                                            context: context,
+                                                                            builder: (BuildContext context) {
+                                                                              return AlertDialog(
+                                                                                shape: RoundedRectangleBorder(
+                                                                                  borderRadius: BorderRadius.circular(10.0),
                                                                                 ),
-                                                                                TextButton(
-                                                                                  onPressed: () {
-                                                                                    Navigator.of(context).pop(true);
-                                                                                  },
-                                                                                  child: Text('Confirm'),
-                                                                                ),
-                                                                              ],
-                                                                            );
-                                                                          },
-                                                                        );
+                                                                                title: Text('Confirm Decline'),
+                                                                                content: Text('Are you sure you want to decline this consultation?'),
+                                                                                actions: [
+                                                                                  TextButton(
+                                                                                    onPressed: () {
+                                                                                      Navigator.of(context).pop(false);
+                                                                                    },
+                                                                                    child: Text('Cancel'),
+                                                                                  ),
+                                                                                  TextButton(
+                                                                                    onPressed: () {
+                                                                                      Navigator.of(context).pop(true);
+                                                                                    },
+                                                                                    child: Text('Confirm'),
+                                                                                  ),
+                                                                                ],
+                                                                              );
+                                                                            },
+                                                                          );
 
-                                                                        if (confirmed == true) {
+                                                                          if (confirmed == true) {
+                                                                            try {
+                                                                              int consultationID = consult.consultationID ?? 0;
+
+                                                                              String newStatus = 'Decline';
+
+                                                                              final response = await http.get(Uri.parse(
+                                                                                'http://${MyApp.ipAddress}/teleclinic/'
+                                                                                    'updateConsultationStatus.php?consultationID='
+                                                                                    '$consultationID&updateConsultationStatus=$newStatus',
+                                                                              ));
+
+                                                                              if (response.statusCode == 200) {
+                                                                                print('Status updated successfully');
+                                                                                // Fetch updated data and trigger a rebuild
+                                                                                setState(() {});
+                                                                              } else {
+                                                                                print('Failed to update status. Status Code: ${response.statusCode}');
+                                                                              }
+                                                                            } catch (e) {
+                                                                              print('Error updating status: $e');
+                                                                            }
+                                                                          }
+                                                                        },
+                                                                      ),
+                                                                      Text('Decline',
+                                                                      style: TextStyle(
+                                                                        fontWeight:
+                                                                        FontWeight.w400,
+                                                                        fontSize: 15
+                                                                      ),),
+                                                                    ],
+                                                                  ),
+                                                                Spacer(),
+                                                                if (consult.consultationStatus == 'Accepted')
+                                                                  Expanded(
+                                                                    child: Column(
+                                                                      children: [
+                                                                        IconButton(
+                                                                          icon: Icon(Icons.add_ic_call_sharp,
+                                                                            size: 30,
+                                                                            color: Color(hexColor("228B22"),)),
+                                                                          onPressed: () async {
+                                                                            bool confirmed = await showDialog(
+                                                                              context: context,
+                                                                              builder: (BuildContext context) {
+                                                                                return AlertDialog(
+                                                                                  shape: RoundedRectangleBorder(
+                                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                                  ),
+                                                                                  title: Text('Confirm Call Patient'),
+                                                                                  content: Text('Are you sure you want to call this patient?'),
+                                                                                  actions: [
+
+                                                                                    TextButton(
+                                                                                      onPressed: () {
+                                                                                        Navigator.of(context).pop(false);
+                                                                                      },
+                                                                                      child: Text('Cancel'),
+                                                                                    ),
+
+                                                                                    TextButton(
+                                                                                      onPressed: () async {
+
+                                                                                        int? consultationID = consult.consultationID;
+                                                                                        print("consullttt$consultationID");
+                                                                                        // Check and request camera and microphone permissions
+                                                                                        var statusCamera = await Permission.camera.request();
+                                                                                        var statusMicrophone = await Permission.microphone.request();
+
+                                                                                        if (statusCamera.isGranted && statusMicrophone.isGranted) {
+                                                                                          print("dapat");
+                                                                                          // Both camera and microphone permissions are granted
+                                                                                          Navigator.of(context).pop(true); // Close the dialog and return true
+                                                                                        } else {
+                                                                                          // Permissions are not granted
+                                                                                          // Show a message to inform the user using a Dialog
+                                                                                          showDialog(
+                                                                                            context: context,
+                                                                                            builder: (BuildContext context) {
+                                                                                              return AlertDialog(
+                                                                                                title: Text('Permission Required'),
+                                                                                                content: Text('Camera and microphone permissions are required to make a call.'),
+                                                                                                actions: [
+                                                                                                  TextButton(
+                                                                                                    onPressed: () {
+                                                                                                      Navigator.of(context).pop(false);
+                                                                                                    },
+                                                                                                    child: Text('OK'),
+                                                                                                  ),
+                                                                                                ],
+                                                                                              );
+                                                                                            },
+                                                                                          );
+                                                                                        }
+                                                                                      },
+                                                                                      child: Text('Confirm'),
+                                                                                    ),
+                                                                                  ],
+                                                                                );
+                                                                              },
+                                                                            );
+
+                                                                            if (confirmed!= null && confirmed) {
+                                                                              try {
+                                                                                actionButtion(true);
+                                                                                print("masuk");
+                                                                                String specialistIDtoString = specialistID.toString();
+                                                                                  dynamicCallID = generateRandomString(15);
+                                                                                print("calllidddd$dynamicCallID");
+                                                                                print("specialistID here $specialistID");
+                                                                                int consultationID = consult.consultationID ?? 0;
+                                                                                int pd = consult.patientID!;
+                                                                                print("Patient ID for sending notification: $pd");
+
+
+                                                                                await saveCallIDtoDatabase(consultationID, dynamicCallID);
+
+
+                                                                           //     sendInAppMessage(pd.toString(), dynamicCallID, consultationID);
+
+
+                                                                                // ZegoSendCallInvitationButton actionButton(bool isVideo)=>
+                                                                                //     ZegoSendCallInvitationButton(
+                                                                                //       isVideoCall:isVideo,
+                                                                                //       resourceID:"zegouikit_call",
+                                                                                //       invitees: [
+                                                                                //         ZegoUIKitUser(id: "1",
+                                                                                //             name: "test")
+                                                                                //       ],
+                                                                                //     );
+                                                                                //
+                                                                                //
+                                                                                // actionButton(true);
+
+                                                                                // updateStatustoGetReadytoCall(consultationID);
+                                                                                Navigator.push(
+                                                                                  context,
+                                                                                  MaterialPageRoute(
+                                                                                    builder: (context) => MyCall(
+                                                                                      callID: dynamicCallID,
+                                                                                      id: specialistIDtoString,
+                                                                                      name: specialistName,
+                                                                                      roleId: 1,
+                                                                                      consultationID: consultationID,
+                                                                                    ),
+                                                                                  ),
+
+                                                                                );
+                                                                               // _sendNotification( pd);
+
+
+
+
+
+                                                                                //await sendCallNotificationWithInAppActions(patientIDforSendingNotification, dynamicCallID);
+
+                                                                                // Navigator.push(
+                                                                                //   context,
+                                                                                //   MaterialPageRoute(
+                                                                                //     builder: (context) => MyCall(
+                                                                                //       callID: dynamicCallID,
+                                                                                //       id: specialistIDtoString,
+                                                                                //       name: specialistName,
+                                                                                //       roleId: 1,
+                                                                                //     ),
+                                                                                //   ),
+                                                                                // );
+                                                                                // //save callid dulu dlm db
+                                                                                String? fcmToken = await getFCMTokenfromPatient(consultationID);
+                                                                                print("fcm token dalam specialist $fcmToken");
+
+
+                                                                                if (fcmToken != null) {
+
+
+                                                                                //  await sendFCMNotification(fcmToken, dynamicCallID, specialistID, specialistName);
+                                                                                } else {
+                                                                                  print('FCM token is null. Cannot send notification.');
+                                                                                }
+
+
+                                                                              } catch (e) {
+                                                                                print('Error during sen: $e');
+                                                                              }
+                                                                            }
+                                                                          },
+                                              ),
+                                              Text('Call Now'),
+                                              ],
+                                            ),
+                                            ),
+
+
+                                                                if (consult.consultationStatus != 'Accepted' &&
+                                                                    consult.consultationStatus != 'Decline' &&
+                                                                    consult.consultationStatus != 'Done' &&
+                                                                    consult.consultationStatus != 'Ready to Call'
+                                                                )
+                                                                  Column(
+                                                                    children: [
+                                                                      IconButton(
+                                                                        icon: Icon(Icons.done,
+                                                                        size: 35,
+                                                                            color: Colors.green,),
+                                                                        onPressed: () async {
                                                                           try {
                                                                             int consultationID = consult.consultationID ?? 0;
-
-                                                                            String newStatus = 'Decline';
+                                                                            String newStatus = 'Accepted';
 
                                                                             final response = await http.get(Uri.parse(
                                                                               'http://${MyApp.ipAddress}/teleclinic/'
@@ -610,240 +815,37 @@ var uuid = Uuid();
                                                                           } catch (e) {
                                                                             print('Error updating status: $e');
                                                                           }
-                                                                        }
-                                                                      },
-                                                                    ),
-                                                                    Text('Decline',
-                                                                    style: TextStyle(
-                                                                      fontWeight:
-                                                                      FontWeight.w400,
-                                                                      fontSize: 15
-                                                                    ),),
-                                                                  ],
-                                                                ),
-                                                              Spacer(),
-                                                              if (consult.consultationStatus == 'Accepted')
-                                                                Expanded(
-                                                                  child: Column(
-                                                                    children: [
-                                                                      IconButton(
-                                                                        icon: Icon(Icons.add_ic_call_sharp,
-                                                                          size: 30,
-                                                                          color: Color(hexColor("228B22"),)),
-                                                                        onPressed: () async {
-                                                                          bool confirmed = await showDialog(
-                                                                            context: context,
-                                                                            builder: (BuildContext context) {
-                                                                              return AlertDialog(
-                                                                                shape: RoundedRectangleBorder(
-                                                                                  borderRadius: BorderRadius.circular(10.0),
-                                                                                ),
-                                                                                title: Text('Confirm Call Patient'),
-                                                                                content: Text('Are you sure you want to call this patient?'),
-                                                                                actions: [
-
-                                                                                  TextButton(
-                                                                                    onPressed: () {
-                                                                                      Navigator.of(context).pop(false);
-                                                                                    },
-                                                                                    child: Text('Cancel'),
-                                                                                  ),
-
-                                                                                  TextButton(
-                                                                                    onPressed: () async {
-
-                                                                                      int? consultationID = consult.consultationID;
-                                                                                      print("consullttt$consultationID");
-                                                                                      // Check and request camera and microphone permissions
-                                                                                      var statusCamera = await Permission.camera.request();
-                                                                                      var statusMicrophone = await Permission.microphone.request();
-
-                                                                                      if (statusCamera.isGranted && statusMicrophone.isGranted) {
-                                                                                        print("dapat");
-                                                                                        // Both camera and microphone permissions are granted
-                                                                                        Navigator.of(context).pop(true); // Close the dialog and return true
-                                                                                      } else {
-                                                                                        // Permissions are not granted
-                                                                                        // Show a message to inform the user using a Dialog
-                                                                                        showDialog(
-                                                                                          context: context,
-                                                                                          builder: (BuildContext context) {
-                                                                                            return AlertDialog(
-                                                                                              title: Text('Permission Required'),
-                                                                                              content: Text('Camera and microphone permissions are required to make a call.'),
-                                                                                              actions: [
-                                                                                                TextButton(
-                                                                                                  onPressed: () {
-                                                                                                    Navigator.of(context).pop(false);
-                                                                                                  },
-                                                                                                  child: Text('OK'),
-                                                                                                ),
-                                                                                              ],
-                                                                                            );
-                                                                                          },
-                                                                                        );
-                                                                                      }
-                                                                                    },
-                                                                                    child: Text('Confirm'),
-                                                                                  ),
-                                                                                ],
-                                                                              );
-                                                                            },
-                                                                          );
-
-                                                                          if (confirmed!= null && confirmed) {
-                                                                            try {
-                                                                              actionButtion(true);
-                                                                              print("masuk");
-                                                                              String specialistIDtoString = specialistID.toString();
-                                                                                dynamicCallID = generateRandomString(15);
-                                                                              print("calllidddd$dynamicCallID");
-                                                                              print("specialistID here $specialistID");
-                                                                              int consultationID = consult.consultationID ?? 0;
-                                                                              int pd = consult.patientID!;
-                                                                              print("Patient ID for sending notification: $pd");
-
-
-                                                                              await saveCallIDtoDatabase(consultationID, dynamicCallID);
-
-
-                                                                              sendInAppMessage(pd.toString(), dynamicCallID, consultationID);
-
-
-                                                                              // ZegoSendCallInvitationButton actionButton(bool isVideo)=>
-                                                                              //     ZegoSendCallInvitationButton(
-                                                                              //       isVideoCall:isVideo,
-                                                                              //       resourceID:"zegouikit_call",
-                                                                              //       invitees: [
-                                                                              //         ZegoUIKitUser(id: "1",
-                                                                              //             name: "test")
-                                                                              //       ],
-                                                                              //     );
-                                                                              //
-                                                                              //
-                                                                              // actionButton(true);
-
-                                                                              // updateStatustoGetReadytoCall(consultationID);
-                                                                              Navigator.push(
-                                                                                context,
-                                                                                MaterialPageRoute(
-                                                                                  builder: (context) => MyCall(
-                                                                                    callID: dynamicCallID,
-                                                                                    id: specialistIDtoString,
-                                                                                    name: specialistName,
-                                                                                    roleId: 1,
-                                                                                    consultationID: consultationID,
-                                                                                  ),
-                                                                                ),
-
-                                                                              );
-                                                                             // _sendNotification( pd);
-
-
-
-
-
-                                                                              //await sendCallNotificationWithInAppActions(patientIDforSendingNotification, dynamicCallID);
-
-                                                                              // Navigator.push(
-                                                                              //   context,
-                                                                              //   MaterialPageRoute(
-                                                                              //     builder: (context) => MyCall(
-                                                                              //       callID: dynamicCallID,
-                                                                              //       id: specialistIDtoString,
-                                                                              //       name: specialistName,
-                                                                              //       roleId: 1,
-                                                                              //     ),
-                                                                              //   ),
-                                                                              // );
-                                                                              // //save callid dulu dlm db
-                                                                              String? fcmToken = await getFCMTokenfromPatient(consultationID);
-                                                                              print("fcm token dalam specialist $fcmToken");
-
-
-                                                                              if (fcmToken != null) {
-
-
-                                                                              //  await sendFCMNotification(fcmToken, dynamicCallID, specialistID, specialistName);
-                                                                              } else {
-                                                                                print('FCM token is null. Cannot send notification.');
-                                                                              }
-
-
-                                                                            } catch (e) {
-                                                                              print('Error during sen: $e');
-                                                                            }
-                                                                          }
                                                                         },
-                                            ),
-                                            Text('Call Now'),
-                                            ],
-                                          ),
-                                          ),
-
-
-                                                              if (consult.consultationStatus != 'Accepted' &&
-                                                                  consult.consultationStatus != 'Decline' &&
-                                                                  consult.consultationStatus != 'Done' &&
-                                                                  consult.consultationStatus != 'Ready to Call'
-                                                              )
-                                                                Column(
-                                                                  children: [
-                                                                    IconButton(
-                                                                      icon: Icon(Icons.done,
-                                                                      size: 35,
-                                                                          color: Colors.green,),
-                                                                      onPressed: () async {
-                                                                        try {
-                                                                          int consultationID = consult.consultationID ?? 0;
-                                                                          String newStatus = 'Accepted';
-
-                                                                          final response = await http.get(Uri.parse(
-                                                                            'http://${MyApp.ipAddress}/teleclinic/'
-                                                                                'updateConsultationStatus.php?consultationID='
-                                                                                '$consultationID&updateConsultationStatus=$newStatus',
-                                                                          ));
-
-                                                                          if (response.statusCode == 200) {
-                                                                            print('Status updated successfully');
-                                                                            // Fetch updated data and trigger a rebuild
-                                                                            setState(() {});
-                                                                          } else {
-                                                                            print('Failed to update status. Status Code: ${response.statusCode}');
-                                                                          }
-                                                                        } catch (e) {
-                                                                          print('Error updating status: $e');
-                                                                        }
-                                                                      },
-                                                                    ),
-                                                                    Text('Accept',
-                                                                    style: TextStyle
-                                                                      (fontWeight:
-                                                                    FontWeight.w400,
-                                                                    fontSize: 15)
-                                                                      ,
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                            ],
+                                                                      ),
+                                                                      Text('Accept',
+                                                                      style: TextStyle
+                                                                        (fontWeight:
+                                                                      FontWeight.w400,
+                                                                      fontSize: 15)
+                                                                        ,
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    } else {
-                                      return Center(child: Text('No data available'));
-                                    }
-                                  },
+                                            );
+                                          },
+                                        );
+                                      } else {
+                                        return Center(child: Text('No data available'));
+                                      }
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),

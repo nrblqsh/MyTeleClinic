@@ -102,7 +102,7 @@ class _MyCallState extends State<MyCall> {
     medInstructionEditingController = TextEditingController();
 
     // Initialize the call timer
-    const Duration callTimeout = const Duration(minutes: 10); // Set your desired timeout duration
+    const Duration callTimeout = const Duration(minutes: 15); // Set your desired timeout duration
     _callTimer = Timer(callTimeout, () {
       // Call timeout occurred, perform actions here
       onCallTimeout();
@@ -122,11 +122,7 @@ class _MyCallState extends State<MyCall> {
   void onCallTimeout() {
     // Perform actions when the call times out
     print('Call timeout occurred');
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                SpecialistHomeScreen()));
+   Navigator.pop(context);
 
     // Add logic to hang up the call or handle the timeout scenario
   }
@@ -350,6 +346,25 @@ class _MyCallState extends State<MyCall> {
                                           shouldHangUp = true;
 
                                           Navigator.of(context).pop(true);
+
+
+                                         if(widget.roleId==0){
+                                           Navigator.of(context).pop(true);
+                                           Navigator.of(context).pop();
+
+                                           Navigator.push(
+                                               context,
+                                               MaterialPageRoute(
+                                                 builder: (context) => HomePage(
+                                                   phone: "phone",
+                                                   patientName: "patientName",
+                                                   patientID: patientID, // Replace with actual patientID
+                                                 ),
+                                               )
+                                           );
+                                         }
+
+
                                           // Navigator.push(
                                           //     context,
                                           //     MaterialPageRoute(
@@ -364,6 +379,7 @@ class _MyCallState extends State<MyCall> {
                                           // }
                                         }
 
+
                                         // else if(shouldHangUp || widget.roleId==0){
                                         //   print("statusX");
                                         //   Navigator.push(context, MaterialPageRoute(builder
@@ -374,8 +390,14 @@ class _MyCallState extends State<MyCall> {
                                         //
                                         //
                                         // }
-                                      }),
+
+
+
+                                      }
+                                      ),
+
                                 ],
+
                               );
                             },
                           );
@@ -411,7 +433,10 @@ class _MyCallState extends State<MyCall> {
                         //     );
                         //   }
                         // }
+
                       },
+
+
                     ),
                   ),
                 ),
@@ -429,7 +454,7 @@ class _MyCallState extends State<MyCall> {
                         duration: Duration(milliseconds: 300),
                         width: isContainerVisible ? 800.0 : 0,
                         height: isContainerVisible ? 700.0 : 0,
-                        color: Colors.white,
+                        color: Colors.white.withOpacity(70),
                         child: isContainerVisible
                             ? SingleChildScrollView(
                                 child: Column(
@@ -631,7 +656,7 @@ class _MyCallState extends State<MyCall> {
                                                         // Display selected medications
                                                         return ListTile(
                                                           title: Text(
-                                                            '${selectedMedications[index]['MedGeneral'] ?? ''} - ${selectedMedications[index]['MedForm'] ?? ''} - ${selectedMedications[index]['Dosage'] ?? ''}',
+                                                            '${selectedMedications[index]['MedGeneral'] ?? ''}(${selectedMedications[index]['Dosage'] ?? ''}) ${selectedMedications[index]['MedForm'] ?? ''} - ${selectedMedications[index]['Dosage'] ?? ''}',
                                                           ),
                                                           onTap: () {
                                                             print(
@@ -655,7 +680,7 @@ class _MyCallState extends State<MyCall> {
                                                                     .length;
                                                         return ListTile(
                                                           title: Text(
-                                                            '${medicationSuggestions[suggestionIndex]['MedGeneral'] ?? ''} - ${medicationSuggestions[suggestionIndex]['MedForm'] ?? ''} - ${medicationSuggestions[suggestionIndex]['Dosage'] ?? ''}',
+                                                            '${medicationSuggestions[suggestionIndex]['MedGeneral'] ?? ''}(${medicationSuggestions[suggestionIndex]['Dosage'] ?? ''}) ${medicationSuggestions[suggestionIndex]['MedForm'] ?? ''}',
                                                           ),
                                                           onTap: () {
                                                             setState(() {
@@ -970,7 +995,7 @@ class _MyCallState extends State<MyCall> {
                       });
                     },
                     child: Icon(
-                      isContainerVisible ? Icons.minimize : Icons.maximize,
+                      isContainerVisible ? Icons.aspect_ratio : Icons.aspect_ratio_sharp,
                       color: Colors.blue,
                       size: 30.0,
                     ),

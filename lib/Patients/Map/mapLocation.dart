@@ -194,7 +194,6 @@ class _MapLocationState extends State<MapLocation> {
 
 
   Widget buildDialog(dynamic item) => Container(
-    height: 200,
     child: Dialog(
       insetPadding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
@@ -253,7 +252,7 @@ class _MapLocationState extends State<MapLocation> {
 
                             ],
                           ),
-                          SizedBox(width:240), // Add some spacing between distance and duration
+                          SizedBox(width:170), // Add some spacing between distance and duration
                           // Clock icon next to duration
                           Row(
                             children: [
@@ -325,6 +324,7 @@ class _MapLocationState extends State<MapLocation> {
                     ),
                   ),
                 ),
+                SizedBox(height: 10,),
                 Container(
                   height: 45,
                   width: 145,
@@ -348,14 +348,20 @@ class _MapLocationState extends State<MapLocation> {
                       backgroundColor: Color(hexColor('7393B3')),
                       fixedSize: Size.fromHeight(35),
                     ),
-                    child: Text(
-                      'Make Appointment',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                      ),
+
+                    child: Column(
+                      children: [
+                        SizedBox(height: 5,),
+                        Text(
+                          'Make Appointment',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -365,7 +371,7 @@ class _MapLocationState extends State<MapLocation> {
 
             Positioned(
               top: 30.0,
-              right: 8.0,
+              right: 18.0,
               child: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {

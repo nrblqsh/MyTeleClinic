@@ -130,29 +130,6 @@ int? consultid;
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 255.0, bottom: 3),
-                      child: Text(
-                        "Welcome,",
-                        style: GoogleFonts.roboto(
-                          fontWeight: FontWeight.bold,
-                          textStyle:
-                              const TextStyle(fontSize: 22, color: Colors.black),
-                        ),
-                      ),
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 5, right: 52),
-                      child: Text(
-                        "${patientName}",
-                        style: GoogleFonts.roboto(
-                          fontWeight: FontWeight.bold,
-                          textStyle:
-                          const TextStyle(fontSize: 22, color: Colors.black),
-                        ),
-                      ),
-                    ),
                     Row(
                       children: [
                         Text(
@@ -1023,10 +1000,12 @@ int? consultid;
               context,
               MaterialPageRoute(
                 builder: (context) =>
-                    NotificationPage(
-                      senderName: specialistName,
-                      consultationID: consultationID,
+                    MyCall(
+                      name: patientName,
+                      id: patientID.toString(),
                       callID: callId,
+                      roleId: 0,
+                      consultationID: consultationID,
                     ),
               ),
             );

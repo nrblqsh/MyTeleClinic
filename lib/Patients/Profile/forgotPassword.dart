@@ -71,39 +71,37 @@ class _forgotPasswordScreenState extends State<forgotPasswordScreen> {
       );
     }
     else {
-      print(" otw");
-      var url = Uri.http(
-          "${MyApp.ipAddress}", '/teleclinic/resetPassword.php', {'q': '{http}'});
+      print("otw");
+      var url = Uri.http("${MyApp.ipAddress}", '/teleclinic/resetPassword.php', {'q': '{http}'});
 
       try {
         var response = await http.post(url, body: {
           "phone": phoneController.text,
-          "password" : newPasswordController.text,
+          "password": newPasswordController.text,
         });
 
         var data = json.decode(response.body);
-        if (data.toString() == "success reset") {
-
-          print("test");
-          print("Number betul");
-
-          Fluttertoast.showToast(msg: "Success Update Password",
+        if (data['message'] == "success reset") {
+          print("Success");
+          Fluttertoast.showToast(
+            msg: "Success Update Password",
             toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,);
-          Navigator.push(context,
-              MaterialPageRoute(
-                builder: (context) => LoginScreen(),
-              )
+            gravity: ToastGravity.CENTER,
           );
-    }
-        else {
-          print("tah la");
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LoginScreen(),
+            ),
+          );
+        } else if (data['message'] == "error") {
+          print("Error updating password");
           showDialog(
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: const Text('Wrong Phone Number'),
-                content: const Text('Your phone number does not registered'),
+                title: const Text('Phone Number Incorrect'),
+                content: const Text('Your Phone Number is Incorrect'),
                 actions: [
                   TextButton(
                     child: const Text('OK'),
@@ -115,6 +113,8 @@ class _forgotPasswordScreenState extends State<forgotPasswordScreen> {
               );
             },
           );
+        } else {
+          print("Unknown response: $data");
         }
       } catch (error) {
         print("Error: $error");
@@ -123,8 +123,7 @@ class _forgotPasswordScreenState extends State<forgotPasswordScreen> {
           builder: (context) {
             return AlertDialog(
               title: const Text('Error'),
-              content: const Text(
-                  'An error occurred while processing your request.'),
+              content: const Text('An error occurred while processing your request.'),
               actions: [
                 TextButton(
                   child: const Text('OK'),
@@ -138,6 +137,8 @@ class _forgotPasswordScreenState extends State<forgotPasswordScreen> {
         );
       }
     }
+
+
   }
 
 
@@ -303,8 +304,8 @@ class _forgotPasswordScreenState extends State<forgotPasswordScreen> {
                         ),
                         child: Center(child: Icon(Icons.check, color: Colors.white, size: 15)),
                       ),
-                      SizedBox(width: 10),
-                      Text(" At least uppercase and lowercase, 1 digit, 1 symbol")
+                      SizedBox(width: 9),
+                      Text("At least 1 uppercase & lowercase, 1 digit, 1 symbol")
                     ],
                   ),
                   SizedBox(height: 10),  // Add space between the two rows
