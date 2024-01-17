@@ -43,6 +43,8 @@
         <meta-data
             android:name="com.google.android.direction.API_KEY"
             android:value="AIzaSyBayQdqPuNJaYbS5vOd_ij7WsQdyPojKsk" />
+        <!--<meta-data android:name=".NotificationServiceExtension"
+            android:value=".NotificationServiceExtension" />-->
     </application>
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>

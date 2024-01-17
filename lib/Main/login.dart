@@ -84,6 +84,16 @@ class _LoginScreenState extends State<LoginScreen> {
           int? patientId = int.tryParse(patientID.toString());
           OneSignal.login(patientId.toString());
 
+
+          Fluttertoast.showToast(
+            msg: "Hello, $patientName",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.blue, // You can customize the color
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -118,12 +128,23 @@ class _LoginScreenState extends State<LoginScreen> {
             plugins: [ZegoUIKitSignalingPlugin()],
           );
 
+          Fluttertoast.showToast(
+            msg: "Hello, $specialistName",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+           // backgroundColor: Colors.blue, // You can customize the color
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+
+          phoneController.clear();
+          passwordController.clear();
           Navigator.push(
               context, MaterialPageRoute(builder: (context) =>
               SpecialistHomeScreen(),));
           setState(() {
-            phoneController.clear();
-            passwordController.clear();
+
           });
         }
         else {
@@ -185,185 +206,190 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async{
+        return  false;
+      },
+      child: Scaffold(
 
-      body: SingleChildScrollView(
-        child:
-        Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Column(
-                children: [
-                  Image.asset(
-                    "asset/logo.png",
-                    width: 280,
-                    height: 350,
-                  ),
-                ],
-              ),
-            ),
-
-
-            Padding( padding: const EdgeInsets.only( left: 15.0, bottom: 10.0),
-                child:
-                Row(
-                    children: <Widget> [
-                      Text('Welcome Back,',
-                        style: TextStyle(decoration: TextDecoration.none,
-                            fontSize: 25.0,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w700),),
-                    ]
-                )
-            ),
-
-            Container(
-                padding: EdgeInsets.all(20),
-                child: Column(  //column untuk letak icon and textfield
+        body: SingleChildScrollView(
+          child:
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Column(
                   children: [
-                    TextField(
-                      controller: phoneController,
-                      decoration: InputDecoration(
-                        labelText: 'Phone Number',
-                        prefixIcon: Icon(Icons.phone),
-                        border: loginInputBorder(),
-                        enabledBorder: loginInputBorder(),
-                        focusedBorder: loginFocusedBorder(),
-                      ) ,
-                      keyboardType: TextInputType.phone,//keyboardType: TextInputType.phone,
-                    )
-                  ],
-                )
-            ),
-
-            Container(
-                padding: EdgeInsets.all(20),
-                child: Column(  //column untuk letak icon and textfield
-                  children: [
-                    TextField(
-                      controller: passwordController,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: Icon(Icons.lock),
-                        suffixIcon: GestureDetector(onTap: (){
-                          setState(() {
-                            _obscureText=!_obscureText;
-                          });
-
-                        },
-                          child:Icon(!_obscureText ?Icons.visibility:
-                          Icons.visibility_off),
-                        ),
-                        border: loginInputBorder(),
-                        enabledBorder: loginInputBorder(),
-                        focusedBorder: loginFocusedBorder(),
-                      ) ,
-                      obscureText: _obscureText,
-                    )
-
-                  ],
-                )
-            ),
-
-            // SizedBox(height: 30),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: MaterialButton(minWidth:double.infinity,
-            //       onPressed: (){
-            //     login();
-            //       },
-            //   child: Text('Login'),
-            //
-            //   color: Colors.teal,
-            //   textColor: Colors.white,),
-            //
-            // ),
-            SizedBox(
-              width:260,
-              height: 45,
-              child: ElevatedButton(
-                onPressed: () {
-                  login();
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
-                  ),
-                  backgroundColor: Color(hexColor('C73B3B')), // Set your preferred background color
-                ),
-                child: Text('Login',
-                  style:TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                  ),
-                ),
-              ),
-            ),
-
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => forgotPasswordScreen(),
-                  ),
-                ); // go to register screen
-              },
-              child: Column(
-                children: [
-                  SizedBox(height: 16),
-                  Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      color: Color(hexColor('#024362')),
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w700,
+                    Image.asset(
+                      "asset/logo.png",
+                      width: 280,
+                      height: 350,
                     ),
-                  ),
-                ],
-              ),
-            ),
-
-
-            SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(),
-                Text(
-                  "Don't have account yet? ",
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w700,
-                  ),
+                  ],
                 ),
+              ),
 
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      Navigator.push(context, MaterialPageRoute(builder:
-                          (context) => RegisterScreen(),)); //go to register screen
-                    });
+
+              Padding( padding: const EdgeInsets.only( left: 15.0, bottom: 10.0),
+                  child:
+                  Row(
+                      children: <Widget> [
+                        Text('Welcome Back,',
+                          style: TextStyle(decoration: TextDecoration.none,
+                              fontSize: 25.0,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700),),
+                      ]
+                  )
+              ),
+
+              Container(
+                  padding: EdgeInsets.all(20),
+                  child: Column(  //column untuk letak icon and textfield
+                    children: [
+                      TextField(
+                        controller: phoneController,
+                        decoration: InputDecoration(
+                          labelText: 'Phone Number',
+                          prefixIcon: Icon(Icons.phone),
+                          border: loginInputBorder(),
+                          enabledBorder: loginInputBorder(),
+                          focusedBorder: loginFocusedBorder(),
+                        ) ,
+                        keyboardType: TextInputType.phone,//keyboardType: TextInputType.phone,
+                      )
+                    ],
+                  )
+              ),
+
+              Container(
+                  padding: EdgeInsets.all(20),
+                  child: Column(  //column untuk letak icon and textfield
+                    children: [
+                      TextField(
+                        controller: passwordController,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          prefixIcon: Icon(Icons.lock),
+                          suffixIcon: GestureDetector(onTap: (){
+                            setState(() {
+                              _obscureText=!_obscureText;
+                            });
+
+                          },
+                            child:Icon(!_obscureText ?Icons.visibility:
+                            Icons.visibility_off),
+                          ),
+                          border: loginInputBorder(),
+                          enabledBorder: loginInputBorder(),
+                          focusedBorder: loginFocusedBorder(),
+                        ) ,
+                        obscureText: _obscureText,
+                      )
+
+                    ],
+                  )
+              ),
+
+              // SizedBox(height: 30),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: MaterialButton(minWidth:double.infinity,
+              //       onPressed: (){
+              //     login();
+              //       },
+              //   child: Text('Login'),
+              //
+              //   color: Colors.teal,
+              //   textColor: Colors.white,),
+              //
+              // ),
+              SizedBox(
+                width:260,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: () {
+                    login();
                   },
-                  child: Text(
-                    'Register Now',
-                    style: TextStyle(
-                      color: Color(
-                        hexColor('#C73B3B'),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
+                    ),
+                    backgroundColor: Color(hexColor('C73B3B')), // Set your preferred background color
+                  ),
+                  child: Text('Login',
+                    style:TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => forgotPasswordScreen(),
+                    ),
+                  ); // go to register screen
+                },
+                child: Column(
+                  children: [
+                    SizedBox(height: 16),
+                    Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        color: Color(hexColor('#024362')),
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
                       ),
+                    ),
+                  ],
+                ),
+              ),
+
+
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(),
+                  Text(
+                    "Don't have account yet? ",
+                    style: TextStyle(
+                      color: Colors.grey,
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                ),
-              ],
-            ),
 
-          ],
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        Navigator.push(context, MaterialPageRoute(builder:
+                            (context) => RegisterScreen(),)); //go to register screen
+                      });
+                    },
+                    child: Text(
+                      'Register Now',
+                      style: TextStyle(
+                        color: Color(
+                          hexColor('#C73B3B'),
+                        ),
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+            ],
+          ),
         ),
       ),
     );
