@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
@@ -96,6 +97,16 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
   //   });
   // }
 
+  static Future<String> getPathImg(int specialistID) async
+  {
+     String strUrl = "";
+     RequestController req = RequestController(
+
+       path: "/teleclinic/getSpecialistImagePatientSide.php",
+
+     );
+     return strUrl;
+  }
 
   static Future<Uint8List?> getSpecialistImage1(int specialistID) async {
 
@@ -291,11 +302,12 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                                                       ),
                                                                     ],
                                                                   ),
-                                                                  child: Image.memory(
-                                                                    specialistImage,
+                                                                  child: Image.network
+                                                                    (
+                                                                    "http://10.131.77.121/teleclinic/getSpecialistImagePatientSide.php?specialistID=${specialist.specialistID}}",
                                                                     width: 90,
                                                                     height: 90,
-                                                                    fit: BoxFit.cover,
+                                                                    fit: BoxFit.fill,
                                                                   ),
                                                                 );
                                                               } else {
@@ -500,8 +512,10 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                                                               ),
                                                                             ],
                                                                           ),
-                                                                          child: Image.memory(
-                                                                            specialistImage,
+                                                                          child:
+                                                                          Image.network
+                                                                            (
+                                                                            "http://10.131.77.121/teleclinic/getSpecialistImagePatientSide.php?specialistID=${specialist.specialistID}}",
                                                                             width: 90,
                                                                             height: 90,
                                                                             fit: BoxFit.fill,
