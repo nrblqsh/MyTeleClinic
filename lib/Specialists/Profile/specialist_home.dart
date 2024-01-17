@@ -360,7 +360,7 @@ var uuid = Uuid();
                                 Icons.people_alt,
                                 30,
                                 Colors.white,
-                                'Patient List',
+                                'Patient\nList',
                               ),
                               onTap: () {
                                 Navigator.push(

@@ -32,6 +32,7 @@ class _ConsultationHistoryState
   String consultationStatus = '';
   String consultationSymptom = '';
   String consultationTreatment = '';
+  String feesConsultation = '';
   // String medGeneral = '';
   // String medForm = '';
   // late List<Consultation> todayConsultations = [];
@@ -67,6 +68,7 @@ class _ConsultationHistoryState
       consultationDateTime: consultationDateTime,
       specialistID: specialistID,
       specialistName: specialistName,
+      feesConsultation: feesConsultation,
     );
     print("patient id ${patientID}");
     print(consultation.fetchPatientConsultation(patientID));
@@ -143,7 +145,7 @@ class _ConsultationHistoryState
                                     children: [
                                       SizedBox(
                                         width: 700,
-                                        height: 90,
+                                        height: 100,
                                         child: Container(
                                           padding: EdgeInsets.only(left: 12, right: 12, top: 10),
                                           decoration: BoxDecoration(
@@ -170,7 +172,8 @@ class _ConsultationHistoryState
                                               Text(
                                                 'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
                                                     'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}\n'
-                                                    'Specialist: ${consult.specialistName}\n',
+                                                    'Specialist: ${consult.specialistName}\n'
+                                                    'Consultation fees: ${consult.feesConsultation}\n',
                                                 //'Consultation Treatment: ${consult.consultationTreatment}\n',
                                                 style: TextStyle(
                                                   fontSize: 14,

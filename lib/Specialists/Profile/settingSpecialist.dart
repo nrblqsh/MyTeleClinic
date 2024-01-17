@@ -254,6 +254,7 @@ Future<void> _loadSpecialistImage() async {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 70,
         backgroundColor: Colors.white,
         leading: IconButton(

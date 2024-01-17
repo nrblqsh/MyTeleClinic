@@ -22,6 +22,7 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
   String consultationStatus = '';
   String consultationSymptom = '';
   String consultationTreatment = '';
+  String feesConsultation = '';
   late List<Consultation> todayConsultations = [];
 
 
@@ -40,7 +41,8 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
         consultationStatus: consultationStatus,
         consultationDateTime: consultationDateTime,
         specialistID: specialistID,
-        specialistName: specialistName);
+        specialistName: specialistName,
+        feesConsultation: feesConsultation);
     print(consultation.fetchSpecialistConsultationHistory(specialistID));
     return await consultation.fetchSpecialistConsultationHistory(specialistID);
   }
@@ -65,13 +67,14 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 68,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 72,
         backgroundColor: Colors.white,
         title: Center(
           child: Image.asset(
             "asset/MYTeleClinic.png",
             width: 594,
-            height: 258,
+            height: 100,
           ),
         ),
       ),
@@ -122,7 +125,7 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
                                   children: [
                                     SizedBox(
                                       width: 700,
-                                      height: 120,
+                                      height: 90,
                                       child: Container(
                                         padding: EdgeInsets.only(
                                             left: 12, right: 12, top: 10),
@@ -159,7 +162,7 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
                                                   consult.consultationDateTime)}\n'
                                                   'Patient Name: ${consult
                                                   .patientName}\n'
-                                                  'Status: ${consult.consultationStatus}\n',
+                                                  'Consultation fees: ${consult.feesConsultation}\n',
                                               style: TextStyle(
                                                 fontSize: 14,
                                               ),

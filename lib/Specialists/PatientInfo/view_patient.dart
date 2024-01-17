@@ -138,7 +138,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
 
   String _formatDateTime(String dateTimeString) {
     DateTime dateTime = DateTime.parse(dateTimeString);
-    return DateFormat('MMMM dd, yyyy').format(dateTime);
+    return DateFormat('dd MMMM yyyy').format(dateTime);
   }
 
   @override

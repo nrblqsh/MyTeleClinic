@@ -24,6 +24,7 @@ class Consultation {
   DateTime? birthDate;
   String? phone; // Add specialist's name field
   Uint8List? patientImage;
+  String? feesConsultation;
 
   // int? medicationID;
   // int? MedID;
@@ -32,7 +33,6 @@ class Consultation {
 
   //String? specialistTitle;
   //int pro
-  String? feesConsultation;
 
 
   Consultation({
@@ -50,6 +50,7 @@ class Consultation {
     this.birthDate,
     this.phone,
     this.patientImage,
+    this.feesConsultation,
     // this.medicationID,
     // this.MedID,
     // this.MedGeneral,
@@ -79,6 +80,7 @@ class Consultation {
           : DateTime.parse('0000-00-00'),
       phone: json['phone'] ?? '',
       patientImage: base64Decode(json["base64Image"] ?? ''),
+      feesConsultation: json['feesConsultation'] ?? '',
     );
   }
 

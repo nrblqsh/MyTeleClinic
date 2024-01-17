@@ -11,8 +11,8 @@ import '../Consultation/patient_medication_history.dart';
 // }
 
 class PatientHistoryScreen extends StatefulWidget {
-  final int patientID;
-  final int specialistID;
+  late int patientID=0;
+  int specialistID;
 
   PatientHistoryScreen({required this.patientID, required this.specialistID});
 
