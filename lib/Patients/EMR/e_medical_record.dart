@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Profile/patient_home_page.dart';
 import '../Profile/settings.dart';
+import '../Telemedicine/view_appointment.dart';
 import '../Telemedicine/view_specialist.dart';
 import 'add_vital_info.dart';
 import 'consultation_history.dart';
@@ -35,11 +36,11 @@ class _MedicalRecordScreenState extends State<MedicalRecordScreen> {
   Future<void> _loadData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     int storedID = prefs.getInt("patientID") ?? 0;
-   // String storedName = prefs.getString("patientID") ?? "";
+    // String storedName = prefs.getString("patientID") ?? "";
 
     setState(() {
       patientID = storedID;
-     //patientName = widget.patientName;
+      //patientName = widget.patientName;
       //print(patientID);
       //patientIDController.text = patientID.toString();
     });
@@ -113,12 +114,14 @@ class _MedicalRecordScreenState extends State<MedicalRecordScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => HomePage(
-                              patientID: patientID,
-                              phone: '',
-                              patientName: '',
-                            )));
+                          patientID: patientID,
+                          phone: '',
+                          patientName: '',
+                        )));
               } else if (index == 3) {
-                // Add your navigation logic here
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ViewAppointmentScreen(patientID: patientID,)));
+
               } else if (index == 4) {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => SettingsScreen(patientID: patientID,)));

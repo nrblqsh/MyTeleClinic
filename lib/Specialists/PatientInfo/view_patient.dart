@@ -10,6 +10,7 @@ import 'package:my_teleclinic/Specialists/PatientInfo/patient_history.dart';
 import 'package:my_teleclinic/Specialists/PatientInfo/patient_info_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../Controller/request_controller.dart';
 import '../../Model/consultation.dart';
 import '../../Main/main.dart';
 
@@ -56,7 +57,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
   Future<List<Consultation>> fetchBySpecialist() async {
 
     final SharedPreferences pref = await SharedPreferences.getInstance();
-      specialistID = pref.getInt("specialistID") ?? 0;
+    specialistID = pref.getInt("specialistID") ?? 0;
     patientID = pref.getInt("patientID") ?? 0;
 
     print(specialistID);
@@ -92,9 +93,9 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
       final Map<String, dynamic> patientData = data[0];
 
       setState(() {
-       // consult = data ;
+        // consult = data ;
         //selectedPatientID = patientIDFromSuggestion;
-       // selectedPatient = selectedPatient;
+        // selectedPatient = selectedPatient;
         selectedPatient = Consultation.fromJson(patientData);
         print ('dia pilih patient ni ${selectedPatient!.patientName}');
 
@@ -138,8 +139,47 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
 
   String _formatDateTime(String dateTimeString) {
     DateTime dateTime = DateTime.parse(dateTimeString);
-    return DateFormat('MMMM dd, yyyy').format(dateTime);
+    return DateFormat('dd MMMM yyyy').format(dateTime);
   }
+
+  static Future<Uint8List?> getPatientImage(int patientID) async {
+
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    // int specialistID = prefs.getInt("specialistID") ?? 0;
+    RequestController req = RequestController(
+
+      path: "/teleclinic/getPatientImage.php",
+
+    );
+
+    // Add specialistID as a query parameter
+    req.path = "${req.path}?patientID=$patientID";
+
+    try {
+      // Make a GET request using RequestController
+      await req.get();
+
+      if (req.status() == 200) {
+        // Image data is available in the response body
+
+
+        return req.result();
+      } else if (req.status() == 404) {
+        // Image not found
+        print('Image not found for specialistID: $patientID');
+        return null;
+      } else {
+        // Handle other status codes
+        print('Failed to retrieve image. Status: ${req.status()}');
+        return null;
+      }
+    } catch (error) {
+      // Handle any exceptions that might occur during the request
+      print('Error retrieving image: $error');
+      return null;
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +239,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                     setState(() {
 
                     });
-                    },
+                  },
                 ),
               ),
             ),
@@ -212,7 +252,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                 elevation: 5,
                 child: Container(
                   height: 10,
-                  width: 600,
+                  width: 500,
                   child: ListView(
                     children: [
                       for (String suggestion in suggestions)
@@ -222,10 +262,10 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                             final currentContext = context;
                             _searchController.text = suggestion;
                             await searchPatients(suggestion);
-                            
+
                             _searchController.clear();
                             suggestions.clear();
-                            
+
                             setState(() {
                               patientID = int.parse('${selectedPatient!.patientID}');
                               print('sekarang dia pilih ${patientID}');
@@ -262,70 +302,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                     ),
                                     child: Column(
                                       children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(bottom: 20.0),
-                                          child: FutureBuilder(
-                                            future: Consultation.getPatientImage(selectedPatient!.patientID!),
-                                            builder: (context, snapshot) {
-                                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                                return CircularProgressIndicator();
-                                              } else if (snapshot.hasError) {
-                                                return Text('Error: ${snapshot.error}');
-                                              } else if (snapshot.hasData) {
-                                                Uint8List? patientImage = snapshot.data as Uint8List?;
-                                                if (patientImage != null && patientImage.isNotEmpty) {
-                                                  return Container(
-                                                    width: 90,
-                                                    height: 90,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(10.0),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.grey.withOpacity(0.5),
-                                                          spreadRadius: 2,
-                                                          blurRadius: 5,
-                                                          offset: Offset(0, 3),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Image.memory(
-                                                      patientImage,
-                                                      width: 90,
-                                                      height: 90,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  );
-                                                } else {
-                                                  // Return an empty Container with an image asset as a placeholder
-                                                  return Container(
-                                                    width: 90,
-                                                    height: 90,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(10.0),
-                                                      image: DecorationImage(
-                                                        image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                              } else {
-                                                // Return an empty Container with an image asset as a placeholder
-                                                return Container(
-                                                  width: 90,
-                                                  height: 90,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(10.0),
-                                                    image: DecorationImage(
-                                                      image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                          ),
-                                        ),
+
                                         Padding(
                                           padding: const EdgeInsets.only(bottom: 15.0),
                                           child: Text(
@@ -355,66 +332,66 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                           ),
                                         ),
 
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 10.0),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'Gender:',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
+                                        Padding(
+                                          padding: const EdgeInsets.only(bottom: 10.0),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Gender:',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(
+                                                '${selectedPatient!.gender}',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        Text(
-                                          '${selectedPatient!.gender}',
-                                          style: TextStyle(
-                                            fontSize: 14,
+                                        Padding(
+                                          padding: const EdgeInsets.only(bottom: 10.0),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Birthdate:',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(
+                                                '${_formatDateTime(selectedPatient!.birthDate.toString())}',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 10.0),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'Birthdate:',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
+                                        Padding(
+                                          padding: const EdgeInsets.only(bottom: 10.0),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Phone:',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(
+                                                '${selectedPatient!.phone}',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        Text(
-                                          '${_formatDateTime(selectedPatient!.birthDate.toString())}',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 10.0),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'Phone:',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '${selectedPatient!.phone}',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
                                         // Add other details...
 
                                         ElevatedButton(
@@ -492,7 +469,7 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                 child: Column(
                                   children: [
                                     SizedBox(
-                                      width: 700,
+                                      width: 500,
                                       height: 70,
                                       child: Container(
                                         padding: EdgeInsets.only(left: 12, right: 12, top: 10),
@@ -515,314 +492,314 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                           ],
                                         ),
                                         child: GestureDetector(
-                                          onTap: () async {
-                                            final currentContext = context;
-                                            setState(() {
-                                              int patientID = int.parse('${consult.patientID}');
-                                            });
-                                            final SharedPreferences pref = await SharedPreferences.getInstance();
-                                            await pref.setInt("patientID", consult.patientID!);
-                                            print('Tapped on patient: ${consult.patientName}');
+                                            onTap: () async {
+                                              final currentContext = context;
+                                              setState(() {
+                                                int patientID = int.parse('${consult.patientID}');
+                                              });
+                                              final SharedPreferences pref = await SharedPreferences.getInstance();
+                                              await pref.setInt("patientID", consult.patientID!);
+                                              print('Tapped on patient: ${consult.patientName}');
 
 
-                                            showDialog(
-                                              context: currentContext,  // Use the context from the build method
-                                              builder: (BuildContext context) {
-                                                return Dialog(
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                                                  ),
-                                                  child: Container(
-                                                    padding: EdgeInsets.only(left: 12, right: 12, top: 10),
-                                                    height: 500,
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(color: Colors.blueAccent),
-                                                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.blueGrey,
-                                                          offset: const Offset(5.0, 5.0),
-                                                          blurRadius: 10.0,
-                                                          spreadRadius: 2.0,
-                                                        ),
-                                                        BoxShadow(
-                                                          color: Colors.white,
-                                                          offset: const Offset(0.0, 0.0),
-                                                          blurRadius: 0.0,
-                                                          spreadRadius: 0.0,
-                                                        ),
-                                                      ],
+                                              showDialog(
+                                                context: currentContext,  // Use the context from the build method
+                                                builder: (BuildContext context) {
+                                                  return Dialog(
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.all(Radius.circular(20)),
                                                     ),
-                                                    child: Column(
-                                                      children: [
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(bottom: 20.0),
-                                                          child: FutureBuilder(
-                                                            future: Consultation.getPatientImage(consult.patientID!),
-                                                            builder: (context, snapshot) {
-                                                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                return CircularProgressIndicator();
-                                                              } else if (snapshot.hasError) {
-                                                                return Text('Error: ${snapshot.error}');
-                                                              } else if (snapshot.hasData) {
-                                                                Uint8List? patientImage = snapshot.data as Uint8List?;
-                                                                if (patientImage != null && patientImage.isNotEmpty) {
-                                                                  return Container(
-                                                                    width: 90,
-                                                                    height: 90,
-                                                                    decoration: BoxDecoration(
-                                                                      borderRadius: BorderRadius.circular(10.0),
-                                                                      boxShadow: [
-                                                                        BoxShadow(
-                                                                          color: Colors.grey.withOpacity(0.5),
-                                                                          spreadRadius: 2,
-                                                                          blurRadius: 5,
-                                                                          offset: Offset(0, 3),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    child: Image.memory(
-                                                                      patientImage,
-                                                                      width: 90,
-                                                                      height: 90,
-                                                                      fit: BoxFit.cover,
-                                                                    ),
-                                                                  );
-                                                                } else {
-                                                                  // Return an empty Container with an image asset as a placeholder
-                                                                  return Container(
-                                                                    width: 90,
-                                                                    height: 90,
-                                                                    decoration: BoxDecoration(
-                                                                      borderRadius: BorderRadius.circular(10.0),
-                                                                      image: DecorationImage(
-                                                                        image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
-                                                                        fit: BoxFit.cover,
-                                                                      ),
-                                                                    ),
-                                                                  );
-                                                                }
-                                                              } else {
-                                                                // Return an empty Container with an image asset as a placeholder
-                                                                return Container(
-                                                                  width: 90,
-                                                                  height: 90,
-                                                                  decoration: BoxDecoration(
-                                                                    borderRadius: BorderRadius.circular(10.0),
-                                                                    image: DecorationImage(
-                                                                      image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
-                                                                      fit: BoxFit.cover,
-                                                                    ),
+                                                    child: Container(
+                                                      padding: EdgeInsets.only(left: 12, right: 12, top: 10),
+                                                      height: 500,
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(color: Colors.blueAccent),
+                                                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.blueGrey,
+                                                            offset: const Offset(5.0, 5.0),
+                                                            blurRadius: 10.0,
+                                                            spreadRadius: 2.0,
+                                                          ),
+                                                          BoxShadow(
+                                                            color: Colors.white,
+                                                            offset: const Offset(0.0, 0.0),
+                                                            blurRadius: 0.0,
+                                                            spreadRadius: 0.0,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: Column(
+                                                        children: [
+                                                          // Padding(
+                                                          //   padding: const EdgeInsets.only(bottom: 20.0),
+                                                          //   child: FutureBuilder(
+                                                          //     future: Consultation.getPatientImage(consult.patientID!),
+                                                          //     builder: (context, snapshot) {
+                                                          //       if (snapshot.connectionState == ConnectionState.waiting) {
+                                                          //         return CircularProgressIndicator();
+                                                          //       } else if (snapshot.hasError) {
+                                                          //         return Text('Error: ${snapshot.error}');
+                                                          //       } else if (snapshot.hasData) {
+                                                          //         Uint8List? patientImage = snapshot.data as Uint8List?;
+                                                          //         if (patientImage != null && patientImage.isNotEmpty) {
+                                                          //           return Container(
+                                                          //             width: 90,
+                                                          //             height: 90,
+                                                          //             decoration: BoxDecoration(
+                                                          //               borderRadius: BorderRadius.circular(10.0),
+                                                          //               boxShadow: [
+                                                          //                 BoxShadow(
+                                                          //                   color: Colors.grey.withOpacity(0.5),
+                                                          //                   spreadRadius: 2,
+                                                          //                   blurRadius: 5,
+                                                          //                   offset: Offset(0, 3),
+                                                          //                 ),
+                                                          //               ],
+                                                          //             ),
+                                                          //             child: Image.memory(
+                                                          //               patientImage,
+                                                          //               width: 90,
+                                                          //               height: 90,
+                                                          //               fit: BoxFit.cover,
+                                                          //             ),
+                                                          //           );
+                                                          //         } else {
+                                                          //           // Return an empty Container with an image asset as a placeholder
+                                                          //           return Container(
+                                                          //             width: 90,
+                                                          //             height: 90,
+                                                          //             decoration: BoxDecoration(
+                                                          //               borderRadius: BorderRadius.circular(10.0),
+                                                          //               image: DecorationImage(
+                                                          //                 image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                          //                 fit: BoxFit.cover,
+                                                          //               ),
+                                                          //             ),
+                                                          //           );
+                                                          //         }
+                                                          //       } else {
+                                                          //         // Return an empty Container with an image asset as a placeholder
+                                                          //         return Container(
+                                                          //           width: 90,
+                                                          //           height: 90,
+                                                          //           decoration: BoxDecoration(
+                                                          //             borderRadius: BorderRadius.circular(10.0),
+                                                          //             image: DecorationImage(
+                                                          //               image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                          //               fit: BoxFit.cover,
+                                                          //             ),
+                                                          //           ),
+                                                          //         );
+                                                          //       }
+                                                          //     },
+                                                          //   ),
+                                                          // ),
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(bottom: 15.0),
+                                                            child: Text(
+                                                              '${consult.patientName}',
+                                                              style: TextStyle(fontSize: 20),
+                                                              textAlign: TextAlign.center,
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(bottom: 10.0),
+                                                            child: Column(
+                                                              children: [
+                                                                Text(
+                                                                  'IC Number:',
+                                                                  style: TextStyle(
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.bold,
                                                                   ),
-                                                                );
-                                                              }
+                                                                ),
+                                                                Text(
+                                                                  '${consult.icNum}',
+                                                                  style: TextStyle(
+                                                                    fontSize: 14,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(bottom: 10.0),
+                                                            child: Column(
+                                                              children: [
+                                                                Text(
+                                                                  'Gender:',
+                                                                  style: TextStyle(
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.bold,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  '${consult.gender}',
+                                                                  style: TextStyle(
+                                                                    fontSize: 14,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(bottom: 10.0),
+                                                            child: Column(
+                                                              children: [
+                                                                Text(
+                                                                  'Birthdate:',
+                                                                  style: TextStyle(
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.bold,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  '${_formatDateTime(consult.birthDate.toString())}',
+                                                                  style: TextStyle(
+                                                                    fontSize: 14,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(bottom: 10.0),
+                                                            child: Column(
+                                                              children: [
+                                                                Text(
+                                                                  'Phone:',
+                                                                  style: TextStyle(
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.bold,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  '${consult.phone}',
+                                                                  style: TextStyle(
+                                                                    fontSize: 14,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder: (context) => PatientInfoScreen(
+                                                                    patientID: consult.patientID!,
+                                                                  ),
+                                                                ),
+                                                              );
                                                             },
+                                                            style: ButtonStyle(
+                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                                                            ),
+                                                            child: Text("View Patient Vital Info"),
                                                           ),
-                                                        ),
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(bottom: 15.0),
-                                                          child: Text(
-                                                            '${consult.patientName}',
-                                                            style: TextStyle(fontSize: 20),
-                                                            textAlign: TextAlign.center,
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder: (context) => PatientHistoryScreen(
+                                                                    patientID: consult.patientID!,
+                                                                    specialistID: consult.specialistID!,
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            },
+                                                            style: ButtonStyle(
+                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                                                            ),
+                                                            child: Text("View Patient History"),
                                                           ),
-                                                        ),
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(bottom: 10.0),
-                                                          child: Column(
-                                                            children: [
-                                                              Text(
-                                                                'IC Number:',
-                                                                style: TextStyle(
-                                                                  fontSize: 14,
-                                                                  fontWeight: FontWeight.bold,
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                '${consult.icNum}',
-                                                                style: TextStyle(
-                                                                  fontSize: 14,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(bottom: 10.0),
-                                                          child: Column(
-                                                            children: [
-                                                              Text(
-                                                                'Gender:',
-                                                                style: TextStyle(
-                                                                  fontSize: 14,
-                                                                  fontWeight: FontWeight.bold,
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                '${consult.gender}',
-                                                                style: TextStyle(
-                                                                  fontSize: 14,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(bottom: 10.0),
-                                                          child: Column(
-                                                            children: [
-                                                              Text(
-                                                                'Birthdate:',
-                                                                style: TextStyle(
-                                                                  fontSize: 14,
-                                                                  fontWeight: FontWeight.bold,
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                '${_formatDateTime(consult.birthDate.toString())}',
-                                                                style: TextStyle(
-                                                                  fontSize: 14,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(bottom: 10.0),
-                                                          child: Column(
-                                                            children: [
-                                                              Text(
-                                                                'Phone:',
-                                                                style: TextStyle(
-                                                                  fontSize: 14,
-                                                                  fontWeight: FontWeight.bold,
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                '${consult.phone}',
-                                                                style: TextStyle(
-                                                                  fontSize: 14,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        ElevatedButton(
-                                                          onPressed: () {
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder: (context) => PatientInfoScreen(
-                                                                  patientID: consult.patientID!,
-                                                                ),
-                                                              ),
-                                                            );
-                                                          },
-                                                          style: ButtonStyle(
-                                                            backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
-                                                          ),
-                                                          child: Text("View Patient Vital Info"),
-                                                        ),
-                                                        ElevatedButton(
-                                                          onPressed: () {
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder: (context) => PatientHistoryScreen(
-                                                                  patientID: consult.patientID!,
-                                                                  specialistID: consult.specialistID!,
-                                                                ),
-                                                              ),
-                                                            );
-                                                          },
-                                                          style: ButtonStyle(
-                                                            backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
-                                                          ),
-                                                          child: Text("View Patient History"),
-                                                        ),
-                                                      ],
+                                                        ],
+                                                      ),
                                                     ),
-                                                  ),
-                                                );
-                                              },
-                                            );
-                                          },child: Column(
+                                                  );
+                                                },
+                                              );
+                                            },child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: <Widget>[
                                             Row(
                                               children: [
-                                                Flexible(
-                                                  child: FutureBuilder(
-                                                    future: Consultation.getPatientImage(consult.patientID!),
-                                                    builder: (context, snapshot) {
-                                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                                        return CircularProgressIndicator();
-                                                      } else if (snapshot.hasError) {
-                                                        return Text('Error: ${snapshot.error}');
-                                                      } else if (snapshot.hasData) {
-                                                        Uint8List? patientImage = snapshot.data as Uint8List?;
-                                                        if (patientImage != null && patientImage.isNotEmpty) {
-                                                          return Column(
-                                                            children: [
-                                                              Container(
-                                                                width: 50,
-                                                                height: 50,
-                                                                decoration: BoxDecoration(
-                                                                  borderRadius: BorderRadius.circular(10.0),
-                                                                  boxShadow: [
-                                                                    BoxShadow(
-                                                                      color: Colors.grey.withOpacity(0.5),
-                                                                      spreadRadius: 2,
-                                                                      blurRadius: 5,
-                                                                      offset: Offset(0, 3),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                child: Image.memory(
-                                                                  patientImage,
-                                                                  width: 90,
-                                                                  height: 90,
-                                                                  fit: BoxFit.fill,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          );
-                                                        } else {
-                                                          // Return an empty Container with an image asset as a placeholder
-                                                          return Container(
-                                                            width: 60,
-                                                            height: 50,
-                                                            decoration: BoxDecoration(
-                                                              borderRadius: BorderRadius.circular(10.0),
-                                                              image: DecorationImage(
-                                                                image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
-                                                                fit: BoxFit.fill,
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }
-                                                      } else {
-                                                        // Return an empty Container with an image asset as a placeholder
-                                                        return Container(
-                                                          width: 60,
-                                                          height: 50,
-                                                          decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(10.0),
-                                                            image: DecorationImage(
-                                                              image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
-                                                              fit: BoxFit.fill,
-                                                            ),
-                                                          ),
-                                                        );
-                                                      }
-                                                    },
-                                                  ),
-                                                ),
+                                                // Flexible(
+                                                //   child: FutureBuilder(
+                                                //     future: Consultation.getPatientImage(consult.patientID!),
+                                                //     builder: (context, snapshot) {
+                                                //       if (snapshot.connectionState == ConnectionState.waiting) {
+                                                //         return CircularProgressIndicator();
+                                                //       } else if (snapshot.hasError) {
+                                                //         return Text('Error: ${snapshot.error}');
+                                                //       } else if (snapshot.hasData) {
+                                                //         Uint8List? patientImage = snapshot.data as Uint8List?;
+                                                //         if (patientImage != null && patientImage.isNotEmpty) {
+                                                //           return Column(
+                                                //             children: [
+                                                //               Container(
+                                                //                 width: 50,
+                                                //                 height: 50,
+                                                //                 decoration: BoxDecoration(
+                                                //                   borderRadius: BorderRadius.circular(10.0),
+                                                //                   boxShadow: [
+                                                //                     BoxShadow(
+                                                //                       color: Colors.grey.withOpacity(0.5),
+                                                //                       spreadRadius: 2,
+                                                //                       blurRadius: 5,
+                                                //                       offset: Offset(0, 3),
+                                                //                     ),
+                                                //                   ],
+                                                //                 ),
+                                                //                 child: Image.memory(
+                                                //                   patientImage,
+                                                //                   width: 90,
+                                                //                   height: 90,
+                                                //                   fit: BoxFit.fill,
+                                                //                 ),
+                                                //               ),
+                                                //             ],
+                                                //           );
+                                                //         } else {
+                                                //           // Return an empty Container with an image asset as a placeholder
+                                                //           return Container(
+                                                //             width: 60,
+                                                //             height: 50,
+                                                //             decoration: BoxDecoration(
+                                                //               borderRadius: BorderRadius.circular(10.0),
+                                                //               image: DecorationImage(
+                                                //                 image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                //                 fit: BoxFit.fill,
+                                                //               ),
+                                                //             ),
+                                                //           );
+                                                //         }
+                                                //       } else {
+                                                //         // Return an empty Container with an image asset as a placeholder
+                                                //         return Container(
+                                                //           width: 60,
+                                                //           height: 50,
+                                                //           decoration: BoxDecoration(
+                                                //             borderRadius: BorderRadius.circular(10.0),
+                                                //             image: DecorationImage(
+                                                //               image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                //               fit: BoxFit.fill,
+                                                //             ),
+                                                //           ),
+                                                //         );
+                                                //       }
+                                                //     },
+                                                //   ),
+                                                // ),
                                                 SizedBox(width: 10), // Add some spacing between the image and text
                                                 Column(
                                                   children: [
                                                     Container(
-                                                      width: 450, // Adjust the width based on your needs
+                                                      width: 320, // Adjust the width based on your needs
                                                       child: Text(
                                                         '${consult.patientName}',
                                                         style: TextStyle(
@@ -835,9 +812,9 @@ class _viewPatientScreenState extends State<viewPatientScreen> {
                                                 ),
                                               ],
                                             ),
-                                              // Add other details...
-                                            ],
-                                          )
+                                            // Add other details...
+                                          ],
+                                        )
                                         ),
                                       ),
                                     ),

@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
 
 
 
-  static final String ipAddress = "10.131.73.21";
+  static final String ipAddress = "192.168.8.186";
   static final String clinicPath = "/teleclinic/clinic.php";
 
   @override

@@ -14,7 +14,10 @@ import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../Model/specialist.dart';
-import 'dart:io';  // Import this for File
+import 'dart:io';
+
+import 'Profile/settingSpecialist.dart';
+import 'Profile/specialist_home.dart';  // Import this for File
 
 
 void main() {
@@ -88,6 +91,7 @@ class _EditProfileSpecialistState extends State<EditProfileSpecialist> {
           _phone = firstSpecialist.phone ?? 'N/A';
           _title = firstSpecialist.specialistTitle ?? 'N/A';
           _password = firstSpecialist.password ?? 'N/A';
+          specialistID = firstSpecialist.specialistID??0;
         });
 
         print("Patient Information:");
@@ -222,6 +226,9 @@ class _EditProfileSpecialistState extends State<EditProfileSpecialist> {
             if (shouldDiscardChanges ?? false) {
               // User confirmed to discard changes
               Navigator.pop(context);
+              setState(() {
+
+              });
 
             }
           },
@@ -498,6 +505,13 @@ class _EditProfileSpecialistState extends State<EditProfileSpecialist> {
                               fontSize: 16.0,
                             );
 
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        SpecialistHomeScreen()
+                                  //****
+                                ));
 
 
                       }

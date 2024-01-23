@@ -374,7 +374,7 @@ class _VitalInfoReportScreenState extends State<VitalInfoReportScreen> {
             ),
 
             Padding(
-              padding: const EdgeInsets.only(top: 25, right: 100, bottom: 10),
+              padding: const EdgeInsets.only(left:70, top: 25, right: 100, bottom: 10),
               child: Text(
                 "Vital Info Report ",
                 style: TextStyle(
@@ -463,6 +463,7 @@ class VitalInfoDataSource extends DataGridSource {
     _vitalInfoDataGridRows = vitalInfos
         .map<DataGridRow>((e) => DataGridRow(cells: [
       // DataGridCell<int>(columnName: 'infoID', value: e.infoID),
+
       DataGridCell<double>(columnName: 'weight', value: e.weight),
       DataGridCell<double>(columnName: 'height', value: e.height),
       DataGridCell<double>(

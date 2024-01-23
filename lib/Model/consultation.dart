@@ -24,6 +24,7 @@ class Consultation {
   DateTime? birthDate;
   String? phone; // Add specialist's name field
   Uint8List? patientImage;
+  String? feesConsultation;
 
   // int? medicationID;
   // int? MedID;
@@ -32,7 +33,6 @@ class Consultation {
 
   //String? specialistTitle;
   //int pro
-  String? feesConsultation;
 
 
   Consultation({
@@ -50,6 +50,7 @@ class Consultation {
     this.birthDate,
     this.phone,
     this.patientImage,
+    this.feesConsultation,
     // this.medicationID,
     // this.MedID,
     // this.MedGeneral,
@@ -79,31 +80,32 @@ class Consultation {
           : DateTime.parse('0000-00-00'),
       phone: json['phone'] ?? '',
       patientImage: base64Decode(json["base64Image"] ?? ''),
+      feesConsultation: json['feesConsultation'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'consultationID': consultationID,
-        'patientID': patientID,
-        'consultationDateTime': consultationDateTime.toString(),
-        'specialistID': specialistID,
-        'consultationTreatment': consultationTreatment,
-        'consultationStatus': consultationStatus,
-        'consultationSymptom': consultationSymptom,
-        'specialistName': specialistName,
-        'patientName': patientName,
-        'icNumber': icNum,
-        'gender': gender,
-        'birthDate': birthDate.toString(),
-        'phone': phone,
-        'patientImage': patientImage,
-        // 'medicationID': medicationID,
-        // 'MedID': MedID,
-        // 'MedForm': MedForm,
-        // 'MedGeneral': MedGeneral,
+    'consultationID': consultationID,
+    'patientID': patientID,
+    'consultationDateTime': consultationDateTime.toString(),
+    'specialistID': specialistID,
+    'consultationTreatment': consultationTreatment,
+    'consultationStatus': consultationStatus,
+    'consultationSymptom': consultationSymptom,
+    'specialistName': specialistName,
+    'patientName': patientName,
+    'icNumber': icNum,
+    'gender': gender,
+    'birthDate': birthDate.toString(),
+    'phone': phone,
+    'patientImage': patientImage,
+    // 'medicationID': medicationID,
+    // 'MedID': MedID,
+    // 'MedForm': MedForm,
+    // 'MedGeneral': MedGeneral,
 
-        //'specialistTitle':specialistTitle
-      };
+    //'specialistTitle':specialistTitle
+  };
 
   Consultation updateStatus(String newStatus) {
     // Create a new instance of Consultation with updated status
@@ -163,7 +165,7 @@ class Consultation {
   Future<bool> save() async {
     // API OPERATION
     RequestController req =
-        RequestController(path: '/teleclinic/consultation.php');
+    RequestController(path: '/teleclinic/consultation.php');
     req.setBody(toJson());
     await req.post();
     if (req.status() == 200) {

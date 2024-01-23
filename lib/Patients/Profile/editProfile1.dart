@@ -7,11 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:my_teleclinic/Patients/Profile/patient_home_page.dart';
 import 'package:my_teleclinic/Specialists/editProfileSpecialist.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/patient.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
+import 'package:image/image.dart' as img;
+
 
 void main() {
   runApp(MaterialApp(
@@ -365,7 +368,7 @@ class _EditProfile1State extends State<EditProfile1> {
               padding: const EdgeInsets.only(left: 5, top: 10, right: 30),
               child: Row(
                 children: [
-                  SizedBox(width: 10,
+                  SizedBox(width:8,
                   height: 30,),
                   GestureDetector(
                     onTap: _selectGender,
@@ -373,7 +376,7 @@ class _EditProfile1State extends State<EditProfile1> {
                         height: 40,
                       child: Container(
                         padding:
-                        EdgeInsets.only(top: 10, right: 519),
+                        EdgeInsets.only(top: 10, right: 273),
                         decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
@@ -487,6 +490,13 @@ class _EditProfile1State extends State<EditProfile1> {
                         fontSize: 16.0,
                       );
 
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage(
+                              phone: phoneController.text,
+                              patientName: _patientName.toString(),
+                              patientID: patientID))
+                      );
 
 
                     }

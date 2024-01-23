@@ -708,7 +708,7 @@ var uuid = Uuid();
                                                                                 await saveCallIDtoDatabase(consultationID, dynamicCallID);
 
 
-                                                                           //     sendInAppMessage(pd.toString(), dynamicCallID, consultationID);
+                                                                                sendInAppMessage(pd.toString(), dynamicCallID, consultationID);
 
 
                                                                                 // ZegoSendCallInvitationButton actionButton(bool isVideo)=>

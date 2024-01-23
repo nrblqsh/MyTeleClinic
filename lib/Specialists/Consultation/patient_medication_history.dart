@@ -97,11 +97,11 @@ class _PatientMedicationHistoryState
             Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 12.0, top: 12),
                 child: Text(
                   'Medication History', // Add your test text here
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -162,17 +162,20 @@ class _PatientMedicationHistoryState
                                           crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                           children: <Widget>[
+                                            Text( 'Date: ${DateFormat('dd/MM/yyyy').format(med.consultationDateTime!)}\n'
+                                                'Time: ${DateFormat('hh:mm a').format(med.consultationDateTime!)}',
+                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+
                                             Text(
-                                              'Date: ${DateFormat('dd/MM/yyyy').format(med.consultationDateTime!)}\n'
-                                                  'Time: ${DateFormat('hh:mm a').format(med.consultationDateTime!)}\n'
-                                                  'Medicine Name: ${med.medGeneral}\n'
+                                              'Medicine Name: ${med.medGeneral}\n'
                                                   'Medicine Type: ${med.medForm}\n'
-                                                  'Medicine Dosage: ${med.dosage}\n'
-                                                  'Medicine Instruction: ${med.medInstruction}\n',
+                                                  'Dosage: ${med.dosage}\n'
+                                                  'Instruction: ${med.medInstruction}\n',
                                               style: TextStyle(
                                                 fontSize: 14,
                                               ),
                                             ),
+
                                           ],
                                         ),
                                       ),

@@ -22,6 +22,7 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
   String consultationStatus = '';
   String consultationSymptom = '';
   String consultationTreatment = '';
+  String feesConsultation = '';
   late List<Consultation> todayConsultations = [];
 
 
@@ -40,7 +41,8 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
         consultationStatus: consultationStatus,
         consultationDateTime: consultationDateTime,
         specialistID: specialistID,
-        specialistName: specialistName);
+        specialistName: specialistName,
+        feesConsultation: feesConsultation);
     print(consultation.fetchSpecialistConsultationHistory(specialistID));
     return await consultation.fetchSpecialistConsultationHistory(specialistID);
   }
@@ -65,13 +67,14 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 68,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 72,
         backgroundColor: Colors.white,
         title: Center(
           child: Image.asset(
             "asset/MYTeleClinic.png",
             width: 594,
-            height: 258,
+            height: 100,
           ),
         ),
       ),
@@ -82,11 +85,11 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
             Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 10.0, top: 10),
                 child: Text(
                   'Consultation History',  // Add your test text here
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -122,7 +125,7 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
                                   children: [
                                     SizedBox(
                                       width: 700,
-                                      height: 120,
+                                      height: 100,
                                       child: Container(
                                         padding: EdgeInsets.only(
                                             left: 12, right: 12, top: 10),
@@ -150,6 +153,12 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
                                           crossAxisAlignment: CrossAxisAlignment
                                               .start,
                                           children: <Widget>[
+                                            Text("${consult
+                                                .patientName}",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                              ),),
                                             Text(
                                               'Date: ${DateFormat('dd/MM/yyyy')
                                                   .format(
@@ -157,9 +166,7 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
                                                   'Time: ${DateFormat('hh:mm a')
                                                   .format(
                                                   consult.consultationDateTime)}\n'
-                                                  'Patient Name: ${consult
-                                                  .patientName}\n'
-                                                  'Status: ${consult.consultationStatus}\n',
+                                                  'Consultation fees: RM ${consult.feesConsultation}\n',
                                               style: TextStyle(
                                                 fontSize: 14,
                                               ),
@@ -218,4 +225,3 @@ class _SpecialistConsultationHistoryState extends State<SpecialistConsultationHi
   }
 
 }
-

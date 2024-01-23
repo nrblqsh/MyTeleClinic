@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
@@ -73,7 +74,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setInt("specialistID", specialistID);
     patientID = prefs.getInt("patientID") ?? 0;
-   // prefs.setInt("patientID", patientID);
+    // prefs.setInt("patientID", patientID);
 
     print ("specialistID ${specialistID}");
     print ("patientID ${patientID}");
@@ -96,6 +97,16 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
   //   });
   // }
 
+  static Future<String> getPathImg(int specialistID) async
+  {
+    String strUrl = "";
+    RequestController req = RequestController(
+
+      path: "/teleclinic/getSpecialistImagePatientSide.php",
+
+    );
+    return strUrl;
+  }
 
   static Future<Uint8List?> getSpecialistImage1(int specialistID) async {
 
@@ -154,38 +165,38 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
       body: SingleChildScrollView(
           child: Column(
               children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 25, right: 100),
-              child: Text(
-                "Find your specialist ",
-                style: GoogleFonts.roboto(
-                  fontWeight: FontWeight.bold,
-                  textStyle: const TextStyle(fontSize: 28, color: Colors.black),
+                Padding(
+                  padding: const EdgeInsets.only(top: 25, right: 100),
+                  child: Text(
+                    "Find your specialist ",
+                    style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.bold,
+                      textStyle: const TextStyle(fontSize: 28, color: Colors.black),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Padding(
-              padding:
-              const EdgeInsets.only(left: 20, top: 10, right: 20, bottom: 10),
-              child: Text(
-                "Discover highly skilled healthcare experts for immediate "
-                    "assistance with your health issues. Seek virtual consultations"
-                    " with doctors through video calls or messaging ",
-                style: GoogleFonts.roboto(
-                  textStyle: const TextStyle(fontSize: 18, color: Colors.black54),
+                Padding(
+                  padding:
+                  const EdgeInsets.only(left: 20, top: 10, right: 20, bottom: 10),
+                  child: Text(
+                    "Discover highly skilled healthcare experts for immediate "
+                        "assistance with your health issues. Seek virtual consultations"
+                        " with doctors through video calls or messaging ",
+                    style: GoogleFonts.roboto(
+                      textStyle: const TextStyle(fontSize: 18, color: Colors.black54),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10, right: 200, bottom: 10),
-              child: Text(
-                "Let's get started! ",
-                style: GoogleFonts.roboto(
-                  textStyle: const TextStyle(fontSize: 18, color: Colors.black54),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, right: 200, bottom: 10),
+                  child: Text(
+                    "Let's get started! ",
+                    style: GoogleFonts.roboto(
+                      textStyle: const TextStyle(fontSize: 18, color: Colors.black54),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-                
+
                 Container(
                   child: FutureBuilder(
                     future: fetchSpecialist(),
@@ -291,11 +302,12 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                                                       ),
                                                                     ],
                                                                   ),
-                                                                  child: Image.memory(
-                                                                    specialistImage,
+                                                                  child: Image.network
+                                                                    (
+                                                                    "http://${MyApp.ipAddress}/teleclinic/getSpecialistImagePatientSide.php?specialistID=${specialist.specialistID}}",
                                                                     width: 90,
                                                                     height: 90,
-                                                                    fit: BoxFit.cover,
+                                                                    fit: BoxFit.fill,
                                                                   ),
                                                                 );
                                                               } else {
@@ -500,8 +512,10 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                                                                               ),
                                                                             ],
                                                                           ),
-                                                                          child: Image.memory(
-                                                                            specialistImage,
+                                                                          child:
+                                                                          Image.network
+                                                                            (
+                                                                            "http://${MyApp.ipAddress}/teleclinic/getSpecialistImagePatientSide.php?specialistID=${specialist.specialistID}}",
                                                                             width: 90,
                                                                             height: 90,
                                                                             fit: BoxFit.fill,
@@ -592,7 +606,7 @@ class _viewSpecialistScreenState extends State<viewSpecialistScreen> {
                 ),
 
 
-          ])),
+              ])),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {

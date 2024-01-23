@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import '../EMR/e_medical_record.dart';
 import '../Profile/patient_home_page.dart';
 import '../Profile/settings.dart';
 import '../../Model/specialist.dart';
+import '../Telemedicine/view_specialist.dart';
 
 // void main() {
 //   runApp(const MaterialApp(
@@ -84,12 +87,63 @@ class _viewClinicSpecialistScreenState extends State<viewClinicSpecialistScreen>
     print("clinic id sekarang ${clinicID}");
   }
 
+
+  static Future<String> getPathImg(int specialistID) async
+  {
+    String strUrl = "";
+    RequestController req = RequestController(
+
+      path: "/teleclinic/getSpecialistImagePatientSide.php",
+
+    );
+    return strUrl;
+  }
+
+
+  static Future<Uint8List?> getSpecialistImage1(int specialistID) async {
+
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    // int specialistID = prefs.getInt("specialistID") ?? 0;
+    RequestController req = RequestController(
+
+      path: "/teleclinic/getSpecialistImagePatientSide.php",
+
+    );
+
+    // Add specialistID as a query parameter
+    req.path = "${req.path}?specialistID=$specialistID";
+
+    try {
+      // Make a GET request using RequestController
+      await req.get();
+
+      if (req.status() == 200) {
+        // Image data is available in the response body
+
+
+        return req.result();
+      } else if (req.status() == 404) {
+        // Image not found
+        print('Image not found for specialistID: $specialistID');
+        return null;
+      } else {
+        // Handle other status codes
+        print('Failed to retrieve image. Status: ${req.status()}');
+        return null;
+      }
+    } catch (error) {
+      // Handle any exceptions that might occur during the request
+      print('Error retrieving image: $error');
+      return null;
+    }
+  }
+
   Future<List<Specialist>> fetchClinicSpecialist() async {
     String url = 'http://${MyApp.ipAddress}/teleclinic/viewClinicSpecialist.php?clinicID=$clinicID';
     final response = await http.get(Uri.parse(url));
     return specialistFromJson(response.body);
   }
-  
+
   @override
   Widget build(BuildContext context) {
     int _currentIndex = 1;
@@ -107,301 +161,458 @@ class _viewClinicSpecialistScreenState extends State<viewClinicSpecialistScreen>
         ),
       ),
       body: SingleChildScrollView(
-          child: Column(children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 25, right: 100),
-              child: Text(
-                "Find your specialist ",
-                style: GoogleFonts.roboto(
-                  fontWeight: FontWeight.bold,
-                  textStyle: const TextStyle(fontSize: 28, color: Colors.black),
+          child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 25, right: 100),
+                  child: Text(
+                    "Find your specialist ",
+                    style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.bold,
+                      textStyle: const TextStyle(fontSize: 28, color: Colors.black),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Padding(
-              padding:
-              const EdgeInsets.only(left: 20, top: 10, right: 20, bottom: 10),
-              child: Text(
-                "Discover highly skilled healthcare experts for immediate "
-                    "assistance with your health issues. Seek virtual consultations"
-                    " with doctors through video calls or messaging ",
-                style: GoogleFonts.roboto(
-                  textStyle: const TextStyle(fontSize: 18, color: Colors.black54),
+                Padding(
+                  padding:
+                  const EdgeInsets.only(left: 20, top: 10, right: 20, bottom: 10),
+                  child: Text(
+                    "Discover highly skilled healthcare experts for immediate "
+                        "assistance with your health issues. Seek virtual consultations"
+                        " with doctors through video calls or messaging ",
+                    style: GoogleFonts.roboto(
+                      textStyle: const TextStyle(fontSize: 18, color: Colors.black54),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10, right: 200, bottom: 10),
-              child: Text(
-                "Let's get started! ",
-                style: GoogleFonts.roboto(
-                  textStyle: const TextStyle(fontSize: 18, color: Colors.black54),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, right: 200, bottom: 10),
+                  child: Text(
+                    "Let's get started! ",
+                    style: GoogleFonts.roboto(
+                      textStyle: const TextStyle(fontSize: 18, color: Colors.black54),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Container(
-              child: FutureBuilder(
-                future: fetchClinicSpecialist(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else if (snapshot.hasData) {
-                    List<Specialist>? specialists =
-                    snapshot.data as List<Specialist>?;
-                    if (specialists != null) {
-                      return ListView.builder(
-                        itemCount: specialists.length,
-                        shrinkWrap: true,
-                        itemBuilder: (BuildContext context, index) {
-                          Specialist specialist = specialists[index];
-                          bool isSpecialistOnline =
-                              specialist.logStatus == 'ONLINE';
-                          return Card(
-                            child: GestureDetector(
-                              onTap: () {
-                                Specialist specialist = specialists[index];
-                                //  print('index-');
-                                // print(index);
-                                setState(() {
-                                  specialistID =
-                                      int.parse('${specialist.specialistID}');
-                                });
-                                print(specialistID);
-                                _loadData();
-                                showDialog(
-                                  context: context,
-                                  // Make sure you have access to the context
-                                  builder: (BuildContext context) {
-                                    return Dialog(
-                                      //backgroundColor: Colors.greenAccent,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(20))),
 
-                                      child: Container(
-                                        padding: EdgeInsets.only(
-                                            left: 12, right: 12, top: 10),
-                                        decoration: BoxDecoration(
-                                          border:
-                                          Border.all(color: Colors.blueAccent),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(12.0)),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.blueGrey,
-                                              offset: const Offset(5.0, 5.0),
-                                              blurRadius: 10.0,
-                                              spreadRadius: 2.0,
-                                            ),
-                                            BoxShadow(
-                                              color: Colors.white,
-                                              offset: const Offset(0.0, 0.0),
-                                              blurRadius: 0.0,
-                                              spreadRadius: 0.0,
-                                            ),
-                                          ],
-                                        ),
-                                        height: 400,
-                                        child: Column(
-                                          // mainAxisAlignment:
-                                          //     MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 20.0),
-                                              child: Image.network(
-                                                'https://t4.ftcdn.net/jpg/02/29/53/11/360_F_229531197_jmFcViuzXaYOQdoOK1qyg7uIGdnuKhpt.jpg',
-                                                width: 90,
-                                                height: 90,
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 5.0),
-                                              child: Text(
-                                                '${specialist.specialistName}',
-                                                style: TextStyle(fontSize: 20),
-                                              ),
-                                              //
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 15.0),
-                                              child: Text(
-                                                '${specialist.specialistTitle}',
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 4, left: 4, bottom: 40.0),
-                                              child: Text(
-                                                'You will need to wait for atleast 15 minutes'
-                                                    ' before specialist approve your request.'
-                                                    ' \nAre you sure to proceed your consultation request?',
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ),
-                                            if (_buildOnlineIndicator(
-                                                isSpecialistOnline) !=
-                                                null)
-                                              ElevatedButton(
-                                                onPressed: isSpecialistOnline
-                                                    ? () async {
-                                                  print(specialistID);
-                                                  // Create a new Booking instance with the selected data
-                                                  Consultation consult =
-                                                  Consultation(
-                                                    patientID: patientID,
-                                                    // Replace with the actual patient ID
-                                                    specialistID:
-                                                    specialistID,
-                                                    consultationDateTime:
-                                                    selectedDate,
-                                                    consultationStatus:
-                                                    'Pending',
-                                                    consultationTreatment: '',
-                                                    consultationSymptom: '',
-                                                  );
-                                                  bool success =
-                                                  await consult.save();
+                Container(
+                  child: FutureBuilder(
+                    future: fetchClinicSpecialist(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (snapshot.hasData) {
+                        List<Specialist>? specialists =
+                        snapshot.data as List<Specialist>?;
+                        if (specialists != null) {
+                          return SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                ListView.builder(
+                                  itemCount: specialists.length,
+                                  shrinkWrap: true,
+                                  itemBuilder: (BuildContext context, index) {
+                                    Specialist specialist = specialists[index];
 
-                                                  // Show the confirmation container only if the booking is successful
-                                                  if (success) {
-                                                    setState(() {
-                                                      showConfirmation = true;
-                                                    });
-                                                  }
+                                    specialistID =
+                                        int.parse('${specialist.specialistID}');
 
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            SuccessRequestScreen(),
-                                                      ));
-                                                }
-                                                    : null,
-                                                style: ButtonStyle(
-                                                  backgroundColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(
-                                                    isSpecialistOnline
-                                                        ? Colors.red
-                                                        : Colors.grey,
+                                    bool isSpecialistOnline =
+                                        specialist.logStatus == 'ONLINE';
+                                    return Card(
+                                      child: GestureDetector(
+                                        onTap: ()  {
+                                          Specialist specialist = specialists[index];
+
+                                          //  print('index-');
+                                          // print(index);
+                                          setState(()  {
+                                            // final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                            //
+                                            // print('Tapped on specialist: ${specialist.specialistID}');
+                                            specialistID =
+                                                int.parse('${specialist.specialistID}');
+                                          });
+                                          print(specialistID);
+
+                                          _loadData();
+                                          showDialog(
+                                            context: context,
+                                            // Make sure you have access to the context
+                                            builder: (BuildContext context) {
+                                              return Dialog(
+                                                //backgroundColor: Colors.greenAccent,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.all(
+                                                        Radius.circular(20))),
+
+                                                child: Container(
+                                                  padding: EdgeInsets.only(
+                                                      left: 12, right: 12, top: 10),
+                                                  decoration: BoxDecoration(
+                                                    border:
+                                                    Border.all(color: Colors.blueAccent),
+                                                    borderRadius: BorderRadius.all(
+                                                        Radius.circular(12.0)),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.blueGrey,
+                                                        offset: const Offset(5.0, 5.0),
+                                                        blurRadius: 10.0,
+                                                        spreadRadius: 2.0,
+                                                      ),
+                                                      BoxShadow(
+                                                        color: Colors.white,
+                                                        offset: const Offset(0.0, 0.0),
+                                                        blurRadius: 0.0,
+                                                        spreadRadius: 0.0,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  height: 400,
+                                                  child: Column(
+                                                    children: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(bottom: 20.0),
+                                                        child: FutureBuilder(
+                                                          future: getSpecialistImage1(specialistID),
+                                                          builder: (context, snapshot) {
+                                                            if (snapshot.connectionState == ConnectionState.waiting) {
+                                                              return CircularProgressIndicator();
+                                                            } else if (snapshot.hasError) {
+                                                              return Text('Error: ${snapshot.error}');
+                                                            } else if (snapshot.hasData) {
+                                                              Uint8List? specialistImage = snapshot.data as Uint8List?;
+                                                              if (specialistImage != null && specialistImage.isNotEmpty) {
+                                                                return Container(
+                                                                  width: 90,
+                                                                  height: 90,
+                                                                  decoration: BoxDecoration(
+                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                    boxShadow: [
+                                                                      BoxShadow(
+                                                                        color: Colors.grey.withOpacity(0.5),
+                                                                        spreadRadius: 2,
+                                                                        blurRadius: 5,
+                                                                        offset: Offset(0, 3),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  child: Image.network
+                                                                    (
+                                                                    "http://${MyApp.ipAddress}/teleclinic/getSpecialistImagePatientSide.php?specialistID=${specialist.specialistID}}",
+                                                                    width: 90,
+                                                                    height: 90,
+                                                                    fit: BoxFit.fill,
+                                                                  ),
+                                                                );
+                                                              } else {
+                                                                // Return an empty Container with an image asset as a placeholder
+                                                                return Container(
+                                                                  width: 90,
+                                                                  height: 90,
+                                                                  decoration: BoxDecoration(
+                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                    image: DecorationImage(
+                                                                      image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                                      fit: BoxFit.cover,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              }
+                                                            } else {
+                                                              // Return an empty Container with an image asset as a placeholder
+                                                              return Container(
+                                                                width: 90,
+                                                                height: 90,
+                                                                decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(10.0),
+                                                                  image: DecorationImage(
+                                                                    image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                                    fit: BoxFit.cover,
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            }
+                                                          },
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(
+                                                            bottom: 5.0),
+                                                        child: Text(
+                                                          '${specialist.specialistName}',
+                                                          style: TextStyle(fontSize: 20),
+                                                        ),
+                                                        //
+                                                      ),
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(
+                                                            bottom: 15.0),
+                                                        child: Text(
+                                                          '${specialist.specialistTitle}',
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(
+                                                            right: 4, left: 4, bottom: 40.0),
+                                                        child: Text(
+                                                          'You will need to wait for atleast 15 minutes'
+                                                              ' before specialist approve your request.'
+                                                              ' \nAre you sure to proceed your consultation request?',
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      if (_buildOnlineIndicator(
+                                                          isSpecialistOnline) !=
+                                                          null)
+                                                        ElevatedButton(
+                                                          onPressed: isSpecialistOnline
+                                                              ? () async {
+                                                            //_getData();
+                                                            //print('SPECIALIST REQUEST >> ${specialistID}');
+                                                            // Create a new Booking instance with the selected data
+                                                            Consultation consult =
+                                                            Consultation(
+                                                              patientID: patientID,
+                                                              specialistID:
+                                                              int.parse(specialist.specialistID),
+                                                              consultationDateTime:
+                                                              selectedDate,
+                                                              consultationStatus:
+                                                              'Pending',
+                                                              consultationTreatment: '',
+                                                              consultationSymptom: '',
+                                                            );
+                                                            bool success =
+                                                            await consult.save();
+
+                                                            // Show the confirmation container only if the booking is successful
+                                                            if (success) {
+                                                              setState(() {
+                                                                showConfirmation = true;
+                                                              });
+                                                            }
+
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder: (context) =>
+                                                                      SuccessRequestScreen(),
+                                                                ));
+                                                          }
+                                                              : null,
+                                                          style: ButtonStyle(
+                                                            backgroundColor:
+                                                            MaterialStateProperty.all<
+                                                                Color>(
+                                                              isSpecialistOnline
+                                                                  ? Colors.red
+                                                                  : Colors.grey,
+                                                            ),
+                                                          ),
+                                                          child: Text(
+                                                              "Request Consultation Now"),
+                                                        ),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    AppointmentScreen(
+                                                                      patientID: 0,
+                                                                      specialistID: specialistID,
+                                                                    ),
+                                                              ));
+                                                        },
+                                                        style: ButtonStyle(
+                                                          backgroundColor:
+                                                          MaterialStateProperty.all<
+                                                              Color>(Colors.red),
+                                                        ),
+                                                        child: Text("Book For Later"),
+                                                      )
+                                                    ],
                                                   ),
                                                 ),
-                                                child: Text(
-                                                    "Request Consultation Now"),
-                                              ),
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          AppointmentScreen(
-                                                            patientID: 0,
-                                                            specialistID: specialistID,
+                                              );
+                                            },
+                                          );
+                                        },
+
+
+                                        child: Card(
+                                          child: Container(
+                                            padding:
+                                            EdgeInsets.only(left: 15, right: 15, top: 10),
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                    width: 700,
+                                                    height: 70,
+                                                    child: Container(
+                                                      padding: EdgeInsets.only(
+                                                          left: 12, right: 12, top: 10),
+                                                      decoration: BoxDecoration(
+                                                        border:
+                                                        Border.all(color: Colors.blueAccent),
+                                                        borderRadius: BorderRadius.all(
+                                                            Radius.circular(12.0)),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.blueGrey,
+                                                            offset: const Offset(5.0, 5.0),
+                                                            blurRadius: 10.0,
+                                                            spreadRadius: 2.0,
                                                           ),
-                                                    ));
-                                              },
-                                              style: ButtonStyle(
-                                                backgroundColor:
-                                                MaterialStateProperty.all<
-                                                    Color>(Colors.red),
-                                              ),
-                                              child: Text("Book For Later"),
-                                            )
-                                          ],
+                                                          BoxShadow(
+                                                            color: Colors.white,
+                                                            offset: const Offset(0.0, 0.0),
+                                                            blurRadius: 0.0,
+                                                            spreadRadius: 0.0,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child:  Row(
+                                                        children: [
+                                                          Flexible(
+                                                            child: FutureBuilder(
+                                                              future: getSpecialistImage1(specialistID),
+                                                              builder: (context, snapshot) {
+                                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                  return CircularProgressIndicator();
+                                                                } else if (snapshot.hasError) {
+                                                                  return Text('Error: ${snapshot.error}');
+                                                                } else if (snapshot.hasData) {
+                                                                  Uint8List? specialistImage = snapshot.data as Uint8List?;
+                                                                  if (specialistImage != null && specialistImage.isNotEmpty) {
+                                                                    return Column(
+                                                                      children: [
+                                                                        Container(
+                                                                          width: 50,
+                                                                          height: 50,
+                                                                          decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(10.0),
+                                                                            boxShadow: [
+                                                                              BoxShadow(
+                                                                                color: Colors.grey.withOpacity(0.5),
+                                                                                spreadRadius: 2,
+                                                                                blurRadius: 5,
+                                                                                offset: Offset(0, 3),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          child:
+                                                                          Image.network
+                                                                            (
+                                                                            "http://${MyApp.ipAddress}/teleclinic/getSpecialistImagePatientSide.php?specialistID=${specialist.specialistID}}",
+                                                                            width: 90,
+                                                                            height: 90,
+                                                                            fit: BoxFit.fill,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    );
+                                                                  } else {
+                                                                    // Return an empty Container with an image asset as a placeholder
+                                                                    return Container(
+                                                                      width: 60,
+                                                                      height: 50,
+                                                                      decoration: BoxDecoration(
+                                                                        borderRadius: BorderRadius.circular(10.0),
+                                                                        image: DecorationImage(
+                                                                          image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                                          fit: BoxFit.fill,
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                } else {
+                                                                  // Return an empty Container with an image asset as a placeholder
+                                                                  return Container(
+                                                                    width: 60,
+                                                                    height: 50,
+                                                                    decoration: BoxDecoration(
+                                                                      borderRadius: BorderRadius.circular(10.0),
+                                                                      image: DecorationImage(
+                                                                        image: AssetImage('asset/default image.jpg'), // Replace with your actual image asset path
+                                                                        fit: BoxFit.fill,
+                                                                      ),
+                                                                    ),
+                                                                  );
+                                                                }
+                                                              },
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 10,),
+                                                          Column(
+                                                            crossAxisAlignment:
+                                                            CrossAxisAlignment.start,
+                                                            children: <Widget>[
+                                                              Row(
+                                                                children: [
+                                                                  Text(
+                                                                    '${specialist.specialistName}',
+                                                                    style: TextStyle(
+                                                                      fontSize: 20,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(width: 5),
+                                                                  _buildOnlineIndicator(
+                                                                      isSpecialistOnline),
+                                                                ],
+                                                              ),
+                                                              Text(
+                                                                '${specialist.specialistTitle}',
+                                                                style: TextStyle(
+                                                                  fontSize: 14,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     );
                                   },
-                                );
-                              },
-                              child: Container(
-                                padding:
-                                EdgeInsets.only(left: 15, right: 15, top: 10),
-                                child: Column(
-                                  children: [
-                                    SizedBox(
-                                      width: 700,
-                                      height: 70,
-                                      child: Container(
-                                        padding: EdgeInsets.only(
-                                            left: 12, right: 12, top: 10),
-                                        decoration: BoxDecoration(
-                                          border:
-                                          Border.all(color: Colors.blueAccent),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(12.0)),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.blueGrey,
-                                              offset: const Offset(5.0, 5.0),
-                                              blurRadius: 10.0,
-                                              spreadRadius: 2.0,
-                                            ),
-                                            BoxShadow(
-                                              color: Colors.white,
-                                              offset: const Offset(0.0, 0.0),
-                                              blurRadius: 0.0,
-                                              spreadRadius: 0.0,
-                                            ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  '${specialist.specialistName}',
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                  ),
-                                                ),
-                                                SizedBox(width: 5),
-                                                _buildOnlineIndicator(
-                                                    isSpecialistOnline),
-                                              ],
-                                            ),
-                                            Text(
-                                              '${specialist.specialistTitle}',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  ],
                                 ),
-                              ),
+                              ],
                             ),
                           );
-                        },
-                      );
-                    } else {
-                      return Text('No data available');
-                    }
-                  } else {
-                    return Text('No data available');
-                  }
-                },
-              ),
-            ),
-          ])),
+                        } else {
+                          return Text('No data available');
+                        }
+                      } else {
+                        return Text('No data available');
+                      }
+                    },
+                  ),
+                ),
+
+
+              ])),
 
     );
+  }
+
+  buildListView(
+
+      ) {
+
   }
 
 // Future<void> _loadData() async {

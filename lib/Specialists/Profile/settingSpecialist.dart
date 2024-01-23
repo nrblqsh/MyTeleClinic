@@ -30,7 +30,7 @@ class SettingsSpecialistScreen extends StatefulWidget {
 }
 
 class _SettingsSpecialistScreenState extends State<SettingsSpecialistScreen> {
-late int specialistID;
+  late int specialistID;
   String? specialistName;
   String? phoneNumber;
   String phone = '';
@@ -76,7 +76,7 @@ late int specialistID;
 
         print("Patient Information:");
         print("Name: $specialistName");
-       ;
+        ;
 
         print("\n");
       } else {
@@ -107,21 +107,21 @@ late int specialistID;
   }
 
 
-Future<void> _loadSpecialistImage() async {
-  try {
-    Uint8List? imageBytes = await Specialist.getSpecialistImage();
+  Future<void> _loadSpecialistImage() async {
+    try {
+      Uint8List? imageBytes = await Specialist.getSpecialistImage();
 
-    if (imageBytes != null && imageBytes.isNotEmpty) {
-      setState(() {
-        _specialist.specialistImagePath = imageBytes;
-      });
-    } else {
-      print('Invalid or empty image data');
+      if (imageBytes != null && imageBytes.isNotEmpty) {
+        setState(() {
+          _specialist.specialistImagePath = imageBytes;
+        });
+      } else {
+        print('Invalid or empty image data');
+      }
+    } catch (e) {
+      print('Error loading specialist image: $e');
     }
-  } catch (e) {
-    print('Error loading specialist image: $e');
   }
-}
 
 
   Future<void> _loadData() async {
@@ -254,15 +254,16 @@ Future<void> _loadSpecialistImage() async {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 70,
         backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          color: Colors.blue,
-        ),
+        // leading: IconButton(
+        //   icon: Icon(Icons.arrow_back_ios),
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        //   color: Colors.blue,
+        // ),
         title: Center(
           child: Image.asset(
             "asset/MYTeleClinic.png",
@@ -419,9 +420,12 @@ Future<void> _loadSpecialistImage() async {
                       GeneralItem(
                         question: 'Our Story',
                         // You can include an Image widget along with text
-                        answer: 'we are from Faculty of Information Technology'
-
-                            '![Our Story Image](asset/MYTeleClinic.png)', // Replace with your image path
+                        answer: 'We are group 16 from Faculty of Information Technology, UTeM, working on My TeleClinic.\n\n'
+                            'My TeleClinic is a project aimed at providing a convenient and accessible platform for telemedicine services.\n\n '
+                            'With a focus on leveraging technology to enhance healthcare, our team is dedicated to creating an innovative solution '
+                            'that connects patients with healthcare professionals remotely.\n\n Through My TeleClinic, we aspire to improve healthcare '
+                            'accessibility, reduce barriers to medical consultations, and ultimately contribute to the well-being of our community.',
+                        // Replace with your image path
                       ),
                       // Add more GeneralItem as needed
                     ],
@@ -443,11 +447,33 @@ Future<void> _loadSpecialistImage() async {
                     title: 'Terms and condition',
                     generalItems: [
                       GeneralItem(
-                        question: 'Our Story',
+                        question: 'User Registration',
                         // You can include an Image widget along with text
-                        answer: 'we are from Faculty of Information Technology'
-
-                            '![Our Story Image](asset/MYTeleClinic.png)', // Replace with your image path
+                        answer: "   - Register an account to use the App.\n"
+                            "   - Provide accurate information during registration.\n"
+                            "   - Maintain the confidentiality of your account.\n\n", // Replace with your image path
+                      ),
+                      GeneralItem(
+                        question: 'Telemedicine Services',
+                        // You can include an Image widget along with text
+                        answer:   "   - Consult healthcare professionals remotely.\n"
+                            "   - Not a substitute for in-person medical care.\n\n", // Replace with your image path
+                      ),
+                      GeneralItem(
+                        question: 'Privacy Policy',
+                        // You can include an Image widget along with text
+                        answer:  "   - Your use is subject to our Privacy Policy.\n\n", // Replace with your image path
+                      ),
+                      GeneralItem(
+                        question: 'Medical Advice',
+                        // You can include an Image widget along with text
+                        answer:  "   - Information is for informational purposes only.\n"
+                            "   - Consult a qualified healthcare professional for advice.\n\n", // Replace with your image path
+                      ),
+                      GeneralItem(
+                        question: 'Contact',
+                        // You can include an Image widget along with text
+                        answer:  "Contact us at myteleclinic@gmail.my\n\n", // Replace with your image path
                       ),
                       // Add more GeneralItem as needed
                     ],

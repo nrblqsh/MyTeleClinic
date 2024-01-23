@@ -235,9 +235,9 @@ int? consultid;
                                     "https://cdn-icons-png.flaticon.com/512/1076/1076325.png",
                                     height: 64,
                                   ),
-                                  SizedBox(height: 8.0),
+                                  SizedBox(height: 5.0),
                                   Text(
-                                    "E-Medical Record",
+                                    "E-Medical\n Record",
                                     style: GoogleFonts.roboto(
                                       fontWeight: FontWeight.bold,
                                       textStyle: const TextStyle(
@@ -292,9 +292,9 @@ int? consultid;
                             width: 64,
                             height: 64,
                           ),
-                          SizedBox(height: 8.0),
+                          SizedBox(height: 7.0),
                           Text(
-                            "View Appointment",
+                            "       View\n Appointment",
                             style: GoogleFonts.roboto(
                               fontWeight: FontWeight.bold,
                               textStyle: const TextStyle(fontSize: 14, color: Colors.blueGrey),
@@ -502,7 +502,7 @@ int? consultid;
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.calendar_today),
-                label: 'View Booking',
+                label: 'View Appointment',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.settings),

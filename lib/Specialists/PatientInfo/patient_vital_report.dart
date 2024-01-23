@@ -23,7 +23,7 @@ class PatientVitalReportScreen extends StatefulWidget {
 }
 
 class _PatientVitalReportScreenState extends State<PatientVitalReportScreen> {
-  late int patientID;
+  late int patientID=0;
   late VitalInfoDataSource vitalInfoDataSource;
   late List<GridColumn> _columns;
 

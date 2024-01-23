@@ -42,8 +42,8 @@ class Medication {
     consultationDateTime: json['consultationDateTime']!= null
         ? DateTime.tryParse(json['consultationDateTime'])
         : DateTime.parse('0000-00-00'),
-    dosage: json["Dosage"],
-    medInstruction: json["MedInstruction"],
+    dosage: json["dosage"],
+    medInstruction: json["medInstruction"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -53,8 +53,8 @@ class Medication {
     "MedGeneral": medGeneral,
     "medForm": medForm,
     'consultationDateTime': consultationDateTime.toString(),
-    "Dosage": dosage,
-    "MedInstruction": medInstruction,
+    "dosage": dosage,
+    "medInstruction": medInstruction,
 
 
 

@@ -116,7 +116,7 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
       vitalInfo = (await generateVitalInfo())!;
       print("ni ha");
       print(vitalInfo);
-     // dateController.text= vitalInfo!.latestDate.toString();
+      // dateController.text= vitalInfo!.latestDate.toString();
       weightController.text = vitalInfo!.weight.toString();
       heightController.text = vitalInfo!.height.toString();
       waistCircumferenceController.text = vitalInfo!.waistCircumference.toString();
@@ -229,7 +229,7 @@ class _AddVitalInfoScreenState extends State<AddVitalInfoScreen> {
         heartRate.isNotEmpty &&
         waistCircumference.isNotEmpty) {
       VitalInfo vitalInfo = VitalInfo(
-          weight: double.parse(weight),
+        weight: double.parse(weight),
         height: double.parse(height),
         waistCircumference: double.parse(waistCircumference),
         bloodPressure: double.parse(bloodPressure),
