@@ -37,7 +37,7 @@ class Specialist {
     required this.password,
     required this.logStatus,
     required this.clinicName,
-      this.specialistImagePath
+    this.specialistImagePath
 
 
   });
@@ -318,5 +318,3 @@ class Specialist {
     }
   }
 }
-
-

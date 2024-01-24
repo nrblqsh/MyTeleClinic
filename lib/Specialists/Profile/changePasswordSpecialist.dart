@@ -4,28 +4,27 @@ import 'package:flutter/material.dart';
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_teleclinic/Main/main.dart';
+import 'package:my_teleclinic/Specialists/Profile/specialist_home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/patient.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import '../Patients/Profile/patient_home_page.dart';
-
 void main() {
   runApp(const MaterialApp(
-    home: ChangePasswordScreen(),
+    home: ChangePasswordScreenSpecialist(),
   ));
 }
 
-class ChangePasswordScreen extends StatefulWidget {
-  const ChangePasswordScreen({Key? key}) : super(key: key);
+class ChangePasswordScreenSpecialist extends StatefulWidget {
+  const ChangePasswordScreenSpecialist({Key? key}) : super(key: key);
 
   @override
-  _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
+  _ChangePasswordScreenSpecialistState createState() => _ChangePasswordScreenSpecialistState();
 }
 
-class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+class _ChangePasswordScreenSpecialistState extends State<ChangePasswordScreenSpecialist> {
 
   bool _isOldPasswordVisible = true;
   bool _isNewPasswordVisible = true;
@@ -40,69 +39,58 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   TextEditingController confirmPasswordController = TextEditingController();
   bool isPhoneNumberExist = false;
 
-  int? patientID;
+  int? specialistID;
 
   @override
   void initState() {
     super.initState();
-    _getPatientID();
+    _getSpecialistID();
   }
 
-  Future<void> _getPatientID() async {
+  Future<void> _getSpecialistID() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      patientID = prefs.getInt('patientID');
+      specialistID = prefs.getInt('specialistID');
     });
   }
 
   Future<void> updatePassword() async {
     try {
-       await _getPatientID();
+      await _getSpecialistID();
 
       final response = await http.post(
-        Uri.http("${MyApp.ipAddress}", '/teleclinic/changePassword1.php', {'q': '{http}'}),
+        Uri.http(MyApp.ipAddress, '/teleclinic/changePasswordSpecialist.php', {'q': '{http}'}),
         body: {
-          'patientID': patientID.toString(),
+          'specialistID': specialistID.toString(),
           'oldPassword': oldPasswordController.text,
           'newPassword': newPasswordController.text,
         },
       );
 
-     // Inside the updatePassword() method
-     if (response.statusCode == 200) {
-       final Map<String, dynamic> responseData = json.decode(response.body);
-       if (responseData['Success'] != null && responseData['Success']) {
+      // Inside the updatePassword() method
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        if (responseData['Success'] != null && responseData['Success']) {
 
-        setState(() {
-          oldPasswordController.clear();
-          newPasswordController.clear();
-          confirmPasswordController.clear();
-        });
+          setState(() {
+            oldPasswordController.clear();
+            newPasswordController.clear();
+            confirmPasswordController.clear();
+          });
 
-        Fluttertoast.showToast(
-          msg: "Hello",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          // backgroundColor: Colors.blue, // You can customize the color
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-        Navigator.push(
+          showToastMessage('Password updated successfully', Colors.green);
+
+          Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => HomePage(
-                phone: "phone",
-                patientName: "patientName",
-                patientID: 0, // Replace with actual patientID
-              ),
-            )
-        );
+              builder: (context) => SpecialistHomeScreen(),
 
-       } else {
-         showToastMessage(responseData['message'] ?? 'Failed to Update Password', Colors.red);
-       }
-     }
+            ),
+          );
+        } else {
+          showToastMessage(responseData['message'] ?? 'Failed to Update Password', Colors.red);
+        }
+      }
     } catch (error) {
       print('Error updating password: $error');
     }
@@ -512,11 +500,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                 color: Colors.white, size: 15)),
                       ),
                       SizedBox(width: 9),
-                          Text(
-                              "At least 1 uppercase & lowercase, 1 digit, 1 symbol"),
-
-
-
+                      Text(
+                          "  At least 1 uppercase & lowercase, 1 digit, 1 symbol")
                     ],
                   ),
 
@@ -553,7 +538,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               height: 45,
               child: ElevatedButton(
                 onPressed: () {
-                    checkAndSave();
+                  checkAndSave();
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(

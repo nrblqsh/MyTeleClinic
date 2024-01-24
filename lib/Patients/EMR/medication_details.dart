@@ -108,207 +108,217 @@ class _MedicationDetailsState extends State<MedicationDetails> {
         appBar: AppBar(
           toolbarHeight: 60,
           backgroundColor: Colors.white,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios, // Custom back button icon
+              color: Colors.blue, // Adjust color as needed
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           title: Center(
             child: Image.asset(
               "asset/MYTeleClinic.png",
               width: 594,
-              height: 258,
+              height: 350,
             ),
           ),
         ),
         body: SingleChildScrollView(
             child: Column(children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 25, right: 20),
-            child: Text(
-              " Consultation Details",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 28,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          FutureBuilder<Consultation?>(
-            future: generateConsultation(consultationID),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    value: 0.8,
-                  ),
-                );
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Text('Error: ${snapshot.error}'),
-                );
-              } else if (snapshot.data == null) {
-                return Center(
-                  child: Text('No data available'),
-                );
-              } else {
-                return Container(
-                    width: double.infinity, // Make it full width
-                    margin: EdgeInsets.all(5),
-                    child: Padding(
-                        padding: const EdgeInsets.only(left: 70.0),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8),
-                                child: RichText(
-                                  text: TextSpan(
-                                    text: 'Symptom : ',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
-                                    children: [
-                                      TextSpan(
-                                        text:
-                                            '${snapshot.data!.consultationSymptom} ',
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.blue),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8),
-                                child: RichText(
-                                  text: TextSpan(
-                                    text: 'Treatment :',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
-                                    children: [
-                                      TextSpan(
-                                        text:
-                                            '${snapshot.data!.consultationTreatment}',
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.blue),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ])));
-              }
-            },
-          ),
-          SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Text(
-                      'Medication Details',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+              Padding(
+                padding: const EdgeInsets.only(top: 25, right: 20),
+                child: Text(
+                  " Consultation Details",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    color: Colors.black,
                   ),
                 ),
-                Container(
-                  child: FutureBuilder<List<Medication>>(
-                    future: fetchPatientMedication(consultationID),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else if (snapshot.hasData) {
-                        List<Medication> meds = snapshot.data!;
-
-                        if (meds.isNotEmpty) {
-                          return ListView.builder(
-                            itemCount: meds.length,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, index) {
-                              Medication med = meds[index];
-                              return Card(
-                                child: InkWell(
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                        left: 15, right: 15, top: 5),
-                                    child: Column(
-                                      children: [
-                                        SizedBox(
-                                          width: 700,
-                                          height: 100,
-                                          child: Container(
-                                            padding: EdgeInsets.only(
-                                                left: 12, right: 12, top: 10),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Colors.blueAccent),
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(12.0)),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.blueGrey,
-                                                  offset:
-                                                      const Offset(5.0, 5.0),
-                                                  blurRadius: 10.0,
-                                                  spreadRadius: 2.0,
-                                                ),
-                                                BoxShadow(
-                                                  color: Colors.white,
-                                                  offset:
-                                                      const Offset(0.0, 0.0),
-                                                  blurRadius: 0.0,
-                                                  spreadRadius: 0.0,
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Text(
-                                                  'Medicine Name: ${med.medGeneral}\n'
-                                                  'Medicine Type: ${med.medForm}\n'
-                                                  'Medicine Dosage: ${med.dosage}\n'
-                                                  'Medicine Instruction: ${med.medInstruction}\n',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+              ),
+              FutureBuilder<Consultation?>(
+                future: generateConsultation(consultationID),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        value: 0.8,
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Error: ${snapshot.error}'),
+                    );
+                  } else if (snapshot.data == null) {
+                    return Center(
+                      child: Text('No data available'),
+                    );
+                  } else {
+                    return Container(
+                        width: double.infinity, // Make it full width
+                        margin: EdgeInsets.all(5),
+                        child: Padding(
+                            padding: const EdgeInsets.only(left: 70.0),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 8),
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: 'Symptom : ',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                        children: [
+                                          TextSpan(
+                                            text:
+                                            '${snapshot.data!.consultationSymptom} ',
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.blue),
                                           ),
-                                        )
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 8),
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: 'Treatment :',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                        children: [
+                                          TextSpan(
+                                            text:
+                                            '${snapshot.data!.consultationTreatment}',
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.blue),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ])));
+                  }
+                },
+              ),
+              SizedBox(height: 30,),
+              SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Medication Details',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      child: FutureBuilder<List<Medication>>(
+                        future: fetchPatientMedication(consultationID),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Error: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            List<Medication> meds = snapshot.data!;
+
+                            if (meds.isNotEmpty) {
+                              return ListView.builder(
+                                itemCount: meds.length,
+                                shrinkWrap: true,
+                                itemBuilder: (BuildContext context, index) {
+                                  Medication med = meds[index];
+                                  return Card(
+                                    child: InkWell(
+                                      child: Container(
+                                        padding: EdgeInsets.only(
+                                            left: 15, right: 15, top: 5),
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              width: 700,
+                                              height: 100,
+                                              child: Container(
+                                                padding: EdgeInsets.only(
+                                                    left: 12, right: 12, top: 10),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: Colors.blueAccent),
+                                                  borderRadius: BorderRadius.all(
+                                                      Radius.circular(12.0)),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.blueGrey,
+                                                      offset:
+                                                      const Offset(5.0, 5.0),
+                                                      blurRadius: 10.0,
+                                                      spreadRadius: 2.0,
+                                                    ),
+                                                    BoxShadow(
+                                                      color: Colors.white,
+                                                      offset:
+                                                      const Offset(0.0, 0.0),
+                                                      blurRadius: 0.0,
+                                                      spreadRadius: 0.0,
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Text(
+                                                      'Medicine Name: ${med.medGeneral}\n'
+                                                          'Type: ${med.medForm}\n'
+                                                          'Dosage: ${med.dosage}\n'
+                                                          'Instruction: ${med.medInstruction}\n',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
                               );
-                            },
-                          );
-                        } else {
-                          return Center(child: Text('No history available'));
-                        }
-                      } else {
-                        return Center(child: Text('No data available'));
-                      }
-                    },
-                  ),
+                            } else {
+                              return Center(child: Text('No history available'));
+                            }
+                          } else {
+                            return Center(child: Text('No data available'));
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ])));
+              ),
+            ])));
   }
 }

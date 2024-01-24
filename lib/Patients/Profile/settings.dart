@@ -23,8 +23,8 @@ import 'editProfile1.dart';
 // }
 
 class SettingsScreen extends StatefulWidget {
-   final int patientID;
-       int _currentIndex = 4;
+  final int patientID;
+  int _currentIndex = 4;
 
 
   SettingsScreen({required this.patientID});
@@ -36,8 +36,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late int patientID;
   String? patientName;
   String? phoneNumber;
-   String phone='';
-   String name = " ";
+  String phone='';
+  String name = " ";
   Uint8List? patientImage;
 
 
@@ -96,7 +96,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       print("Patient Information:");
       print("Name: $patientName");
       print("Phone: $phoneNumber");
-;
+      ;
     } else {
       print('No patient data available');
     }
@@ -232,269 +232,294 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     int _currentIndex =4;
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 70,
-        backgroundColor: Colors.white,
+        appBar: AppBar(
+          toolbarHeight: 70,
+          backgroundColor: Colors.white,
 
-        title: Center(
-          child: Image.asset(
-            "asset/MYTeleClinic.png",
-            width: 594,
-            height: 258,
+          title: Center(
+            child: Image.asset(
+              "asset/MYTeleClinic.png",
+              width: 594,
+              height: 258,
+            ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                padding: EdgeInsets.only(left: 20),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      key: UniqueKey(), // Add this line
-                      radius: 45,
-                      backgroundImage: _getImageProvider(),
-                    ),
-                    SizedBox(height: 5),
-                    Padding(
-                      padding: const EdgeInsets.only(top:25.0, left: 20),
-                      child: Container(
-                        child: Column(
-                          children: [
-                            Container(
-                              child: Text(
-                                patientName?.isEmpty ?? true ? name : patientName!,
-                                style: TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(height: 20),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        key: UniqueKey(), // Add this line
+                        radius: 45,
+                        backgroundImage: _getImageProvider(),
+                      ),
+                      SizedBox(height: 5),
+                      Padding(
+                        padding: const EdgeInsets.only(top:25.0, left: 20),
+                        child: Container(
+                          child: Column(
+                            children: [
+                              Container(
+                                child: Text(
+                                  patientName?.isEmpty ?? true ? name : patientName!,
+                                  style: TextStyle(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                            ),
 
-                                 Padding(
-                                   padding: const EdgeInsets.only(right:10.0),
-                                   child: Container(
+                              Padding(
+                                padding: const EdgeInsets.only(right:10.0),
+                                child: Container(
 
 
-                                     child: Text(
-                                      phoneNumber?.isEmpty ?? true ? "+6$phone" :
-                                      "+6$phoneNumber"!,
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  child: Text(
+                                    phoneNumber?.isEmpty ?? true ? "+6$phone" :
+                                    "+6$phoneNumber"!,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
-                                   ),
-                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    )
+                      )
 
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15.0, top: 40.0),
-              child: Row(
-                children: <Widget>[
-                  Text(
-                    'My account',
-                    style: TextStyle(
-                      decoration: TextDecoration.none,
-                      fontSize: 30.0,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20.0),
-
-            settings('Edit Profile', () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => EditProfile1()),
-              );
-            }),
-            settings('Change Password', () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ChangePasswordScreen())
-              );
-            }),
-
-            Padding(
-              padding: const EdgeInsets.only(left: 15.0, top: 5.0),
-              child: Row(
-                children: <Widget>[
-                  Text(
-                    'General',
-                    style: TextStyle(
+              Padding(
+                padding: const EdgeInsets.only(left: 15.0, top: 40.0),
+                child: Row(
+                  children: <Widget>[
+                    Text(
+                      'My account',
+                      style: TextStyle(
                         decoration: TextDecoration.none,
                         fontSize: 30.0,
                         fontFamily: 'Inter',
-                        fontWeight: FontWeight.w700),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20.0),
-
-            general('Help Centre', () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => GeneralPage(
-                    title: 'Help Center',
-                    generalItems: [
-                      GeneralItem(
-                        question: 'How do I create an account?',
-                        answer: 'To create an account, go to the Settings screen -> select "Create Account."',
+                        fontWeight: FontWeight.w700,
                       ),
-                      // Add more GeneralItem as needed
-                      GeneralItem(
-                        question: 'I forgot my password. What should I do?',
-                        answer: 'If you forgot your password, you can use the'
-                            ' "Forgot Password" feature on the login screen. '
-                            'Follow the prompts to reset your password.',
-                      ),
-                      GeneralItem(
-                        question: 'How can I contact support?',
-                        answer: 'For support, please email us at '
-                            'MyTeleClinic@UTeM.com.'
-                            ' We will get back to you as soon as possible.',
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }, [
-              GeneralItem(
-                question: 'How do I create an account?',
-                answer: 'To create an account, go to the Settings screen -> select "Create Account."',
-              ),
-            ]),
-
-
-            general('About Us', () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => GeneralPage(
-                    title: 'About Us',
-                    generalItems: [
-                      GeneralItem(
-                        question: 'Our Story',
-                        // You can include an Image widget along with text
-                        answer: 'we are from Faculty of Information Technology'
-
-                            '![Our Story Image](asset/MYTeleClinic.png)', // Replace with your image path
-                      ),
-                      // Add more GeneralItem as needed
-                    ],
-                  ),
-                ),
-              );
-            }, [
-              GeneralItem(
-                question: 'How do I create an account?',
-                answer: 'To create an account, go to the Settings screen -> select "Create Account."',
-              ),
-            ]),
-
-            general('Terms and Condition', () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => GeneralPage(
-                    title: 'Terms and condition',
-                    generalItems: [
-                      GeneralItem(
-                        question: 'Our Story',
-                        // You can include an Image widget along with text
-                        answer: 'we are from Faculty of Information Technology'
-
-                            '![Our Story Image](asset/MYTeleClinic.png)', // Replace with your image path
-                      ),
-                      // Add more GeneralItem as needed
-                    ],
-                  ),
-                ),
-              );
-            }, [
-              GeneralItem(
-                question: 'How do I create an account?',
-                answer: 'To create an account, go to the Settings screen -> select "Create Account."',
-              ),
-            ]),
-
-            SizedBox(
-              width: 260,
-              height: 65,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 17.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text("Log Out"),
-                          content: Text("Are you sure you want to log out?"),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-
-                                showSnackBar("Logged out successfully");
-
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                                );
-                              },
-                              child: Text("Log Out"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
                     ),
-                    backgroundColor: Color(hexColor('C73B3B')),
-                  ),
-                  child: Text(
-                    'Log Out',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
+                  ],
+                ),
+              ),
+              SizedBox(height: 20.0),
+
+              settings('Edit Profile', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EditProfile1()),
+                );
+              }),
+              settings('Change Password', () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ChangePasswordScreen())
+                );
+              }),
+
+              Padding(
+                padding: const EdgeInsets.only(left: 15.0, top: 5.0),
+                child: Row(
+                  children: <Widget>[
+                    Text(
+                      'General',
+                      style: TextStyle(
+                          decoration: TextDecoration.none,
+                          fontSize: 30.0,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20.0),
+
+              general('Help Centre', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GeneralPage(
+                      title: 'Help Center',
+                      generalItems: [
+                        GeneralItem(
+                          question: 'How do I create an account?',
+                          answer: 'To create an account, go to the Settings screen -> select "Create Account."',
+                        ),
+                        // Add more GeneralItem as needed
+                        GeneralItem(
+                          question: 'I forgot my password. What should I do?',
+                          answer: 'If you forgot your password, you can use the'
+                              ' "Forgot Password" feature on the login screen. '
+                              'Follow the prompts to reset your password.',
+                        ),
+                        GeneralItem(
+                          question: 'How can I contact support?',
+                          answer: 'For support, please email us at '
+                              'MyTeleClinic@UTeM.com.'
+                              ' We will get back to you as soon as possible.',
+                        ),
+                      ],
                     ),
                   ),
+                );
+              }, [
+                GeneralItem(
+                  question: 'How do I create an account?',
+                  answer: 'To create an account, go to the Settings screen -> select "Create Account."',
+                ),
+              ]),
+
+
+              general('About Us', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GeneralPage(
+                      title: 'About Us',
+                      generalItems: [
+                        GeneralItem(
+                          question: 'Our Story',
+                          // You can include an Image widget along with text
+                          answer: 'We are group 16 from Faculty of Information Technology, UTeM, working on My TeleClinic.\n\n'
+                              'My TeleClinic is a project aimed at providing a convenient and accessible platform for telemedicine services.\n\n '
+                              'With a focus on leveraging technology to enhance healthcare, our team is dedicated to creating an innovative solution '
+                              'that connects patients with healthcare professionals remotely.\n\n Through My TeleClinic, we aspire to improve healthcare '
+                              'accessibility, reduce barriers to medical consultations, and ultimately contribute to the well-being of our community.',
+                          // Replace with your image path
+                        ),
+                        // Add more GeneralItem as needed
+                      ],
+                    ),
+                  ),
+                );
+              }, [
+                GeneralItem(
+                  question: 'How do I create an account?',
+                  answer: 'To create an account, go to the Settings screen -> select "Create Account."',
+                ),
+              ]),
+
+              general('Terms and Condition', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GeneralPage(
+                      title: 'Terms and condition',
+                      generalItems: [
+                        GeneralItem(
+                          question: 'User Registration',
+                          // You can include an Image widget along with text
+                          answer: "   - Register an account to use the App.\n"
+                              "   - Provide accurate information during registration.\n"
+                              "   - Maintain the confidentiality of your account.\n\n", // Replace with your image path
+                        ),
+                        GeneralItem(
+                          question: 'Telemedicine Services',
+                          // You can include an Image widget along with text
+                          answer:   "   - Consult healthcare professionals remotely.\n"
+                              "   - Not a substitute for in-person medical care.\n\n", // Replace with your image path
+                        ),
+                        GeneralItem(
+                          question: 'Privacy Policy',
+                          // You can include an Image widget along with text
+                          answer:  "   - Your use is subject to our Privacy Policy.\n\n", // Replace with your image path
+                        ),
+                        GeneralItem(
+                          question: 'Medical Advice',
+                          // You can include an Image widget along with text
+                          answer:  "   - Information is for informational purposes only.\n"
+                              "   - Consult a qualified healthcare professional for advice.\n\n", // Replace with your image path
+                        ),
+                        GeneralItem(
+                          question: 'Contact',
+                          // You can include an Image widget along with text
+                          answer:  "Contact us at myteleclinic@gmail.my\n\n", // Replace with your image path
+                        ),
+                        // Add more GeneralItem as needed
+                      ],
+                    ),
+                  ),
+                );
+              }, [
+                GeneralItem(
+                  question: 'How do I create an account?',
+                  answer: 'To create an account, go to the Settings screen -> select "Create Account."',
+                ),
+              ]),
+
+              SizedBox(
+                width: 260,
+                height: 65,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 17.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text("Log Out"),
+                            content: Text("Are you sure you want to log out?"),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+
+                                  showSnackBar("Logged out successfully");
+
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                                  );
+                                },
+                                child: Text("Log Out"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      backgroundColor: Color(hexColor('C73B3B')),
+                    ),
+                    child: Text(
+                      'Log Out',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
         bottomNavigationBar: BottomNavigationBar(
 
           currentIndex: _currentIndex,

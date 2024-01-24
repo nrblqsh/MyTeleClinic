@@ -102,10 +102,11 @@ class _MyCallState extends State<MyCall> {
     medInstructionEditingController = TextEditingController();
 
     // Initialize the call timer
-    const Duration callTimeout = const Duration(minutes: 10); // Set your desired timeout duration
+    const Duration callTimeout = const Duration(minutes: 15); // Set your desired timeout duration
     _callTimer = Timer(callTimeout, () {
       // Call timeout occurred, perform actions here
       onCallTimeout();
+
     });
   }
 
@@ -122,11 +123,9 @@ class _MyCallState extends State<MyCall> {
   void onCallTimeout() {
     // Perform actions when the call times out
     print('Call timeout occurred');
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                SpecialistHomeScreen()));
+    Navigator.of(context).pop(true);
+   super.dispose();
+
 
     // Add logic to hang up the call or handle the timeout scenario
   }
@@ -219,8 +218,9 @@ class _MyCallState extends State<MyCall> {
 
                     config: ZegoUIKitPrebuiltCallConfig
                         .oneOnOneVideoCall(),
-                    events:
-                    ZegoUIKitPrebuiltCallEvents(
+                    events: ZegoUIKitPrebuiltCallEvents(
+
+
 
                       onHangUpConfirmation: (BuildContext context) async {
                         bool shouldHangUp = false;
@@ -292,10 +292,9 @@ class _MyCallState extends State<MyCall> {
                                           style:
                                               TextStyle(color: Colors.white70)),
                                       onPressed: () {
-                                        shouldHangUp = false;
 
-                                        Navigator.of(context).pop(false);
-                                      }),
+
+                                        Navigator.of(context).pop(false);                                    }),
                                   ElevatedButton(
                                       child: const Text("Exit"),
                                       onPressed: () async {
@@ -329,89 +328,39 @@ class _MyCallState extends State<MyCall> {
                                         if (response.statusCode == 200) {
                                           print('Status updated successfully');
 
-                                          // Update the UI with the new status
 
-                                          // Close the existing dialog and show the updated one
-                                          // Navigator.of(context).pop(true);
-                                          //  Navigator.push(
-                                          //    context,
-                                          //    MaterialPageRoute(
-                                          //      builder: (context) => MenuScreen
-                                          //        (specialistName: specialistName,
-                                          //        logStatus: 'Done',
-                                          //        specialistID: specialistID,
-                                          //        todayConsultations: [],
-                                          //        fetchTodayConsultations: () {  },
-                                          //        navigateToPage: (int ) {  },
-                                          //
-                                          //      ), // Replace YourSpecificPage with the actual widget/page you want to navigate to
-                                          //    ),
-                                          //  );
+
+
+                                          Navigator.of(context).pop();
+
+
                                           shouldHangUp = true;
 
-                                          Navigator.of(context).pop(true);
-                                          // Navigator.push(
-                                          //     context,
-                                          //     MaterialPageRoute(
-                                          //         builder: (context) =>
-                                          //             SpecialistHomeScreen()));
 
-                                          // else if(widget.roleId==0){
-                                          //   Navigator.push(context, MaterialPageRoute(builder
-                                          //       : (context)=>HomePage(phone:
-                                          //   "phone", patientName: "patientName",
-                                          //       patientID: patientID)));
-                                          // }
                                         }
 
-                                        // else if(shouldHangUp || widget.roleId==0){
-                                        //   print("statusX");
-                                        //   Navigator.push(context, MaterialPageRoute(builder
-                                        //             : (context)=>HomePage(phone:
-                                        //         "phone", patientName: "patientName",
-                                        //             patientID: patientID)));
-                                        //    //Navigator.of(context).pop(true);
-                                        //
-                                        //
-                                        // }
-                                      }),
+                                      }
+
+                                      ),
+
                                 ],
+
                               );
+
                             },
+
+
                           );
+
                         }
 
 
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //       builder: (context) => HomePage(
-                          //         phone: "phone",
-                          //         patientName: "patientName",
-                          //         patientID: patientID, // Replace with actual patientID
-                          //       ),
-                          //     )
-                          // );
 
 
-                        // }   if (shouldHangUp || widget.roleId == 0) {
-                        //   print("Hang up or navigate based on shouldHangUp or roleId");
-                        //
-                        //   // If roleId is 0, directly navigate to the appropriate screen
-                        //   if (widget.roleId == 0) {
-                        //     Navigator.push(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //         builder: (context) => HomePage(
-                        //           phone: "phone",
-                        //           patientName: "patientName",
-                        //           patientID: patientID, // Replace with actual patientID
-                        //         ),
-                        //       ),
-                        //     );
-                        //   }
-                        // }
                       },
+
+
+
                     ),
                   ),
                 ),
@@ -631,7 +580,7 @@ class _MyCallState extends State<MyCall> {
                                                         // Display selected medications
                                                         return ListTile(
                                                           title: Text(
-                                                            '${selectedMedications[index]['MedGeneral'] ?? ''} - ${selectedMedications[index]['MedForm'] ?? ''} - ${selectedMedications[index]['Dosage'] ?? ''}',
+                                                            '${selectedMedications[index]['MedGeneral'] ?? ''}(${selectedMedications[index]['Dosage'] ?? ''}) ${selectedMedications[index]['MedForm'] ?? ''} - ${selectedMedications[index]['Dosage'] ?? ''}',
                                                           ),
                                                           onTap: () {
                                                             print(
@@ -655,7 +604,7 @@ class _MyCallState extends State<MyCall> {
                                                                     .length;
                                                         return ListTile(
                                                           title: Text(
-                                                            '${medicationSuggestions[suggestionIndex]['MedGeneral'] ?? ''} - ${medicationSuggestions[suggestionIndex]['MedForm'] ?? ''} - ${medicationSuggestions[suggestionIndex]['Dosage'] ?? ''}',
+                                                            '${medicationSuggestions[suggestionIndex]['MedGeneral'] ?? ''}(${medicationSuggestions[suggestionIndex]['Dosage'] ?? ''}) ${medicationSuggestions[suggestionIndex]['MedForm'] ?? ''}',
                                                           ),
                                                           onTap: () {
                                                             setState(() {
@@ -970,7 +919,7 @@ class _MyCallState extends State<MyCall> {
                       });
                     },
                     child: Icon(
-                      isContainerVisible ? Icons.minimize : Icons.maximize,
+                      isContainerVisible ? Icons.aspect_ratio : Icons.aspect_ratio_sharp,
                       color: Colors.blue,
                       size: 30.0,
                     ),
@@ -1134,3 +1083,22 @@ class _MyCallState extends State<MyCall> {
 //
 //       )
 // }
+
+
+
+class TestWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // This is an empty Flutter widget
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                SpecialistHomeScreen()));
+
+    return Container(
+
+    );
+  }
+}

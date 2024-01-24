@@ -45,7 +45,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
 
   String _formatDateTime(String dateTimeString) {
     DateTime dateTime = DateTime.parse(dateTimeString); // Parse the string into a DateTime object
-    return DateFormat('MMMM dd, yyyy - hh:mm a').format(dateTime); // Format the DateTime object
+    return DateFormat('dd MMMM yyyy - hh:mm a').format(dateTime); // Format the DateTime object
   }
 
   @override
@@ -73,7 +73,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
           .toList();
 
       // Sort patientConsultations based on appointment date in descending order
-      patientConsultations.sort((a, b) => b.consultationDateTime.compareTo(a.consultationDateTime));
+      // patientConsultations.sort((a, b) => b.consultationDateTime.compareTo(a.consultationDateTime));
 
       return patientConsultations;
     } else {
@@ -88,6 +88,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
+      print ('response data ${response.body}');
       return Specialist.fromJson(responseData);
     } else {
       throw Exception('Failed to fetch specialist details');
@@ -157,15 +158,15 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
               : snapshot.hasData
               ? SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+             // mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.only(left: 10.0, top: 10),
                   child: Center(
                     child: Text(
-                      'LIST APPOINTMENT',
+                      'List Appointment',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 28,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -252,7 +253,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
                                                   'Consultation ID is null');
                                             }
                                           }
-                                          : null, // Disable button if overdue
+                                              : null, // Disable button if overdue
                                           style: ElevatedButton
                                               .styleFrom(
                                             backgroundColor:
@@ -396,7 +397,7 @@ class _ViewAppointmentScreenState extends State<ViewAppointmentScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
-            label: 'View Booking',
+            label: 'View Appointment',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),

@@ -11,7 +11,7 @@ import '../../Patients/EMR/current_vital.dart';
 // }
 
 class PatientInfoScreen extends StatefulWidget {
-  late int patientID=0;
+  int patientID;
 
   PatientInfoScreen({required this.patientID});
 
@@ -20,7 +20,7 @@ class PatientInfoScreen extends StatefulWidget {
 }
 
 class _PatientInfoScreenState  extends State<PatientInfoScreen> {
-  late int patientID=0;
+  late int patientID;
   late String patientName;
 
   @override

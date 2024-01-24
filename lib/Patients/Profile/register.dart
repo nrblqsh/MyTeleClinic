@@ -39,13 +39,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,);
     }
-    else if(!_passwordTotalConstraints ){
+     if(!_passwordTotalConstraints ){
       print("password salah");
       Fluttertoast.showToast(msg: "Your Password does not fulfill the requirement",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,);
     }
-    else if(int.parse(phoneController.text)<=8 &&
+    if(int.parse(phoneController.text)<=8 &&
         int.parse(phoneController.text)>=12){
       print("numberphone salah");
       showDialog(
@@ -289,8 +289,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   child: Center(child: Icon(Icons.check, color: Colors.white, size: 15)),
                 ),
-                SizedBox(width: 10),
-                Text(" At least uppercase and lowercase, 1 digit, 1 symbol")
+                SizedBox(width: 6),
+                Text(" At least 1 uppercase & lowercase, 1 digit, 1 symbol")
               ],
             ),
             SizedBox(height: 10),  // Add space between the two rows

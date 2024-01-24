@@ -86,11 +86,11 @@ class _ConsultationHistoryState
             Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 8.0, top: 20),
                 child: Text(
                   'Consultation History',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -167,10 +167,14 @@ class _ConsultationHistoryState
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: <Widget>[
+                                              Text( '${consult.specialistName}',
+                                                style: TextStyle(
+                                                  fontSize: 20, fontWeight: FontWeight.bold
+                                                ),),
+                                              SizedBox(height: 2,),
                                               Text(
                                                 'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
-                                                    'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}\n'
-                                                    'Specialist: ${consult.specialistName}\n',
+                                                    'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}',
                                                 //'Consultation Treatment: ${consult.consultationTreatment}\n',
                                                 style: TextStyle(
                                                   fontSize: 14,

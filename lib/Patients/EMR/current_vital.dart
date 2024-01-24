@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:my_teleclinic/Main/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:my_teleclinic/Model/vital_info.dart';
@@ -19,7 +20,7 @@ class CurrentVitalInfoScreen extends StatefulWidget {
 }
 
 class _CurrentVitalInfoScreenState extends State<CurrentVitalInfoScreen> {
-  late int patientID;
+  late int patientID=0;
   late String patientName;
   late VitalInfo vitalInfo;
 
@@ -46,7 +47,7 @@ class _CurrentVitalInfoScreenState extends State<CurrentVitalInfoScreen> {
   Future<VitalInfo?> generateVitalInfo() async {
     try {
       var url =
-          'http://192.168.0.116/teleclinic/currentVitalInfo.php?patientID=$patientID';
+          'http://${MyApp.ipAddress}/teleclinic/currentVitalInfo.php?patientID=$patientID';
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {

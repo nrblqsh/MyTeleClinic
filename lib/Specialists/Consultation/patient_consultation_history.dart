@@ -29,6 +29,7 @@ class _PatientConsultationHistoryState
   String consultationStatus = '';
   String consultationSymptom = '';
   String consultationTreatment = '';
+
   // String medGeneral = '';
   // String medForm = '';
   late List<Consultation> todayConsultations = [];
@@ -39,8 +40,8 @@ class _PatientConsultationHistoryState
     _loadDetails();
   }
 
-  Future<List<Consultation>> fetchConsultationByPatient(
-      int specialistID, int patientID) async {
+  Future<List<Consultation>> fetchConsultationByPatient(int specialistID,
+      int patientID) async {
     Consultation consultation = Consultation(
       patientID: patientID,
       consultationTreatment: consultationTreatment,
@@ -54,7 +55,6 @@ class _PatientConsultationHistoryState
     return await consultation.fetchConsultationByPatient(
         specialistID, patientID);
   }
-
 
 
   Future<void> _loadDetails() async {
@@ -95,11 +95,12 @@ class _PatientConsultationHistoryState
             Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 12.0,
+                    top: 12),
                 child: Text(
                   'Consultation History', // Add your test text here
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -115,7 +116,7 @@ class _PatientConsultationHistoryState
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
                     List<Consultation>? consultations =
-                        snapshot.data as List<Consultation>?;
+                    snapshot.data as List<Consultation>?;
 
                     if (consultations != null && consultations.isNotEmpty) {
                       return ListView.builder(
@@ -158,18 +159,53 @@ class _PatientConsultationHistoryState
                                         ),
                                         child: Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: <Widget>[
                                             Text(
-                                              'Date: ${DateFormat('dd/MM/yyyy').format(consult.consultationDateTime)}\n'
-                                              'Time: ${DateFormat('hh:mm a').format(consult.consultationDateTime)}\n'
-                                              'Status: ${consult.consultationStatus}\n'
-                                              'Consultation Symptom: ${consult.consultationSymptom}\n'
-                                              'Consultation Treatment: ${consult.consultationTreatment}\n',
+                                              'Date: ${DateFormat('dd/MM/yyyy')
+                                                  .format(consult
+                                                  .consultationDateTime)}\n'
+                                                  'Time: ${DateFormat('hh:mm a')
+                                                  .format(consult
+                                                  .consultationDateTime)}',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16),),
+                                            Text(
+                                              'Symptom: ${consult
+                                                  .consultationSymptom}\n'
+                                                  'Treatment: ${consult
+                                                  .consultationTreatment}',
+                                                  // 'Status: ${consult
+                                                  // .consultationStatus}\n',
                                               style: TextStyle(
                                                 fontSize: 14,
                                               ),
                                             ),
+
+                                            Container(
+                                                height: 23,
+                                                width: 75,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius
+                                                      .circular(20),
+                                                  color: _getStatusColor(consult
+                                                      .consultationStatus),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    '${consult
+                                                        .consultationStatus}',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight
+                                                            .normal,
+                                                        color: Colors.white
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+
                                           ],
                                         ),
                                       ),
@@ -220,4 +256,27 @@ class _PatientConsultationHistoryState
 //     },
 //   );
 // }
+
+  Color hexColor(String color) {
+    String newColor = '0xff' + color.replaceAll('#', '');
+    int finalColor = int.parse(newColor);
+    return Color(finalColor);
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Accepted':
+        return Colors.green;
+      case 'Decline':
+        return Colors.red;
+      case 'Pending':
+      // Use your hexColor function here for the desired color
+        return hexColor('FFC000');
+      case 'Done':
+      // Use your hexColor function here for the desired color
+        return hexColor('024362');
+      default:
+        return Colors.transparent; // Default color
+    }
+  }
 }
